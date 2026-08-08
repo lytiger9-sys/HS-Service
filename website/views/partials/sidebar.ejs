@@ -1,0 +1,24 @@
+<aside class="sidebar">
+  <div class="brand">
+    <span class="brand-kicker">HS Service</span>
+    <h1><%= botName %></h1>
+    <p><%= guild.name %></p>
+  </div>
+
+  <% if (currentUser) { %>
+    <%- include('sidebar-user', { currentUser }) %>
+  <% } %>
+
+  <nav class="sidebar-nav">
+    <% sections.forEach((section, index) => { %>
+      <button type="button" class="sidebar-tab <%= activeSection === section.id ? 'is-active' : '' %>" data-tab="<%= section.id %>">
+        <span class="nav-index"><%= String(index + 1).padStart(2, "0") %></span>
+        <span class="nav-copy">
+          <strong class="nav-label"><%= section.label %></strong>
+          <span class="nav-description"><%= section.description %></span>
+        </span>
+        <span class="nav-arrow">&rarr;</span>
+      </button>
+    <% }) %>
+  </nav>
+</aside>

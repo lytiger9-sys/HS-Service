@@ -1,0 +1,33 @@
+<section class="grid two-up">
+  <article class="card">
+    <h3>활성 티켓</h3>
+    <div class="stack">
+      <% const activeTickets = overview.activeTickets || []; %>
+      <% activeTickets.slice(0, 5).forEach((ticket) => { %>
+        <div class="mini-item">
+          <strong><%= ticket.userTag || ticket.userId || "알 수 없음" %></strong>
+          <span><%= ticket.channelId ? `#${ticket.channelId}` : "채널 없음" %> · <%= formatDate(ticket.createdAt) %></span>
+        </div>
+      <% }) %>
+      <% if (!activeTickets.length) { %>
+        <p class="muted">활성 티켓이 없습니다.</p>
+      <% } %>
+    </div>
+  </article>
+
+  <article class="card">
+    <h3>최근 제재</h3>
+    <div class="stack">
+      <% const recentPunishments = overview.recentPunishments || []; %>
+      <% recentPunishments.slice(0, 5).forEach((entry) => { %>
+        <div class="mini-item">
+          <strong><%= entry.memberTag || entry.memberId || "알 수 없음" %></strong>
+          <span><%= entry.type %> · <%= formatDate(entry.createdAt) %></span>
+        </div>
+      <% }) %>
+      <% if (!recentPunishments.length) { %>
+        <p class="muted">최근 제재 기록이 없습니다.</p>
+      <% } %>
+    </div>
+  </article>
+</section>

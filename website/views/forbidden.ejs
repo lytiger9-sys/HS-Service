@@ -1,0 +1,49 @@
+<%- include('partials/head', { title: `${botName} 접근 거부` }) %>
+<body class="status-page forbidden-page">
+  <main class="status-shell">
+    <section class="status-card">
+      <p class="eyebrow">Access denied</p>
+      <h1>관리자 전용 대시보드입니다</h1>
+      <p class="muted">
+        <%= guildName %>의 관리자 계정만 이 대시보드에 들어올 수 있습니다.
+        현재 로그인한 계정에는 필요한 권한이 없습니다.
+      </p>
+
+      <% if (message) { %>
+        <div class="flash"><%= message %></div>
+      <% } %>
+
+      <div class="status-actions">
+        <a class="primary" href="/auth/discord">다른 계정으로 로그인</a>
+        <a class="secondary" href="/auth/logout">로그아웃</a>
+      </div>
+    </section>
+
+    <% if (currentUser) { %>
+      <aside class="status-card status-user">
+        <p class="eyebrow">Signed in</p>
+        <div class="status-user-row">
+          <img class="status-avatar" src="<%= currentUser.avatarUrl %>" alt="<%= currentUser.displayName %>" />
+          <div>
+            <strong><%= currentUser.displayName %></strong>
+            <p><%= currentUser.tag %></p>
+          </div>
+        </div>
+        <ul class="status-list">
+          <li>이 계정은 현재 로그인되어 있습니다.</li>
+          <li>관리자 권한이 확인되면 대시보드로 이동할 수 있습니다.</li>
+        </ul>
+      </aside>
+    <% } else { %>
+      <aside class="status-card status-user">
+        <p class="eyebrow">Next step</p>
+        <h2>권한이 있는 계정으로 다시 로그인하세요.</h2>
+        <ul class="status-list">
+          <li>관리자 권한이 있는 Discord 계정인지 확인하세요.</li>
+          <li>대상 서버에 참여한 상태여야 합니다.</li>
+        </ul>
+      </aside>
+    <% } %>
+  </main>
+</body>
+</html>

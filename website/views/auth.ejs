@@ -1,0 +1,38 @@
+<%- include('partials/head', { title: `${botName} 로그인` }) %>
+<body class="status-page auth-page">
+  <main class="status-shell">
+    <section class="status-card">
+      <p class="eyebrow">Discord OAuth</p>
+      <h1><%= botName %> 로그인</h1>
+      <p class="muted">
+        <%= guildName %>의 관리자 계정만 대시보드에 접근할 수 있습니다.
+        Discord 계정으로 인증하면 봇이 권한을 다시 확인합니다.
+      </p>
+
+      <% if (message) { %>
+        <div class="flash"><%= message %></div>
+      <% } %>
+
+      <div class="auth-badges">
+        <span class="auth-badge">Discord 계정 인증</span>
+        <span class="auth-badge">관리자 권한 확인</span>
+        <span class="auth-badge">MongoDB 세션 저장</span>
+      </div>
+
+      <div class="status-actions">
+        <a class="primary" href="/auth/discord">Discord로 로그인</a>
+      </div>
+    </section>
+
+    <aside class="status-card status-user">
+      <p class="eyebrow">Access</p>
+      <h2>이 페이지는 로그인 진입점입니다.</h2>
+      <ul class="status-list">
+        <li>로그인 후에도 서버 관리자만 대시보드로 이동할 수 있습니다.</li>
+        <li>세션은 MongoDB에 저장되어 새로고침 후에도 유지됩니다.</li>
+        <li>관리자가 아니면 접근이 거부됩니다.</li>
+      </ul>
+    </aside>
+  </main>
+</body>
+</html>

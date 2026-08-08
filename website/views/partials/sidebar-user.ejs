@@ -1,0 +1,12 @@
+<div class="sidebar-user">
+  <div class="sidebar-user-row">
+    <img class="user-avatar" src="<%= currentUser.avatarUrl %>" alt="<%= currentUser.displayName %>" />
+    <div class="sidebar-user-copy">
+      <span class="sidebar-user-kicker">Signed in</span>
+      <strong><%= currentUser.displayName %></strong>
+      <span><%= currentUser.tag %></span>
+    </div>
+  </div>
+
+  <a class="sidebar-logout" href="/auth/logout">로그아웃</a>
+</div>

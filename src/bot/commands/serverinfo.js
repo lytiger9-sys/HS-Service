@@ -1,0 +1,13 @@
+import { SlashCommandBuilder } from "discord.js";
+
+export default {
+  data: new SlashCommandBuilder()
+    .setName("serverinfo")
+    .setDescription("서버 인원, 봇 수, 채널 수를 보여줍니다."),
+
+  async execute(interaction, context) {
+    await interaction.deferReply({ ephemeral: true });
+    const embed = await context.services.serverInfo.buildInfoEmbed(interaction.guild);
+    return interaction.editReply({ embeds: [embed] });
+  }
+};
