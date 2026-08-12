@@ -36,6 +36,9 @@ export function createHoneypotService(context, guildState) {
     }
 
     const settings = (await context.services.settings.getSettings(guildId));
+    if (settings.honeypot?.enabled === false) {
+      return null;
+    }
     if (!settings.honeypot.channelId) {
       return null;
     }
@@ -74,6 +77,9 @@ export function createHoneypotService(context, guildState) {
     }
 
     const settings = (await context.services.settings.getSettings(message.guild.id)).honeypot;
+    if (settings.enabled === false) {
+      return false;
+    }
     if (!settings.channelId || message.channelId !== settings.channelId) {
       return false;
     }

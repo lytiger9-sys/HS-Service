@@ -9,6 +9,10 @@ export function createGuildStateService(context) {
     return context.store.patchGuild(guildId, updater, createDefaultGuildState);
   }
 
+  async function reset(guildId) {
+    return context.store.resetGuild(guildId, createDefaultGuildState);
+  }
+
   function snapshot(guildId) {
     return context.store.snapshotGuild(guildId);
   }
@@ -16,6 +20,7 @@ export function createGuildStateService(context) {
   return {
     ensure,
     patch,
+    reset,
     snapshot
   };
 }

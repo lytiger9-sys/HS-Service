@@ -5,16 +5,19 @@
 
     <main class="content">
       <% const panelClass = (panel) => `dashboard-panel${activeSection === panel ? '' : ' is-hidden'}`; %>
-      <% if (saved) { %>
-        <div class="flash">변경 사항이 저장되었습니다.</div>
-      <% } %>
+      <div class="save-toast" data-save-toast hidden aria-live="polite"></div>
 
       <section class="<%= panelClass('overview') %>" data-panel="overview">
         <section class="hero card">
-        <div>
-          <p class="eyebrow">Server Control</p>
-          <h2><%= guild.name %></h2>
-          <p class="muted">서버 정보, 자동 환영, 보안, 티켓, 투표, 로그 설정을 한곳에서 관리합니다.</p>
+        <div class="hero-top">
+          <div>
+            <p class="eyebrow">Server Control</p>
+            <h2><%= guild.name %></h2>
+            <p class="muted">서버 정보, 자동 환영, 보안, 티켓, 관리자 상태, 투표, 로그 설정을 한곳에서 관리합니다.</p>
+          </div>
+          <form class="hero-reset" method="post" action="/guild/<%= guild.id %>/reset" data-reset-form data-confirm-reset="true" data-confirm-message="이 서버의 데이터를 기본값으로 초기화할까요?">
+            <button class="ghost danger" type="submit">DB 초기화</button>
+          </form>
         </div>
         <div class="hero-grid">
           <div class="metric">
@@ -71,7 +74,8 @@
       </section>
 
       <section class="panel-stack <%= panelClass('administrators') %>" data-panel="administrators">
-        <%- include('partials/admins-panel', { administrators, formatDate }) %>
+        <%- include('partials/admins-panel', { administrators, staffMembers, formatDate }) %>
+        <%- include('partials/staff-panel', { guild, channels, settings, staffMembers, staffCounts, formatDate }) %>
       </section>
 
       <section class="panel-stack <%= panelClass('welcome') %>" data-panel="welcome">
@@ -81,15 +85,14 @@
               <p class="eyebrow">Welcome</p>
               <h3>환영 메시지</h3>
             </div>
-            <p class="muted">신규 입장 시 채널 임베드와 DM을 분리해서 보냅니다.</p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="welcome-settings-form" name="welcomeEnabled" <%= settings.welcome.enabled ? 'checked' : '' %> />
+              <span>환영 기능 활성화</span>
+            </label>
           </div>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/welcome">
+          <form class="settings-form" id="welcome-settings-form" method="post" action="/guild/<%= guild.id %>/settings/welcome">
             <div class="form-grid">
-              <label class="field toggle">
-                <input type="checkbox" name="welcomeEnabled" <%= settings.welcome.enabled ? 'checked' : '' %> />
-                <span>환영 기능 활성화</span>
-              </label>
               <label class="field">
                 <span>환영 채널</span>
                 <select name="welcomeChannelId">
@@ -167,49 +170,7 @@
         </aside>
       </section>
 
-      <section class="panel-stack <%= panelClass('ticket') %>" data-panel="ticket">
-        <article class="card section-panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Ticket</p>
-              <h3>티켓 설정</h3>
-            </div>
-            <p class="muted">관리자만 티켓을 열고 닫습니다. 카테고리와 로그 채널을 지정하세요.</p>
-          </div>
-
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/ticket">
-            <div class="form-grid">
-              <label class="field toggle">
-                <input type="checkbox" name="ticketEnabled" <%= settings.ticket.enabled ? 'checked' : '' %> />
-                <span>티켓 기능 활성화</span>
-              </label>
-              <label class="field">
-                <span>티켓 카테고리</span>
-                <select name="ticketCategoryId">
-                  <option value="">선택 안 함</option>
-                  <% channels.categories.forEach((channel) => { %>
-                    <option value="<%= channel.id %>" <%= settings.ticket.categoryId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
-                  <% }) %>
-                </select>
-              </label>
-              <label class="field">
-                <span>티켓 로그 채널</span>
-                <select name="ticketLogChannelId">
-                  <option value="">선택 안 함</option>
-                  <% channels.text.forEach((channel) => { %>
-                    <option value="<%= channel.id %>" <%= settings.ticket.logChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
-                  <% }) %>
-                </select>
-              </label>
-              <label class="field">
-                <span>채널 접두사</span>
-                <input type="text" name="ticketPrefix" value="<%= settings.ticket.channelPrefix %>" />
-              </label>
-            </div>
-            <button class="primary" type="submit">저장</button>
-          </form>
-        </article>
-      </section>
+      <%- include('partials/ticket-panel', { guild, channels, settings, panelClass }) %>
 
       <section class="panel-stack <%= panelClass('security') %>" data-panel="security">
         <article class="card section-panel">
@@ -218,10 +179,13 @@
               <p class="eyebrow">Security</p>
               <h3>보안 규칙</h3>
             </div>
-            <p class="muted">전체 멘션, 도배, 욕설, 초대 링크를 각각 타임아웃 처리합니다.</p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="security-settings-form" name="securityEnabled" <%= settings.security.enabled !== false ? 'checked' : '' %> />
+              <span>보안 기능 활성화</span>
+            </label>
           </div>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/security">
+          <form class="settings-form" id="security-settings-form" method="post" action="/guild/<%= guild.id %>/settings/security">
             <div class="form-grid">
               <label class="field">
                 <span>전체 멘션 타임아웃(분)</span>
@@ -264,10 +228,13 @@
               <p class="eyebrow">Role Assignment</p>
               <h3>메시지 역할 지급</h3>
             </div>
-            <p class="muted">지정한 채널에 글을 남긴 사용자에게 역할을 자동으로 부여합니다.</p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="assignment-settings-form" name="assignmentEnabled" <%= settings.assignment.enabled !== false ? 'checked' : '' %> />
+              <span>할당 기능 활성화</span>
+            </label>
           </div>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/assignment">
+          <form class="settings-form" id="assignment-settings-form" method="post" action="/guild/<%= guild.id %>/settings/assignment">
             <div class="form-grid">
               <label class="field">
                 <span>대상 채널</span>
@@ -300,10 +267,13 @@
               <p class="eyebrow">Voice</p>
               <h3>임시 음성 채널</h3>
             </div>
-            <p class="muted">간단한 명령으로 생성되는 임시 음성 채널의 위치를 지정합니다.</p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="voice-settings-form" name="voiceEnabled" <%= settings.voice.enabled !== false ? 'checked' : '' %> />
+              <span>음성 기능 활성화</span>
+            </label>
           </div>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/voice">
+          <form class="settings-form" id="voice-settings-form" method="post" action="/guild/<%= guild.id %>/settings/voice">
             <div class="form-grid">
               <label class="field">
                 <span>카테고리</span>
@@ -335,10 +305,13 @@
               <p class="eyebrow">Honeypot</p>
               <h3>허니팟 채널</h3>
             </div>
-            <p class="muted">지정 채널 발언자를 추방하고 적발 수를 표시합니다. 현재 적발: <strong><%= settings.honeypot.caughtCount %></strong></p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="honeypot-settings-form" name="honeypotEnabled" <%= settings.honeypot.enabled !== false ? 'checked' : '' %> />
+              <span>허니팟 기능 활성화</span>
+            </label>
           </div>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/honeypot">
+          <form class="settings-form" id="honeypot-settings-form" method="post" action="/guild/<%= guild.id %>/settings/honeypot">
             <div class="form-grid">
               <label class="field">
                 <span>허니팟 채널</span>
@@ -371,10 +344,13 @@
               <p class="eyebrow">Notice</p>
               <h3>서버 공지</h3>
             </div>
-            <p class="muted">/notice 명령에 표시할 서버 안내 문구를 저장합니다.</p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="notice-settings-form" name="noticeEnabled" <%= settings.notice.enabled !== false ? 'checked' : '' %> />
+              <span>공지 기능 활성화</span>
+            </label>
           </div>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/notice">
+          <form class="settings-form" id="notice-settings-form" method="post" action="/guild/<%= guild.id %>/settings/notice">
             <div class="form-grid">
               <label class="field full">
                 <span>공지 내용</span>
@@ -393,8 +369,15 @@
               <p class="eyebrow">Polls</p>
               <h3>투표 생성</h3>
             </div>
-            <p class="muted">마지막 항목을 자유 입력으로 바꿔 버튼형 투표를 게시합니다.</p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="polls-settings-form" name="pollsEnabled" <%= settings.polls.enabled !== false ? 'checked' : '' %> />
+              <span>투표 기능 활성화</span>
+            </label>
           </div>
+
+          <form class="settings-form" id="polls-settings-form" method="post" action="/guild/<%= guild.id %>/settings/polls">
+            <button class="ghost" type="submit">저장</button>
+          </form>
 
           <form class="settings-form" method="post" action="/guild/<%= guild.id %>/polls">
             <div class="form-grid">
@@ -450,17 +433,20 @@
         </aside>
       </section>
 
-      <section class="panel-stack <%= panelClass('logs') %>" data-panel="logs">
+      <section class="panel-stack <%= panelClass('logs') %>" data-panel="logs" hidden>
         <article class="card section-panel">
           <div class="section-head">
             <div>
               <p class="eyebrow">Logs</p>
               <h3>로그 채널</h3>
             </div>
-            <p class="muted">환영, 티켓, 보안, 서버, 투표, 시스템 로그를 각각 분리할 수 있습니다.</p>
+            <label class="field toggle section-toggle">
+              <input type="checkbox" form="logs-settings-form" name="logsEnabled" <%= settings.logs.enabled !== false ? 'checked' : '' %> />
+              <span>로그 기능 활성화</span>
+            </label>
           </div>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/settings/logs">
+          <form class="settings-form" id="logs-settings-form" method="post" action="/guild/<%= guild.id %>/settings/logs">
             <div class="form-grid">
               <label class="field">
                 <span>환영 로그</span>
@@ -468,15 +454,6 @@
                   <option value="">선택 안 함</option>
                   <% channels.text.forEach((channel) => { %>
                     <option value="<%= channel.id %>" <%= settings.logs.welcomeChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
-                  <% }) %>
-                </select>
-              </label>
-              <label class="field">
-                <span>티켓 로그</span>
-                <select name="logTicketChannelId">
-                  <option value="">선택 안 함</option>
-                  <% channels.text.forEach((channel) => { %>
-                    <option value="<%= channel.id %>" <%= settings.logs.ticketChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
                   <% }) %>
                 </select>
               </label>
@@ -531,7 +508,12 @@
         </article>
       </section>
 
+      <%- include('partials/logs-panel', { guild, channels, settings, panelClass }) %>
+
     </main>
   </div>
 
+  <script>
+    window.dashboardSettings = <%- JSON.stringify(settings) %>;
+  </script>
   <%- include('partials/footer') %>

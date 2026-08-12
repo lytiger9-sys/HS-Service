@@ -1,5 +1,5 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { isAdministrator } from "../../shared/guards.js";
+import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
 function buildFreeTextModal(pollId) {
   const modal = new ModalBuilder()
@@ -8,7 +8,7 @@ function buildFreeTextModal(pollId) {
 
   const input = new TextInputBuilder()
     .setCustomId("poll-free-text")
-    .setLabel("답변")
+    .setLabel("내용")
     .setStyle(TextInputStyle.Paragraph)
     .setMaxLength(500)
     .setRequired(true);
@@ -20,36 +20,84 @@ function buildFreeTextModal(pollId) {
 export async function handleButtonInteraction(interaction, context) {
   const [scope, action, id, extra] = interaction.customId.split(":");
 
-  if (scope === "ticket" && action === "close") {
-    if (!isAdministrator(interaction.member)) {
-      return interaction.reply({ content: "관리자만 닫을 수 있습니다.", ephemeral: true });
-    }
-
-    const channelId = id;
-    if (!interaction.guild || interaction.channelId !== channelId) {
-      return interaction.reply({ content: "현재 채널에서만 닫을 수 있습니다.", ephemeral: true });
-    }
-
-    await context.services.tickets.closeTicket({
-      guild: interaction.guild,
-      channel: interaction.channel,
-      closedBy: interaction.member,
-      reason: `button close by ${interaction.user.tag}`
-    });
-
-    return interaction.reply({ content: "티켓을 닫았습니다.", ephemeral: true });
+  if (scope === "ticket" && action === "open") {
+    const payload = await context.services.tickets.buildCategoryMenu(interaction.guildId);
+    return interaction.reply(payload);
   }
 
-  if (scope === "poll" && action === "vote") {
-    const pollId = id;
+  if (scope === "ticket" && action === "close") {
+    if (!interaction.guild || !interaction.channel) {
+      return interaction.reply({ content: "서버 채널에서만 사용할 수 있습니다.", ephemeral: true });
+    }
+
+    if (!isAdministrator(interaction.member)) {
+      return interaction.reply({ content: "관리자만 티켓을 닫을 수 있습니다.", ephemeral: true });
+    }
+
+    const payload = await context.services.tickets.beginClosePrompt({
+      guild: interaction.guild,
+      channel: interaction.channel,
+      requestedBy: interaction.member
+    });
+
+    return interaction.reply({ ...payload, ephemeral: true });
+  }
+
+  if (scope === "ticket" && action === "close-confirm") {
+    if (!interaction.guild || !interaction.channel) {
+      return interaction.reply({ content: "서버 채널에서만 사용할 수 있습니다.", ephemeral: true });
+    }
+
+    if (!isAdministrator(interaction.member)) {
+      return interaction.reply({ content: "관리자만 티켓을 닫을 수 있습니다.", ephemeral: true });
+    }
+
+    await context.services.tickets.confirmClose({
+      guild: interaction.guild,
+      channel: interaction.channel,
+      closedBy: interaction.member
+    });
+
+    return interaction.update({
+      content: "티켓 삭제가 확정되었습니다. 10초 후 삭제됩니다.",
+      components: []
+    });
+  }
+
+  if (scope === "ticket" && action === "close-cancel") {
+    if (!isAdministrator(interaction.member)) {
+      return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
+    }
+
+    const payload = await context.services.tickets.cancelClosePrompt();
+    return interaction.update({
+      content: payload.content,
+      components: []
+    });
+  }
+
+  if (scope === "poll" && id === "vote") {
+    const pollId = action;
     const optionIndex = Number(extra);
     await context.services.polls.handleChoiceVote(interaction, pollId, optionIndex);
     return interaction.reply({ content: "투표가 반영되었습니다.", ephemeral: true });
   }
 
-  if (scope === "poll" && action === "free") {
-    const pollId = id;
+  if (scope === "poll" && id === "free") {
+    const pollId = action;
     return interaction.showModal(buildFreeTextModal(pollId));
+  }
+
+  if (scope === "staff" && action === "toggle") {
+    if (!isAdministrator(interaction.member)) {
+      return interaction.reply({ content: "관리자만 출퇴근 상태를 변경할 수 있습니다.", ephemeral: true });
+    }
+
+    await interaction.deferReply({ ephemeral: true });
+    const result = await context.services.staff.toggleStatus(interaction.guildId, interaction.member);
+    return interaction.editReply({
+      content: `상태를 ${result.label}(으)로 변경했습니다.`
+    });
   }
 
   return interaction.reply({ content: "처리할 수 없는 버튼입니다.", ephemeral: true });

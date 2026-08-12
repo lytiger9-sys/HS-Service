@@ -1,3 +1,5 @@
+import { createDefaultTicketSettings } from "../shared/ticket.js";
+
 export function createDefaultState() {
   return {
     guilds: {}
@@ -11,29 +13,34 @@ export function createDefaultGuildSettings() {
       channelId: "",
       errorChannelId: "",
       embedTitle: "환영합니다",
-      embedDescription: "{user}님, {guild}에 오신 것을 환영합니다.",
+      embedDescription: "{user}님, {guild} 서버에 오신 것을 환영합니다.",
       embedColor: "#101010",
       dmTitle: "환영합니다",
-      dmMessage: "{user}님, {guild}에 오신 것을 환영합니다.\n현재 인원: {totalmember}명",
+      dmMessage: "{user}님, {guild} 서버에 오신 것을 환영합니다.\n현재 인원: {totalmember}명",
       dmColor: "#1f1f1f"
     },
-    ticket: {
-      enabled: false,
-      categoryId: "",
-      logChannelId: "",
-      channelPrefix: "ticket-"
+    ticket: createDefaultTicketSettings(),
+    polls: {
+      enabled: true
     },
     notice: {
+      enabled: true,
       content: "공지사항이 아직 설정되지 않았습니다.",
       updatedAt: null
     },
     honeypot: {
+      enabled: true,
       channelId: "",
       logChannelId: "",
       caughtCount: 0,
       statusMessageId: ""
     },
     security: {
+      enabled: true,
+      massMentionEnabled: true,
+      spamEnabled: true,
+      profanityEnabled: true,
+      inviteEnabled: true,
       massMentionTimeoutMinutes: 10,
       spamTimeoutMinutes: 10,
       profanityTimeoutMinutes: 10,
@@ -43,17 +50,27 @@ export function createDefaultGuildSettings() {
       profanityWords: []
     },
     assignment: {
+      enabled: true,
       channelId: "",
       roleId: ""
     },
     voice: {
+      enabled: true,
       categoryId: "",
       defaultName: "임시 채널",
       maxUsers: 0
     },
+    staff: {
+      enabled: true,
+      channelId: "",
+      messageId: "",
+      embedTitle: "관리자 출퇴근 상태",
+      embedDescription: "버튼을 눌러 출퇴근 상태를 변경합니다.",
+      buttonLabel: "출퇴근",
+      statuses: {}
+    },
     logs: {
-      welcomeChannelId: "",
-      ticketChannelId: "",
+      enabled: true,
       moderationChannelId: "",
       securityChannelId: "",
       serverChannelId: "",

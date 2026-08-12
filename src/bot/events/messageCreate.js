@@ -13,6 +13,10 @@ export default async function handleMessageCreate(message, context) {
     return;
   }
 
+  if (await context.services.tickets.handleCloseShortcut(message)) {
+    return;
+  }
+
   await context.services.moderation.evaluateMessage(message).catch(() => null);
   await context.services.assignment.handleMessage(message).catch(() => null);
 }

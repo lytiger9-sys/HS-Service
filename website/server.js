@@ -20,6 +20,9 @@ export async function startWebsite(context) {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(express.static(path.join(__dirname, "public")));
+  app.get("/HS.gif", (_req, res) => {
+    res.sendFile(path.join(__dirname, "..", "HS.gif"));
+  });
 
   configureWebAuth(app, context);
 

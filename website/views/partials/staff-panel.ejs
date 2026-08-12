@@ -1,0 +1,107 @@
+<article class="card section-panel staff-panel">
+  <% const staffSettings = settings.staff || {}; %>
+  <% const staffList = staffMembers || []; %>
+  <% const onDutyMembers = staffList.filter((member) => member.isOnDuty); %>
+  <% const offDutyMembers = staffList.filter((member) => !member.isOnDuty); %>
+  <% const onDutyCount = (staffCounts && typeof staffCounts.onDuty === 'number') ? staffCounts.onDuty : onDutyMembers.length; %>
+  <% const offDutyCount = (staffCounts && typeof staffCounts.offDuty === 'number') ? staffCounts.offDuty : offDutyMembers.length; %>
+
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Staff Board</p>
+      <h3>출퇴근 게시판</h3>
+    </div>
+    <label class="field toggle section-toggle">
+      <input type="checkbox" form="staff-settings-form" name="staffEnabled" <%= staffSettings.enabled !== false ? 'checked' : '' %> />
+      <span>출퇴근 기능 활성화</span>
+    </label>
+  </div>
+
+  <div class="grid two-up staff-layout">
+    <form class="settings-form" id="staff-settings-form" method="post" action="/guild/<%= guild.id %>/settings/staff">
+      <div class="form-grid">
+        <label class="field">
+          <span>게시 채널</span>
+          <select name="staffChannelId">
+            <option value="">현재 채널 사용</option>
+            <% channels.text.forEach((channel) => { %>
+              <option value="<%= channel.id %>" <%= staffSettings.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
+            <% }) %>
+          </select>
+        </label>
+        <label class="field">
+          <span>임베드 제목</span>
+          <input type="text" name="staffEmbedTitle" value="<%= staffSettings.embedTitle %>" data-staff-preview="title" />
+        </label>
+        <label class="field full">
+          <span>임베드 설명</span>
+          <textarea name="staffEmbedDescription" rows="5" data-staff-preview="description"><%= staffSettings.embedDescription %></textarea>
+        </label>
+        <label class="field">
+          <span>버튼 문구</span>
+          <input type="text" name="staffButtonLabel" value="<%= staffSettings.buttonLabel %>" data-staff-preview="button" />
+        </label>
+      </div>
+      <button class="primary" type="submit">저장</button>
+    </form>
+
+    <aside class="preview-column">
+      <div class="card staff-preview-card">
+        <div class="section-head compact">
+          <div>
+            <p class="eyebrow">Live Preview</p>
+            <h3>관리자 상태 임베드</h3>
+          </div>
+        </div>
+        <div class="discord-preview staff-preview" id="staff-preview">
+          <div class="preview-bar preview-bar-staff"></div>
+          <div class="preview-body">
+            <h4 data-preview-staff-title><%= staffSettings.embedTitle %></h4>
+            <p data-preview-staff-description><%= staffSettings.embedDescription %></p>
+            <div class="staff-preview-divider"></div>
+            <div class="staff-preview-summary">
+              <span>출근 중: <%= onDutyCount %>명</span>
+              <span>퇴근 중: <%= offDutyCount %>명</span>
+            </div>
+
+            <div class="staff-preview-groups">
+              <div class="staff-preview-group">
+                <span class="staff-preview-label">출근 중 (<%= onDutyCount %>)</span>
+                <div class="staff-preview-list">
+                  <% if (onDutyMembers.length) { %>
+                    <% onDutyMembers.forEach((member) => { %>
+                      <span class="staff-preview-pill is-on-duty"><%= member.displayName || member.username || member.tag %></span>
+                    <% }) %>
+                  <% } else { %>
+                    <span class="staff-preview-empty">출근 중인 관리자가 없습니다.</span>
+                  <% } %>
+                </div>
+              </div>
+
+              <div class="staff-preview-group">
+                <span class="staff-preview-label">퇴근 중 (<%= offDutyCount %>)</span>
+                <div class="staff-preview-list">
+                  <% if (offDutyMembers.length) { %>
+                    <% offDutyMembers.forEach((member) => { %>
+                      <span class="staff-preview-pill is-off-duty"><%= member.displayName || member.username || member.tag %></span>
+                    <% }) %>
+                  <% } else { %>
+                    <span class="staff-preview-empty">퇴근 중인 관리자가 없습니다.</span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="staff-preview-actions">
+            <span class="staff-preview-button" data-preview-staff-button><%= staffSettings.buttonLabel %></span>
+          </div>
+          <div class="staff-preview-footer">
+            <span><%= guild.name %></span>
+            <span>방금 전</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</article>

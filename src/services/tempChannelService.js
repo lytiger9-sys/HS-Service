@@ -15,6 +15,9 @@ async function resolveVoiceChannel(guild, channelId) {
 export function createTempChannelService(context, guildState) {
   async function createTemporaryVoiceChannel({ guild, member, name }) {
     const settings = (await context.services.settings.getSettings(guild.id)).voice;
+    if (settings.enabled === false) {
+      throw new Error("현재 음성 채널 기능이 꺼져 있습니다.");
+    }
     const channelName = slugifyDiscordName(name || settings.defaultName || "임시 채널", "임시-채널");
 
     const channel = await guild.channels.create({

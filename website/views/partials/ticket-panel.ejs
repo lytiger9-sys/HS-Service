@@ -1,0 +1,197 @@
+<% const ticketSettings = settings.ticket || {}; %>
+<% const ticketBoard = ticketSettings.board || {}; %>
+<% const realTicketCategories = ticketSettings.categories || []; %>
+<% const ticketCategories = realTicketCategories.length ? realTicketCategories : [
+  { id: "", label: "", serverCategoryId: "", questions: [{ id: "", label: "", required: false, style: "paragraph" }] }
+]; %>
+
+<section class="panel-stack <%= panelClass('ticket') %>" data-panel="ticket">
+  <article class="card section-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Ticket</p>
+        <h3>티켓 설정</h3>
+      </div>
+      <label class="field toggle section-toggle">
+        <input type="checkbox" form="ticket-settings-form" name="ticketEnabled" <%= ticketSettings.enabled !== false ? 'checked' : '' %> />
+        <span>티켓 기능 활성화</span>
+      </label>
+    </div>
+
+    <form class="settings-form ticket-form" id="ticket-settings-form" method="post" action="/guild/<%= guild.id %>/settings/ticket" data-ticket-form>
+      <input type="hidden" name="ticketBoardMessageId" value="<%= ticketBoard.messageId || '' %>" />
+
+      <div class="form-grid">
+        <label class="field">
+          <span>티켓 게시 채널</span>
+          <select name="ticketBoardChannelId" data-ticket-preview="boardChannel">
+            <option value="">선택 없음</option>
+            <% channels.text.forEach((channel) => { %>
+              <option value="<%= channel.id %>" <%= ticketBoard.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
+            <% }) %>
+          </select>
+        </label>
+        <label class="field">
+          <span>게시 제목</span>
+          <input type="text" name="ticketBoardTitle" value="<%= ticketBoard.title || '' %>" data-ticket-preview="title" />
+        </label>
+        <label class="field full">
+          <span>게시 설명</span>
+          <textarea name="ticketBoardDescription" rows="4" data-ticket-preview="description"><%= ticketBoard.description || '' %></textarea>
+        </label>
+        <label class="field">
+          <span>버튼 라벨</span>
+          <input type="text" name="ticketBoardButtonLabel" value="<%= ticketBoard.buttonLabel || '' %>" data-ticket-preview="button" />
+        </label>
+        <label class="field">
+          <span>강조 색상</span>
+          <input type="color" name="ticketBoardAccentColor" value="<%= ticketBoard.accentColor || '#4f6685' %>" data-ticket-preview="accent" />
+        </label>
+        <label class="field">
+          <span>푸터 텍스트</span>
+          <input type="text" name="ticketBoardFooterText" value="<%= ticketBoard.footerText || '' %>" data-ticket-preview="footer" />
+        </label>
+      </div>
+
+      <div class="ticket-category-toolbar">
+        <div>
+          <h4>티켓 카테고리</h4>
+          <p class="muted">카테고리와 질문은 필요한 만큼 추가할 수 있습니다.</p>
+        </div>
+        <button type="button" class="ghost" data-ticket-add-category>카테고리 추가</button>
+      </div>
+
+      <div class="ticket-category-list" data-ticket-category-list>
+        <% ticketCategories.forEach((category, index) => { %>
+          <% const questions = category.questions && category.questions.length ? category.questions : [{ id: "", label: "", required: false, style: "paragraph" }]; %>
+          <article class="ticket-category-card" data-ticket-category>
+            <div class="ticket-category-head">
+              <span class="ticket-category-label">카테고리 <%= index + 1 %></span>
+              <button type="button" class="ghost danger" data-ticket-remove-category>삭제</button>
+            </div>
+
+            <div class="ticket-category-row">
+              <input type="hidden" name="ticketCategories[<%= index %>][id]" value="<%= category.id || '' %>" data-ticket-category-id />
+              <label class="field">
+                <span>카테고리 이름</span>
+                <input type="text" name="ticketCategories[<%= index %>][label]" value="<%= category.label || '' %>" data-ticket-category-label />
+              </label>
+              <label class="field">
+                <span>열릴 서버 카테고리</span>
+                <select name="ticketCategories[<%= index %>][serverCategoryId]">
+                  <option value="">선택 없음</option>
+                  <% channels.categories.forEach((channel) => { %>
+                    <option value="<%= channel.id %>" <%= category.serverCategoryId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
+                  <% }) %>
+                </select>
+              </label>
+            </div>
+
+            <div class="ticket-question-list" data-ticket-question-list>
+              <% questions.forEach((question, questionIndex) => { %>
+                <article class="ticket-question-card" data-ticket-question>
+                  <div class="ticket-question-row">
+                    <input type="hidden" name="ticketCategories[<%= index %>][questions][<%= questionIndex %>][id]" value="<%= question.id || '' %>" data-ticket-question-id />
+                    <label class="field ticket-question-text">
+                      <span>질문 내용</span>
+                      <input type="text" name="ticketCategories[<%= index %>][questions][<%= questionIndex %>][label]" value="<%= question.label || '' %>" data-ticket-question-label />
+                    </label>
+                    <label class="field toggle ticket-question-toggle">
+                      <input type="checkbox" name="ticketCategories[<%= index %>][questions][<%= questionIndex %>][required]" <%= question.required ? 'checked' : '' %> data-ticket-question-required />
+                      <span>필수</span>
+                    </label>
+                    <button type="button" class="ghost danger ticket-row-delete" data-ticket-remove-question>삭제</button>
+                  </div>
+                </article>
+              <% }) %>
+            </div>
+
+            <div class="ticket-category-actions">
+              <button type="button" class="ghost" data-ticket-add-question>질문 추가</button>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+
+      <button class="primary" type="submit">저장</button>
+    </form>
+
+    <form class="settings-form ticket-publish-form" method="post" action="/guild/<%= guild.id %>/ticket/publish">
+      <button class="ghost" type="submit">보드 전송</button>
+    </form>
+  </article>
+
+  <aside class="preview-column">
+    <div class="card ticket-preview-card">
+      <div class="section-head compact">
+        <div>
+          <p class="eyebrow">Live Preview</p>
+          <h3>티켓 게시물</h3>
+        </div>
+      </div>
+
+      <div class="discord-preview ticket-preview" id="ticket-preview">
+        <div class="preview-bar preview-bar-ticket"></div>
+        <div class="preview-body">
+          <h4 data-preview-ticket-title><%= ticketBoard.title || '티켓 안내' %></h4>
+          <p data-preview-ticket-description><%= ticketBoard.description || '버튼을 눌러 티켓을 열 수 있습니다.' %></p>
+          <div class="ticket-preview-divider"></div>
+          <div class="ticket-preview-actions">
+            <span class="ticket-preview-button" data-preview-ticket-button><%= ticketBoard.buttonLabel || '티켓 열기' %></span>
+          </div>
+          <div class="ticket-preview-footer">
+            <span data-preview-ticket-footer><%= ticketBoard.footerText || '봇 전용 티켓' %></span>
+            <span>방금 전</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<template id="ticket-category-template">
+  <article class="ticket-category-card" data-ticket-category>
+    <div class="ticket-category-head">
+      <span class="ticket-category-label">카테고리</span>
+      <button type="button" class="ghost danger" data-ticket-remove-category>삭제</button>
+    </div>
+
+    <div class="ticket-category-row">
+      <input type="hidden" name="ticketCategories[__INDEX__][id]" value="" data-ticket-category-id />
+      <label class="field">
+        <span>카테고리 이름</span>
+        <input type="text" name="ticketCategories[__INDEX__][label]" value="" data-ticket-category-label />
+      </label>
+      <label class="field">
+        <span>열릴 서버 카테고리</span>
+        <select name="ticketCategories[__INDEX__][serverCategoryId]">
+          <option value="">선택 없음</option>
+          <% channels.categories.forEach((channel) => { %>
+            <option value="<%= channel.id %>"><%= channel.label %></option>
+          <% }) %>
+        </select>
+      </label>
+    </div>
+
+    <div class="ticket-question-list" data-ticket-question-list>
+      <article class="ticket-question-card" data-ticket-question>
+        <div class="ticket-question-row">
+          <input type="hidden" name="ticketCategories[__INDEX__][questions][0][id]" value="" data-ticket-question-id />
+          <label class="field ticket-question-text">
+            <span>질문 내용</span>
+            <input type="text" name="ticketCategories[__INDEX__][questions][0][label]" value="" data-ticket-question-label />
+          </label>
+          <label class="field toggle ticket-question-toggle">
+            <input type="checkbox" name="ticketCategories[__INDEX__][questions][0][required]" data-ticket-question-required />
+            <span>필수</span>
+          </label>
+          <button type="button" class="ghost danger ticket-row-delete" data-ticket-remove-question>삭제</button>
+        </div>
+      </article>
+    </div>
+
+    <div class="ticket-category-actions">
+      <button type="button" class="ghost" data-ticket-add-question>질문 추가</button>
+    </div>
+  </article>
+</template>

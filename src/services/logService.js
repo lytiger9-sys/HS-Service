@@ -32,23 +32,37 @@ export function createLogService(context, guildState) {
       return null;
     }
 
+    const settings = await getSettings(guildId);
+    if (settings.logs?.enabled === false) {
+      return null;
+    }
+
     const channel = await resolveTextChannel(guild, channelId);
     return send(channel, payload);
   }
 
   async function sendLogByKey(guildId, key, payload) {
     const settings = await getSettings(guildId);
+    if (settings.logs?.enabled === false) {
+      return null;
+    }
     const channelId = settings.logs?.[key];
     return sendConfigured(guildId, channelId, payload);
   }
 
   async function sendWelcomeError(guildId, payload) {
     const settings = await getSettings(guildId);
+    if (settings.logs?.enabled === false) {
+      return null;
+    }
     return sendConfigured(guildId, settings.welcome.errorChannelId, payload);
   }
 
   async function sendHoneypotLog(guildId, payload) {
     const settings = await getSettings(guildId);
+    if (settings.logs?.enabled === false) {
+      return null;
+    }
     return sendConfigured(guildId, settings.honeypot.logChannelId, payload);
   }
 

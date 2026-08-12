@@ -105,6 +105,11 @@ function applyVote(poll, user, optionIndex, freeText = "") {
 
 export function createPollService(context, guildState) {
   async function createPoll(guildId, payload) {
+    const settings = await context.services.settings.getSettings(guildId);
+    if (settings.polls?.enabled === false) {
+      throw new Error("현재 투표 기능이 꺼져 있습니다.");
+    }
+
     const question = String(payload.question ?? "").trim();
     if (!question) {
       throw new Error("투표 질문을 입력해야 합니다.");
@@ -148,6 +153,11 @@ export function createPollService(context, guildState) {
     const guild = await context.client.guilds.fetch(guildId).catch(() => null);
     if (!guild) {
       throw new Error("서버를 찾을 수 없습니다.");
+    }
+
+    const settings = await context.services.settings.getSettings(guildId);
+    if (settings.polls?.enabled === false) {
+      throw new Error("현재 투표 기능이 꺼져 있습니다.");
     }
 
     const poll = await getPoll(guildId, pollId);
@@ -213,6 +223,11 @@ export function createPollService(context, guildState) {
   }
 
   async function vote(guildId, pollId, user, optionIndex, freeText = "") {
+    const settings = await context.services.settings.getSettings(guildId);
+    if (settings.polls?.enabled === false) {
+      throw new Error("현재 투표 기능이 꺼져 있습니다.");
+    }
+
     await guildState.patch(guildId, (guild) => {
       const poll = guild.polls[pollId];
       if (!poll) {

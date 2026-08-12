@@ -81,5 +81,33 @@ function setupPollPreview() {
   render();
 }
 
+function setupStaffPreview() {
+  const titleInput = document.querySelector('[data-staff-preview="title"]');
+  const descriptionInput = document.querySelector('[data-staff-preview="description"]');
+  const buttonInput = document.querySelector('[data-staff-preview="button"]');
+
+  const title = document.querySelector("[data-preview-staff-title]");
+  const description = document.querySelector("[data-preview-staff-description]");
+  const button = document.querySelector("[data-preview-staff-button]");
+
+  if (!title || !description || !button) {
+    return;
+  }
+
+  const render = () => {
+    title.textContent = text(titleInput?.value, "관리자 출퇴근 상태");
+    description.textContent = text(descriptionInput?.value, "버튼을 눌러 출퇴근 상태를 변경합니다.");
+    button.textContent = text(buttonInput?.value, "출퇴근");
+  };
+
+  [titleInput, descriptionInput, buttonInput].forEach((input) => {
+    input?.addEventListener("input", render);
+    input?.addEventListener("change", render);
+  });
+
+  render();
+}
+
 setupWelcomePreview();
 setupPollPreview();
+setupStaffPreview();

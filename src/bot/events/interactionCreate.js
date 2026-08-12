@@ -1,6 +1,7 @@
 import { isAllowedGuild } from "../../shared/guards.js";
 import { handleSlashCommand } from "../interactions/slash.js";
 import { handleButtonInteraction } from "../interactions/buttons.js";
+import { handleSelectMenuInteraction } from "../interactions/selectMenus.js";
 import { handleModalInteraction } from "../interactions/modals.js";
 
 export default async function handleInteractionCreate(interaction, context) {
@@ -16,6 +17,11 @@ export default async function handleInteractionCreate(interaction, context) {
 
     if (interaction.isButton()) {
       await handleButtonInteraction(interaction, context);
+      return;
+    }
+
+    if (interaction.isStringSelectMenu()) {
+      await handleSelectMenuInteraction(interaction, context);
       return;
     }
 

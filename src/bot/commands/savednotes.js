@@ -26,6 +26,11 @@ export default {
       return interaction.editReply({ content: "관리자만 사용할 수 있습니다." });
     }
 
+    const isTicketChannel = await context.services.tickets.isBotTicketChannel(interaction.guildId, interaction.channelId).catch(() => false);
+    if (!isTicketChannel) {
+      return interaction.editReply({ content: "봇이 만든 티켓 채널에서만 사용할 수 있습니다." });
+    }
+
     const notes = await context.services.notes.listNotes(interaction.guildId);
     if (!notes.length) {
       return interaction.editReply({ content: "저장된 내용이 없습니다." });

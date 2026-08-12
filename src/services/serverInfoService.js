@@ -10,6 +10,7 @@ function sortMembersByJoinDate(members) {
 function formatAdministrator(member) {
   return {
     id: member.id,
+    mention: `<@${member.id}>`,
     tag: member.user.tag,
     displayName: member.displayName || member.user.globalName || member.user.username,
     username: member.user.username,

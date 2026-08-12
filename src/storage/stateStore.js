@@ -1,6 +1,7 @@
 import { createDefaultState, createDefaultGuildState } from "../config/defaults.js";
 import { connectMongo } from "../database/connect.js";
 import { GuildStateModel } from "../database/models/guildState.js";
+import { normalizeTicketSettings } from "../shared/ticket.js";
 
 function clone(value) {
   return structuredClone(value);
@@ -15,7 +16,7 @@ function normalizeGuildState(doc) {
   const source = JSON.parse(JSON.stringify(doc));
   const { _id, __v, ...data } = source;
 
-  return {
+  const normalized = {
     ...defaults,
     ...data,
     settings: {
@@ -38,6 +39,45 @@ function normalizeGuildState(doc) {
       ...(data.tempChannels || {})
     }
   };
+
+  const logs = data.settings?.logs || {};
+  normalized.settings.logs = {
+    ...defaults.settings.logs,
+    enabled: logs.enabled ?? defaults.settings.logs.enabled,
+    moderationChannelId: logs.moderationChannelId || "",
+    securityChannelId: logs.securityChannelId || "",
+    serverChannelId: logs.serverChannelId || "",
+    voteChannelId: logs.voteChannelId || "",
+    systemChannelId: logs.systemChannelId || ""
+  };
+
+  const staff = data.settings?.staff || {};
+  const staffStatuses = staff.statuses && typeof staff.statuses === "object" ? staff.statuses : {};
+  normalized.settings.staff = {
+    ...defaults.settings.staff,
+    enabled: staff.enabled ?? defaults.settings.staff.enabled,
+    ...staff,
+    channelId: staff.channelId || "",
+    messageId: staff.messageId || "",
+    statuses: {
+      ...staffStatuses
+    }
+  };
+
+  const security = data.settings?.security || {};
+  normalized.settings.security = {
+    ...defaults.settings.security,
+    ...security,
+    enabled: security.enabled ?? defaults.settings.security.enabled,
+    massMentionEnabled: security.massMentionEnabled ?? defaults.settings.security.massMentionEnabled,
+    spamEnabled: security.spamEnabled ?? defaults.settings.security.spamEnabled,
+    profanityEnabled: security.profanityEnabled ?? defaults.settings.security.profanityEnabled,
+    inviteEnabled: security.inviteEnabled ?? defaults.settings.security.inviteEnabled
+  };
+
+  normalized.settings.ticket = normalizeTicketSettings(data.settings?.ticket || defaults.settings.ticket);
+
+  return normalized;
 }
 
 function serializeGuildState(guildId, guildState) {
@@ -92,6 +132,20 @@ export class StateStore {
     );
 
     return guildState;
+  }
+
+  async resetGuild(guildId, createGuildState = createDefaultGuildState) {
+    await this.load();
+
+    const task = async () => {
+      this.state.guilds ??= {};
+      this.state.guilds[guildId] = createGuildState();
+      await this.saveGuild(guildId);
+      return this.state.guilds[guildId];
+    };
+
+    this.queue = this.queue.then(task, task);
+    return this.queue;
   }
 
   async ensureGuild(guildId, createGuildState = createDefaultGuildState) {

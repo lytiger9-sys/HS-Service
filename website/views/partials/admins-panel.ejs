@@ -4,23 +4,33 @@
       <p class="eyebrow">Administrators</p>
       <h3>관리자 계정</h3>
     </div>
-    <p class="muted">서버에서 관리자 권한을 가진 사용자 계정만 보여줍니다.</p>
+    <p class="muted">서버에서 관리자 권한을 가진 사용자 계정과 현재 출퇴근 상태를 함께 보여줍니다.</p>
   </div>
 
-  <% if (administrators && administrators.length) { %>
+  <% const staffList = (staffMembers && staffMembers.length ? staffMembers : administrators) || []; %>
+  <% if (staffList.length) { %>
     <div class="admin-list">
-      <% administrators.forEach((admin) => { %>
+      <% staffList.forEach((admin) => { %>
         <div class="admin-card">
-          <img class="admin-avatar" src="<%= admin.avatarUrl %>" alt="<%= admin.displayName %>" />
+          <img class="admin-avatar" src="<%= admin.avatarUrl %>" alt="<%= admin.displayName || admin.username || admin.tag %>" />
           <div class="admin-meta">
             <div class="admin-topline">
-              <strong><%= admin.displayName %></strong>
-              <span><%= admin.tag %></span>
+              <strong><%= admin.displayName || admin.username || admin.tag %></strong>
+              <span><%= admin.username || admin.tag %></span>
             </div>
             <div class="admin-tags">
               <span class="chip">최고 역할: <%= admin.highestRole %></span>
               <span class="chip">가입: <%= formatDate(admin.joinedTimestamp) %></span>
             </div>
+          </div>
+          <% const isOnDuty = Boolean(admin.isOnDuty); %>
+          <div class="admin-status">
+            <span class="chip status-chip <%= isOnDuty ? 'is-on-duty' : 'is-off-duty' %>">
+              <%= isOnDuty ? '출근' : '퇴근' %>
+            </span>
+            <span class="admin-status-note">
+              <%= admin.statusUpdatedAt ? `업데이트: ${formatDate(admin.statusUpdatedAt)}` : '기본 상태' %>
+            </span>
           </div>
         </div>
       <% }) %>
@@ -28,4 +38,6 @@
   <% } else { %>
     <p class="muted">표시할 사용자 관리자 계정이 없습니다.</p>
   <% } %>
+
+  <p class="muted admin-status-footnote">아래 게시판의 출퇴근 버튼으로 상태를 변경합니다.</p>
 </article>

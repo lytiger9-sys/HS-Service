@@ -8,6 +8,9 @@ export function createAssignmentService(context, guildState) {
     }
 
     const settings = (await context.services.settings.getSettings(message.guild.id)).assignment;
+    if (settings.enabled === false) {
+      return false;
+    }
     if (!settings.channelId || !settings.roleId || message.channelId !== settings.channelId) {
       return false;
     }

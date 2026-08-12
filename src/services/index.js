@@ -10,6 +10,8 @@ import { createServerInfoService } from "./serverInfoService.js";
 import { createLogService } from "./logService.js";
 import { createHoneypotService } from "./honeypotService.js";
 import { createAssignmentService } from "./assignmentService.js";
+import { createMessageLogService } from "./messageLogService.js";
+import { createStaffService } from "./staffService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -26,6 +28,8 @@ export function createServices(context) {
     tempChannels: createTempChannelService(context, guildState),
     serverInfo: createServerInfoService(context, guildState),
     honeypot: createHoneypotService(context, guildState),
-    assignment: createAssignmentService(context, guildState)
+    assignment: createAssignmentService(context, guildState),
+    messageLogs: createMessageLogService(context),
+    staff: createStaffService(context, guildState)
   };
 }

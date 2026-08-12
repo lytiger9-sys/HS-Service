@@ -113,9 +113,12 @@ export function createModerationService(context, guildState) {
     }
 
     const settings = (await context.services.settings.getSettings(message.guild.id)).security;
+    if (settings.enabled === false) {
+      return null;
+    }
     const triggers = [];
 
-    if (message.mentions.everyone) {
+    if (settings.massMentionEnabled !== false && message.mentions.everyone) {
       triggers.push({
         type: "mass-mention",
         label: "전체 멘션",
@@ -123,7 +126,7 @@ export function createModerationService(context, guildState) {
       });
     }
 
-    if (isInviteLink(message.content)) {
+    if (settings.inviteEnabled !== false && isInviteLink(message.content)) {
       triggers.push({
         type: "invite-link",
         label: "초대 링크",
@@ -131,7 +134,7 @@ export function createModerationService(context, guildState) {
       });
     }
 
-    if (containsProfanity(message.content, settings.profanityWords || [])) {
+    if (settings.profanityEnabled !== false && containsProfanity(message.content, settings.profanityWords || [])) {
       triggers.push({
         type: "profanity",
         label: "욕설",
@@ -139,7 +142,7 @@ export function createModerationService(context, guildState) {
       });
     }
 
-    if (detectSpam(message, settings)) {
+    if (settings.spamEnabled !== false && detectSpam(message, settings)) {
       triggers.push({
         type: "spam",
         label: "도배",

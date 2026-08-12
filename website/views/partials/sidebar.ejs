@@ -9,6 +9,14 @@
     <%- include('sidebar-user', { currentUser }) %>
   <% } %>
 
+  <div class="sidebar-search">
+    <label class="sidebar-search-field">
+      <span class="sidebar-search-label">탭 검색</span>
+      <input type="search" class="sidebar-search-input" placeholder="탭 이름이나 설명으로 검색" data-tab-search />
+    </label>
+    <div class="sidebar-search-results" data-tab-search-results hidden></div>
+  </div>
+
   <nav class="sidebar-nav">
     <% sections.forEach((section, index) => { %>
       <button type="button" class="sidebar-tab <%= activeSection === section.id ? 'is-active' : '' %>" data-tab="<%= section.id %>">

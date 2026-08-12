@@ -33,9 +33,14 @@ export default {
     .setName("save")
     .setDescription("제목과 내용을 모달로 저장합니다."),
 
-  async execute(interaction) {
+  async execute(interaction, context) {
     if (!isAdministrator(interaction.member)) {
       return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
+    }
+
+    const isTicketChannel = await context.services.tickets.isBotTicketChannel(interaction.guildId, interaction.channelId).catch(() => false);
+    if (!isTicketChannel) {
+      return interaction.reply({ content: "봇이 만든 티켓 채널에서만 사용할 수 있습니다.", ephemeral: true });
     }
 
     await interaction.showModal(buildSaveModal());
