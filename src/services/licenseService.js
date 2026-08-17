@@ -1,10 +1,9 @@
 import crypto from "node:crypto";
 import { LicenseModel } from "../database/models/license.js";
+import { PLAN_IDS } from "../config/plans.js";
 
-const PLAN_VALUES = new Set(["basic", "pro", "enterprise"]);
-
-function normalizePlan(plan) {
-  return PLAN_VALUES.has(plan) ? plan : "basic";
+export function normalizePlan(plan) {
+  return PLAN_IDS.has(plan) ? plan : "free";
 }
 
 function normalizeDurationDays(value) {
