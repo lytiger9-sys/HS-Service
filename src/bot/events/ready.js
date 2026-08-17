@@ -20,4 +20,13 @@ export default async function handleReady(client, context) {
     await targetGuild.commands.set(commandList.map((command) => command.data.toJSON()));
     await context.services.honeypot.syncStatusMessage(targetGuild.id).catch(() => null);
   }
+
+  const cleanupExpiredBanners = async () => {
+    for (const guild of client.guilds.cache.values()) {
+      await context.services.partners.cleanupExpiredBanners(guild.id).catch(() => null);
+    }
+  };
+  await cleanupExpiredBanners();
+  const cleanupTimer = setInterval(cleanupExpiredBanners, 60 * 60 * 1000);
+  cleanupTimer.unref?.();
 }

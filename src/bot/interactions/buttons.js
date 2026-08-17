@@ -42,8 +42,8 @@ export async function handleButtonInteraction(interaction, context) {
   if (scope === "partner" && action === "approve") {
     if (!isAdministrator(interaction.member)) return interaction.reply({ content: "관리자만 파트너를 승인할 수 있습니다.", ephemeral: true });
     await interaction.deferReply({ ephemeral: true });
-    await context.services.partners.approve(interaction.guildId, id, interaction.user);
-    return interaction.editReply({ content: "파트너 신청을 승인하고 채널과 웹훅을 생성했습니다." });
+    const approved = await context.services.partners.approve(interaction.guildId, id, interaction.user);
+    return interaction.editReply({ content: approved ? "파트너 신청을 승인하고 채널과 웹훅을 생성했습니다." : "이미 처리된 파트너 신청입니다." });
   }
 
   if (scope === "partner" && action === "reject") {

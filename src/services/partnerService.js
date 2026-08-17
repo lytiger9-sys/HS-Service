@@ -104,7 +104,19 @@ export function createPartnerService(context) {
       serverLink: text(interaction.fields.getTextInputValue("partner-server-link"), "", 500),
       promoWebhook: text(interaction.fields.getTextInputValue("partner-promo-webhook"), "", 500)
     };
-    if (!values.affiliateName || !values.serverLink) throw new Error("제휴명과 서버 링크는 필수입니다.");
+    if (!values.affiliateName || !values.serverLink || !values.promoWebhook) throw new Error("제휴명·서버 링크·홍보 웹훅은 필수입니다.");
+    for (const [label, value] of [["서버 링크", values.serverLink], ["홍보 웹훅", values.promoWebhook]]) {
+      let parsed;
+      try { parsed = new URL(value); } catch { parsed = null; }
+      if (!parsed || parsed.protocol !== "https:") throw new Error(`${label}은 https URL이어야 합니다.`);
+    }
+    const current = state(interaction.guildId);
+    if ((current.partners || []).some((item) => ["pending", "active"].includes(item.status) && item.requesterId === interaction.user.id)) {
+      throw new Error("이미 처리 중인 파트너 신청이 있습니다.");
+    }
+    const settings = current.settings?.partner;
+    const approvalChannel = await interaction.guild.channels.fetch(settings?.approvalChannelId).catch(() => null);
+    if (!approvalChannel?.isTextBased()) throw new Error("파트너 승인 채널이 설정되지 않았습니다.");
     const id = shortId();
     const application = {
       id,
@@ -115,14 +127,12 @@ export function createPartnerService(context) {
       createdAt: nowIso(),
       updatedAt: nowIso()
     };
+    const approvalMessage = await approvalChannel.send({ embeds: [applicationEmbed(application)], components: approvalComponents(id) });
+    application.approvalMessageId = approvalMessage.id;
     await patch(interaction.guildId, (draft) => {
       draft.partners ??= [];
       draft.partners.push(application);
     });
-    const settings = state(interaction.guildId).settings.partner;
-    const approvalChannel = await interaction.guild.channels.fetch(settings.approvalChannelId).catch(() => null);
-    if (!approvalChannel?.isTextBased()) throw new Error("파트너 승인 채널이 설정되지 않았습니다.");
-    await approvalChannel.send({ embeds: [applicationEmbed(application)], components: approvalComponents(id) });
     return application;
   }
 
@@ -155,12 +165,16 @@ export function createPartnerService(context) {
       mentionDate: "",
       dailyMentionCount: 0,
       warningCount: 0,
+      penaltyDate: "",
       updatedAt: nowIso()
     };
     await patch(guildId, (draft) => {
       const index = draft.partners.findIndex((item) => item.id === applicationId);
       if (index >= 0) draft.partners[index] = updated;
     });
+    const approvalChannel = await guild.channels.fetch(settings.approvalChannelId).catch(() => null);
+    const approvalMessage = application.approvalMessageId ? await approvalChannel?.messages.fetch(application.approvalMessageId).catch(() => null) : null;
+    await approvalMessage?.edit({ embeds: [applicationEmbed(updated).setTitle("파트너 신청 승인")], components: [] }).catch(() => null);
     const user = await context.client.users.fetch(application.requesterId).catch(() => null);
     await user?.send(`파트너 신청이 승인되었습니다. 홍보 메시지용 웹훅입니다:\n${webhook.url}`).catch(() => null);
     return updated;
@@ -177,6 +191,10 @@ export function createPartnerService(context) {
       rejected = item;
     });
     if (rejected) {
+      const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+      const approvalChannel = await guild?.channels.fetch(current.settings.partner.approvalChannelId).catch(() => null);
+      const approvalMessage = rejected.approvalMessageId ? await approvalChannel?.messages.fetch(rejected.approvalMessageId).catch(() => null) : null;
+      await approvalMessage?.edit({ embeds: [applicationEmbed(rejected).setTitle("파트너 신청 거절")], components: [] }).catch(() => null);
       const user = await context.client.users.fetch(rejected.requesterId).catch(() => null);
       await user?.send("파트너 신청이 거절되었습니다.").catch(() => null);
     }
@@ -203,6 +221,7 @@ export function createPartnerService(context) {
       });
       return true;
     }
+    if (partner.penaltyDate === today) return true;
     warningCount += 1;
     const durationMs = warningCount >= 2 ? 7 * DAY_MS : DAY_MS;
     const member = await message.guild.members.fetch(message.author.id).catch(() => null);
@@ -210,7 +229,7 @@ export function createPartnerService(context) {
     await member?.send(`파트너 채널에서 하루 2회 이상 전체 멘션을 사용해 ${warningCount >= 2 ? "7일" : "1일"} 타임아웃이 적용되었습니다.`).catch(() => null);
     await patch(message.guild.id, (draft) => {
       const item = draft.partners.find((entry) => entry.id === partner.id);
-      if (item) { item.mentionDate = today; item.dailyMentionCount = nextCount; item.warningCount = warningCount; }
+      if (item) { item.mentionDate = today; item.dailyMentionCount = nextCount; item.warningCount = warningCount; item.penaltyDate = today; }
     });
     return true;
   }
