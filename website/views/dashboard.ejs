@@ -49,28 +49,26 @@
           <dl class="key-list">
             <div><dt>채널</dt><dd><%= overview.channels %>개</dd></div>
             <div><dt>역할</dt><dd><%= overview.roles %>개</dd></div>
-            <div><dt>티켓</dt><dd><%= overview.activeTickets.length %>개</dd></div>
             <div><dt>임시 음성</dt><dd><%= overview.tempChannels.length %>개</dd></div>
           </dl>
         </article>
 
         <article class="card" data-section="overview">
-          <h3>최근 기록</h3>
+          <h3>최근 제재</h3>
           <div class="stack">
-            <% (overview.recentNotes || []).slice(0, 3).forEach((note) => { %>
+            <% const recentPunishments = overview.recentPunishments || []; %>
+            <% recentPunishments.slice(0, 5).forEach((entry) => { %>
               <div class="mini-item">
-                <strong><%= note.title %></strong>
-                <span><%= formatDate(note.createdAt) %></span>
+                <strong><%= entry.memberTag || entry.memberId || "알 수 없음" %></strong>
+                <span><%= entry.type %> · <%= formatDate(entry.createdAt) %></span>
               </div>
             <% }) %>
-            <% if (!(overview.recentNotes || []).length) { %>
-              <p class="muted">저장된 내용이 없습니다.</p>
+            <% if (!recentPunishments.length) { %>
+              <p class="muted">최근 제재 기록이 없습니다.</p>
             <% } %>
           </div>
         </article>
         </section>
-
-        <%- include('partials/server-status-panel', { overview, formatDate }) %>
       </section>
 
       <section class="panel-stack <%= panelClass('administrators') %>" data-panel="administrators">

@@ -66,10 +66,8 @@ export function createServerInfoService(context, guildState) {
     return {
       guild,
       ...overview,
-      recentNotes: state?.notes?.slice(0, 5) ?? [],
       recentPunishments: state?.punishments?.slice(0, 5) ?? [],
       activePolls: Object.values(state?.polls ?? {}).filter((poll) => poll.messageId),
-      activeTickets: Object.values(state?.tickets ?? {}).filter((ticket) => ticket.status === "open"),
       tempChannels: Object.values(state?.tempChannels ?? {})
     };
   }
