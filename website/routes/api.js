@@ -1,6 +1,7 @@
 import express from "express";
 import { getAccessMessage, resolveDashboardAccess } from "../lib/dashboardAccess.js";
 import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
+import { canUseFeature, featureDeniedMessage } from "../../src/shared/planAccess.js";
 
 function readBoolean(value) {
   return value === "on" || value === "true" || value === "1";
@@ -32,6 +33,17 @@ function splitLines(value, maxItems = 100, maxLength = 100) {
 
 function wantsJson(req) {
   return req.get("X-Requested-With") === "fetch" || req.accepts(["json", "html"]) === "json";
+}
+
+function featureForSection(section) {
+  const map = { welcome: "welcome", ticket: "ticket", security: "security", notice: "notice", polls: "polls", partner: "partner" };
+  return map[section] || null;
+}
+
+async function requireFeature(context, guildId, feature) {
+  if (!feature) return { allowed: true };
+  const access = await canUseFeature(context, guildId, feature);
+  return { ...access, allowed: access.featureAllowed, message: featureDeniedMessage(feature) };
 }
 
 function saveResponse(res, req, { section, message = "저장되었습니다." }) {
@@ -203,6 +215,8 @@ export function createApiRouter(context) {
       if (guildId !== access.guild.id) {
         return res.status(403).send("접근할 수 없는 서버입니다.");
       }
+      const featureAccess = await requireFeature(context, guildId, featureForSection(section));
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
 
       const payload = sectionPayload(section, req.body);
       if (!payload) {
@@ -261,6 +275,8 @@ export function createApiRouter(context) {
       const { guildId, partnerId } = req.params;
       const access = await resolveDashboardAccess(context, req.user?.id);
       if (!access.allowed || guildId !== access.guild.id) return res.status(403).send("접근할 수 없는 서버입니다.");
+      const featureAccess = await requireFeature(context, guildId, "partner");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
       await context.services.partners.deletePartner(guildId, partnerId);
       return wantsJson(req) ? res.json({ ok: true }) : res.redirect("/?section=partner");
     } catch (error) {
@@ -273,6 +289,8 @@ export function createApiRouter(context) {
       const { guildId } = req.params;
       const access = await resolveDashboardAccess(context, req.user?.id);
       if (!access.allowed || guildId !== access.guild.id) return res.status(403).send("접근할 수 없는 서버입니다.");
+      const featureAccess = await requireFeature(context, guildId, "partner");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
       await context.services.partners.createBanner(guildId, {
         licenseKey: String(req.body.bannerLicenseKey || "").trim(),
         serverName: String(req.body.bannerServerName || "").trim(),
@@ -296,6 +314,8 @@ export function createApiRouter(context) {
       if (guildId !== access.guild.id) {
         return res.status(403).send("접근할 수 없는 서버입니다.");
       }
+      const featureAccess = await requireFeature(context, guildId, "ticket");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
 
       const message = await context.services.tickets.syncBoard(guildId);
       if (!message) {
@@ -326,6 +346,8 @@ export function createApiRouter(context) {
       if (guildId !== access.guild.id) {
         return res.status(403).send("접근할 수 없는 서버입니다.");
       }
+      const featureAccess = await requireFeature(context, guildId, "polls");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
 
       const poll = await context.services.polls.createPoll(guildId, {
         channelId: req.body.pollChannelId || "",

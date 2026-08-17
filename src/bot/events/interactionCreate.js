@@ -3,12 +3,19 @@ import { handleSlashCommand } from "../interactions/slash.js";
 import { handleButtonInteraction } from "../interactions/buttons.js";
 import { handleSelectMenuInteraction } from "../interactions/selectMenus.js";
 import { handleModalInteraction } from "../interactions/modals.js";
+import { canUseFeature, featureDeniedMessage, interactionFeature } from "../../shared/planAccess.js";
 
 export default async function handleInteractionCreate(interaction, context) {
   try {
-    const isPartnerInteraction = typeof interaction.customId === "string" && interaction.customId.startsWith("partner:");
-    if (interaction.guildId && !isAllowedGuild(context, interaction.guildId) && !isPartnerInteraction) {
+    const feature = interactionFeature(interaction.customId || "");
+    if (interaction.guildId && !isAllowedGuild(context, interaction.guildId) && !feature) {
       return interaction.reply({ content: "허용된 서버에서만 작동합니다.", ephemeral: true }).catch(() => null);
+    }
+    if (interaction.guildId && feature) {
+      const access = await canUseFeature(context, interaction.guildId, feature);
+      if (!access.featureAllowed) {
+        return interaction.reply({ content: featureDeniedMessage(feature), ephemeral: true }).catch(() => null);
+      }
     }
 
     if (interaction.isChatInputCommand()) {

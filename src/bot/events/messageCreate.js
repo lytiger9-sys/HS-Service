@@ -1,16 +1,18 @@
 import { isAllowedGuild } from "../../shared/guards.js";
+import { canUseFeature } from "../../shared/planAccess.js";
 
 export default async function handleMessageCreate(message, context) {
   if (!message.guild || message.author.bot) {
     return;
   }
 
+  const partnerAccess = await canUseFeature(context, message.guild.id, "partner");
   if (!isAllowedGuild(context, message.guild.id)) {
-    if (await context.services.partners.handleMessage(message)) return;
+    if (partnerAccess.featureAllowed && await context.services.partners.handleMessage(message)) return;
     return;
   }
 
-  if (await context.services.partners.handleMessage(message)) {
+  if (partnerAccess.featureAllowed && await context.services.partners.handleMessage(message)) {
     return;
   }
 
