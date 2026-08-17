@@ -220,6 +220,37 @@ export function createPartnerService(context) {
     return (state(guildId).partners || []).filter((partner) => partner.status === "active" && new Date(partner.lastMessageAt || partner.approvedAt).getTime() < cutoff);
   }
 
+  async function createBanner(guildId, { licenseKey, serverName, serverLink, promoWebhook }) {
+    const current = state(guildId);
+    const settings = current.settings?.partner?.banner;
+    if (!settings?.enabled || !settings.categoryId) throw new Error("상단배너 기능 또는 배너 카테고리가 설정되지 않았습니다.");
+    const license = await context.services.licenses.activate(licenseKey, guildId);
+    if (!license || !["pro", "enterprise"].includes(license.plan)) throw new Error("상단배너를 사용할 수 있는 플랜이 아닙니다.");
+    const category = await context.client.channels.fetch(settings.categoryId).catch(() => null);
+    if (!category || category.type !== ChannelType.GuildCategory) throw new Error("상단배너 카테고리를 찾을 수 없습니다.");
+    const guild = await context.client.guilds.fetch(guildId);
+    const channel = await guild.channels.create({
+      name: buildChannelName(settings, text(serverName, "서버", 70), true),
+      type: ChannelType.GuildText,
+      parent: category.id,
+      permissionOverwrites: [{ id: guild.id, allow: [PermissionFlagsBits.ViewChannel], deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.MentionEveryone] }]
+    });
+    await channel.send({ embeds: [new EmbedBuilder().setTitle(settings.embedTitle).setDescription(`${settings.embedDescription}\\n\\n서버: ${text(serverName, "-", 80)}\\n링크: ${text(serverLink, "-", 500)}\\n홍보 웹훅: ${text(promoWebhook, "-", 500)}`).setColor(settings.embedColor)] });
+    const slot = { id: shortId(), licenseId: String(license._id), channelId: channel.id, serverName: text(serverName, "서버", 80), serverLink: text(serverLink, "", 500), promoWebhook: text(promoWebhook, "", 500), expiresAt: license.expiresAt, createdAt: nowIso() };
+    await patch(guildId, (draft) => { draft.bannerSlots ??= []; draft.bannerSlots.push(slot); });
+    return slot;
+  }
+
+  async function cleanupExpiredBanners(guildId) {
+    const current = state(guildId);
+    const expired = (current.bannerSlots || []).filter((slot) => slot.expiresAt && new Date(slot.expiresAt) <= new Date());
+    if (!expired.length) return 0;
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    for (const slot of expired) await guild?.channels.delete(slot.channelId).catch(() => null);
+    await patch(guildId, (draft) => { draft.bannerSlots = (draft.bannerSlots || []).filter((slot) => !expired.some((item) => item.id === slot.id)); });
+    return expired.length;
+  }
+
   async function deletePartner(guildId, id) {
     const current = state(guildId);
     const partner = (current.partners || []).find((item) => item.id === id);
@@ -232,5 +263,5 @@ export function createPartnerService(context) {
     return partner;
   }
 
-  return { syncConditionsMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner };
+  return { syncConditionsMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner, createBanner, cleanupExpiredBanners };
 }

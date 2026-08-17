@@ -83,6 +83,15 @@ export function createLicenseService() {
       return license;
     },
 
+    async getActiveByGuild(guildId) {
+      const licenses = await LicenseModel.find({ assignedGuildId: String(guildId), status: "active" }).sort({ expiresAt: -1 });
+      const license = licenses[0];
+      if (!license) return null;
+      refreshExpiredStatus(license);
+      if (license.isModified("status")) await license.save();
+      return license.status === "active" ? license.toObject() : null;
+    },
+
     async getActiveById(id, guildId) {
       const license = await LicenseModel.findOne({ _id: id, assignedGuildId: String(guildId) });
       if (!license) return null;

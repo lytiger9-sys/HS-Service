@@ -268,6 +268,23 @@ export function createApiRouter(context) {
     }
   });
 
+  router.post("/:guildId/partner/banner", async (req, res, next) => {
+    try {
+      const { guildId } = req.params;
+      const access = await resolveDashboardAccess(context, req.user?.id);
+      if (!access.allowed || guildId !== access.guild.id) return res.status(403).send("접근할 수 없는 서버입니다.");
+      await context.services.partners.createBanner(guildId, {
+        licenseKey: String(req.body.bannerLicenseKey || "").trim(),
+        serverName: String(req.body.bannerServerName || "").trim(),
+        serverLink: String(req.body.bannerServerLink || "").trim(),
+        promoWebhook: String(req.body.bannerPromoWebhook || "").trim()
+      });
+      return wantsJson(req) ? res.json({ ok: true }) : res.redirect("/?section=partner");
+    } catch (error) {
+      return res.redirect(`/?section=partner&error=${encodeURIComponent(error.message)}`);
+    }
+  });
+
   router.post("/:guildId/ticket/publish", async (req, res, next) => {
     try {
       const { guildId } = req.params;

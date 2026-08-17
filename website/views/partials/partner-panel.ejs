@@ -40,6 +40,17 @@
       <label class="field full"><span>배너 내용</span><textarea form="partner-settings-form" name="bannerEmbedDescription" rows="3"><%= settings.partner.banner.embedDescription %></textarea></label>
       <label class="field"><span>배너 색상</span><input type="color" form="partner-settings-form" name="bannerEmbedColor" value="<%= settings.partner.banner.embedColor %>" /></label>
     </div>
+    <form class="settings-form banner-create-form" method="post" action="/guild/<%= guild.id %>/partner/banner">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <h4>라이선스로 상단배너 만들기</h4>
+      <div class="form-grid">
+        <label class="field"><span>배너 라이선스 키</span><input name="bannerLicenseKey" placeholder="HS-XXXXXX-XXXXXX-XXXXXX" required /></label>
+        <label class="field"><span>서버명</span><input name="bannerServerName" maxlength="80" required /></label>
+        <label class="field"><span>서버 링크</span><input name="bannerServerLink" maxlength="500" required /></label>
+        <label class="field"><span>우리 서버 홍보 웹훅</span><input name="bannerPromoWebhook" maxlength="500" required /></label>
+      </div>
+      <button class="primary" type="submit">상단배너 생성</button>
+    </form>
   </article>
 
   <article class="card section-panel">

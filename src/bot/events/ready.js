@@ -6,7 +6,12 @@ export default async function handleReady(client, context) {
 
   for (const guild of client.guilds.cache.values()) {
     if (!isAllowedGuild(context, guild.id)) {
-      await guild.leave().catch(() => null);
+      const license = await context.services.licenses.getActiveByGuild(guild.id).catch(() => null);
+      if (!license) {
+        await guild.leave().catch(() => null);
+        continue;
+      }
+      await context.services.partners.cleanupExpiredBanners(guild.id).catch(() => null);
     }
   }
 
