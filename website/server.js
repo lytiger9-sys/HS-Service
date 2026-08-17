@@ -5,26 +5,31 @@ import { configureWebAuth } from "./lib/auth.js";
 import { createAuthRouter } from "./routes/auth.js";
 import { createIndexRouter } from "./routes/index.js";
 import { createApiRouter } from "./routes/api.js";
+import { applySecurityHeaders, csrfProtection, ensureCsrfToken, requestRateLimit } from "./lib/security.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function startWebsite(context) {
   const app = express();
+  app.disable("x-powered-by");
+  app.use(applySecurityHeaders);
 
   app.set("view engine", "ejs");
   app.set("views", path.join(__dirname, "views"));
   if (context.config.sessionCookieSecure) {
     app.set("trust proxy", 1);
   }
-  app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
+  app.use(express.urlencoded({ extended: true, limit: "100kb" }));
+  app.use(express.json({ limit: "100kb" }));
   app.use(express.static(path.join(__dirname, "public")));
   app.get("/HS.gif", (_req, res) => {
     res.sendFile(path.join(__dirname, "..", "HS.gif"));
   });
 
   configureWebAuth(app, context);
+  app.use(ensureCsrfToken);
+  app.use(requestRateLimit);
 
   app.use((req, res, next) => {
     res.locals.currentUser = req.user || null;
@@ -36,7 +41,7 @@ export async function startWebsite(context) {
 
   app.use("/auth", createAuthRouter(context));
   app.use("/", createIndexRouter(context));
-  app.use("/guild", createApiRouter(context));
+  app.use("/guild", csrfProtection, createApiRouter(context));
 
   app.use((error, req, res, _next) => {
     console.error("[web] error:", error);
@@ -44,9 +49,10 @@ export async function startWebsite(context) {
       return;
     }
 
-    res.status(500).render("error", {
+    const isDevelopment = process.env.NODE_ENV === "development";
+    res.status(error.statusCode || 500).render("error", {
       title: "서버 오류",
-      message: error.message || "알 수 없는 오류가 발생했습니다."
+      message: isDevelopment ? (error.message || "알 수 없는 오류가 발생했습니다.") : "요청을 처리하는 중 오류가 발생했습니다."
     });
   });
 

@@ -6,16 +6,28 @@ function readBoolean(value) {
   return value === "on" || value === "true" || value === "1";
 }
 
-function readNumber(value, fallback = 0) {
+function readNumber(value, fallback = 0, min = -Infinity, max = Infinity) {
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, parsed));
 }
 
-function splitLines(value) {
+function readText(value, fallback = "", maxLength = 2000) {
+  const text = String(value ?? fallback).trim();
+  return text.slice(0, maxLength);
+}
+
+function readDiscordId(value) {
+  const id = readText(value, "", 22);
+  return /^\d{15,22}$/.test(id) ? id : "";
+}
+
+function splitLines(value, maxItems = 100, maxLength = 100) {
   return String(value ?? "")
     .split(/\r?\n|,/g)
-    .map((entry) => entry.trim())
-    .filter(Boolean);
+    .map((entry) => entry.trim().slice(0, maxLength))
+    .filter(Boolean)
+    .slice(0, maxItems);
 }
 
 function wantsJson(req) {
@@ -36,14 +48,14 @@ function sectionPayload(section, body) {
     return {
       welcome: {
         enabled: readBoolean(body.welcomeEnabled),
-        channelId: body.welcomeChannelId || "",
-        errorChannelId: body.welcomeErrorChannelId || "",
-        embedTitle: body.welcomeEmbedTitle || "",
-        embedDescription: body.welcomeEmbedDescription || "",
-        embedColor: body.welcomeEmbedColor || "#101010",
-        dmTitle: body.welcomeDmTitle || "",
-        dmMessage: body.welcomeDmMessage || "",
-        dmColor: body.welcomeDmColor || "#1f1f1f"
+        channelId: readDiscordId(body.welcomeChannelId),
+        errorChannelId: readDiscordId(body.welcomeErrorChannelId),
+        embedTitle: readText(body.welcomeEmbedTitle, "", 256),
+        embedDescription: readText(body.welcomeEmbedDescription, "", 4000),
+        embedColor: /^#[0-9a-f]{6}$/i.test(body.welcomeEmbedColor || "") ? body.welcomeEmbedColor : "#101010",
+        dmTitle: readText(body.welcomeDmTitle, "", 256),
+        dmMessage: readText(body.welcomeDmMessage, "", 4000),
+        dmColor: /^#[0-9a-f]{6}$/i.test(body.welcomeDmColor || "") ? body.welcomeDmColor : "#1f1f1f"
       }
     };
   }
@@ -58,10 +70,10 @@ function sectionPayload(section, body) {
     return {
       staff: {
         enabled: readBoolean(body.staffEnabled),
-        channelId: body.staffChannelId || "",
-        embedTitle: body.staffEmbedTitle || "",
-        embedDescription: body.staffEmbedDescription || "",
-        buttonLabel: body.staffButtonLabel || "출퇴근"
+        channelId: readDiscordId(body.staffChannelId),
+        embedTitle: readText(body.staffEmbedTitle, "", 256),
+        embedDescription: readText(body.staffEmbedDescription, "", 4000),
+        buttonLabel: readText(body.staffButtonLabel, "출퇴근", 80)
       }
     };
   }
@@ -74,13 +86,13 @@ function sectionPayload(section, body) {
         spamEnabled: body.spamEnabled === undefined ? true : readBoolean(body.spamEnabled),
         profanityEnabled: body.profanityEnabled === undefined ? true : readBoolean(body.profanityEnabled),
         inviteEnabled: body.inviteEnabled === undefined ? true : readBoolean(body.inviteEnabled),
-        massMentionTimeoutMinutes: readNumber(body.massMentionTimeoutMinutes, 10),
-        spamTimeoutMinutes: readNumber(body.spamTimeoutMinutes, 10),
-        profanityTimeoutMinutes: readNumber(body.profanityTimeoutMinutes, 10),
-        inviteTimeoutMinutes: readNumber(body.inviteTimeoutMinutes, 10),
-        spamWindowSeconds: readNumber(body.spamWindowSeconds, 12),
-        spamRepeatThreshold: readNumber(body.spamRepeatThreshold, 3),
-        profanityWords: splitLines(body.profanityWords)
+        massMentionTimeoutMinutes: readNumber(body.massMentionTimeoutMinutes, 10, 0, 10080),
+        spamTimeoutMinutes: readNumber(body.spamTimeoutMinutes, 10, 0, 10080),
+        profanityTimeoutMinutes: readNumber(body.profanityTimeoutMinutes, 10, 0, 10080),
+        inviteTimeoutMinutes: readNumber(body.inviteTimeoutMinutes, 10, 0, 10080),
+        spamWindowSeconds: readNumber(body.spamWindowSeconds, 12, 1, 3600),
+        spamRepeatThreshold: readNumber(body.spamRepeatThreshold, 3, 2, 100),
+        profanityWords: splitLines(body.profanityWords, 200, 80)
       }
     };
   }
@@ -89,8 +101,8 @@ function sectionPayload(section, body) {
     return {
       assignment: {
         enabled: readBoolean(body.assignmentEnabled),
-        channelId: body.assignmentChannelId || "",
-        roleId: body.assignmentRoleId || ""
+        channelId: readDiscordId(body.assignmentChannelId),
+        roleId: readDiscordId(body.assignmentRoleId)
       }
     };
   }
@@ -99,9 +111,9 @@ function sectionPayload(section, body) {
     return {
       voice: {
         enabled: readBoolean(body.voiceEnabled),
-        categoryId: body.voiceCategoryId || "",
-        defaultName: body.voiceDefaultName || "임시 채널",
-        maxUsers: readNumber(body.voiceMaxUsers, 0)
+        categoryId: readDiscordId(body.voiceCategoryId),
+        defaultName: readText(body.voiceDefaultName, "임시 채널", 100),
+        maxUsers: readNumber(body.voiceMaxUsers, 0, 0, 99)
       }
     };
   }
@@ -110,8 +122,8 @@ function sectionPayload(section, body) {
     return {
       honeypot: {
         enabled: readBoolean(body.honeypotEnabled),
-        channelId: body.honeypotChannelId || "",
-        logChannelId: body.honeypotLogChannelId || ""
+        channelId: readDiscordId(body.honeypotChannelId),
+        logChannelId: readDiscordId(body.honeypotLogChannelId)
       }
     };
   }
@@ -120,7 +132,7 @@ function sectionPayload(section, body) {
     return {
       notice: {
         enabled: readBoolean(body.noticeEnabled),
-        content: body.noticeContent || "",
+        content: readText(body.noticeContent, "", 4000),
         updatedAt: new Date().toISOString()
       }
     };
@@ -138,11 +150,11 @@ function sectionPayload(section, body) {
     return {
       logs: {
         enabled: readBoolean(body.logsEnabled),
-        moderationChannelId: body.logModerationChannelId || "",
-        securityChannelId: body.logSecurityChannelId || "",
-        serverChannelId: body.logServerChannelId || "",
-        voteChannelId: body.logVoteChannelId || "",
-        systemChannelId: body.logSystemChannelId || ""
+        moderationChannelId: readDiscordId(body.logModerationChannelId),
+        securityChannelId: readDiscordId(body.logSecurityChannelId),
+        serverChannelId: readDiscordId(body.logServerChannelId),
+        voteChannelId: readDiscordId(body.logVoteChannelId),
+        systemChannelId: readDiscordId(body.logSystemChannelId)
       }
     };
   }
