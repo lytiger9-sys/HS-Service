@@ -1,4 +1,9 @@
 export async function handleModalInteraction(interaction, context) {
+  if (interaction.customId === "partner:application") {
+    await context.services.partners.createApplication(interaction);
+    return interaction.reply({ content: "파트너 신청이 접수되었습니다. 관리자 검토 후 안내드리겠습니다.", ephemeral: true });
+  }
+
   if (interaction.customId === "save-note") {
     const title = interaction.fields.getTextInputValue("save-note-title");
     const content = interaction.fields.getTextInputValue("save-note-content");

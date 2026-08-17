@@ -64,7 +64,8 @@ function buildSections() {
     { id: "honeypot", label: "허니팟", description: "유입 감시" },
     { id: "notice", label: "공지", description: "서버 안내" },
     { id: "polls", label: "투표", description: "버튼 투표" },
-    { id: "logs", label: "로그", description: "채널 연결" }
+    { id: "logs", label: "로그", description: "채널 연결" },
+    { id: "partner", label: "파트너", description: "제휴 신청 및 채널" }
   ];
 }
 
@@ -85,12 +86,13 @@ function normalizeStaffSettings(settings = {}) {
 }
 
 export async function buildDashboardViewModel(context, guild) {
-  const [overview, settings, notes, polls, tempChannels] = await Promise.all([
+  const [overview, settings, notes, polls, tempChannels, stalePartners] = await Promise.all([
     context.services.serverInfo.getDashboardSnapshot(guild),
     context.services.settings.getSettings(guild.id),
     context.services.notes.listNotes(guild.id),
     context.services.polls.listPolls(guild.id),
-    context.services.tempChannels.listTempChannels(guild.id)
+    context.services.tempChannels.listTempChannels(guild.id),
+    context.services.partners.listStale(guild.id)
   ]);
 
   const administrators = (overview.administrators || []).filter((admin) => !admin.isBot);
@@ -142,6 +144,7 @@ export async function buildDashboardViewModel(context, guild) {
     notes,
     polls,
     tempChannels,
+    stalePartners,
     staffMembers,
     staffCounts,
     channels: groupedChannels,

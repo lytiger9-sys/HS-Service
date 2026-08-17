@@ -76,6 +76,30 @@ export function createDefaultGuildSettings() {
       serverChannelId: "",
       voteChannelId: "",
       systemChannelId: ""
+    },
+    partner: {
+      enabled: false,
+      conditionsChannelId: "",
+      conditionsMessageId: "",
+      approvalChannelId: "",
+      partnerCategoryId: "",
+      namePrefix: "파트너-",
+      nameSuffix: "",
+      nameEmoji: "",
+      embedTitle: "파트너 모집",
+      embedDescription: "파트너 조건을 확인한 후 아래 버튼으로 신청해 주세요.",
+      embedColor: "#3a7da8",
+      buttonLabel: "파트너 신청",
+      banner: {
+        enabled: false,
+        categoryId: "",
+        namePrefix: "배너-",
+        nameSuffix: "",
+        nameEmoji: "",
+        embedTitle: "상단 배너",
+        embedDescription: "상단 배너 안내",
+        embedColor: "#b89968"
+      }
     }
   };
 }
@@ -88,6 +112,8 @@ export function createDefaultGuildState() {
     joinOrder: [],
     tickets: {},
     polls: {},
-    tempChannels: {}
+    tempChannels: {},
+    partners: [],
+    bannerSlots: []
   };
 }

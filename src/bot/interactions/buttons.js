@@ -17,8 +17,40 @@ function buildFreeTextModal(pollId) {
   return modal;
 }
 
+function buildPartnerApplicationModal() {
+  const modal = new ModalBuilder().setCustomId("partner:application").setTitle("파트너 신청");
+  const fields = [
+    ["partner-affiliate-name", "파트너 제휴명", TextInputStyle.Short],
+    ["partner-member-count", "파트너 현 인원", TextInputStyle.Short],
+    ["partner-recovery-key", "복구키 사용 여부", TextInputStyle.Short],
+    ["partner-server-link", "서버 링크", TextInputStyle.Short],
+    ["partner-promo-webhook", "우리 서버 홍보 웹훅", TextInputStyle.Paragraph]
+  ];
+  modal.addComponents(...fields.map(([id, label, style]) => new ActionRowBuilder().addComponents(
+    new TextInputBuilder().setCustomId(id).setLabel(label).setStyle(style).setRequired(true).setMaxLength(500)
+  )));
+  return modal;
+}
+
 export async function handleButtonInteraction(interaction, context) {
   const [scope, action, id, extra] = interaction.customId.split(":");
+
+  if (interaction.customId === "partner:apply") {
+    return interaction.showModal(buildPartnerApplicationModal());
+  }
+
+  if (scope === "partner" && action === "approve") {
+    if (!isAdministrator(interaction.member)) return interaction.reply({ content: "관리자만 파트너를 승인할 수 있습니다.", ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
+    await context.services.partners.approve(interaction.guildId, id, interaction.user);
+    return interaction.editReply({ content: "파트너 신청을 승인하고 채널과 웹훅을 생성했습니다." });
+  }
+
+  if (scope === "partner" && action === "reject") {
+    if (!isAdministrator(interaction.member)) return interaction.reply({ content: "관리자만 파트너를 거절할 수 있습니다.", ephemeral: true });
+    await context.services.partners.reject(interaction.guildId, id, interaction.user);
+    return interaction.update({ content: "파트너 신청을 거절했습니다.", components: [] });
+  }
 
   if (scope === "ticket" && action === "open") {
     const payload = await context.services.tickets.buildCategoryMenu(interaction.guildId);

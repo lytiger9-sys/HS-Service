@@ -1,0 +1,75 @@
+<section class="panel-stack <%= panelClass('partner') %>" data-panel="partner">
+  <article class="card section-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Partner</p>
+        <h3>파트너 설정</h3>
+        <p class="muted">파트너 신청 버튼, 승인 채널, 파트너 채널 이름과 상단배너를 설정합니다.</p>
+      </div>
+      <label class="field toggle section-toggle">
+        <input type="checkbox" form="partner-settings-form" name="partnerEnabled" <%= settings.partner.enabled ? 'checked' : '' %> />
+        <span>파트너 기능 활성화</span>
+      </label>
+    </div>
+    <form class="settings-form" id="partner-settings-form" method="post" action="/guild/<%= guild.id %>/settings/partner">
+      <div class="form-grid">
+        <label class="field"><span>파트너 조건 채널</span><select name="partnerConditionsChannelId"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.conditionsChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
+        <label class="field"><span>파트너 승인 채널</span><select name="partnerApprovalChannelId"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.approvalChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
+        <label class="field"><span>파트너 카테고리</span><select name="partnerCategoryId"><option value="">선택 안 함</option><% channels.categories.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.partnerCategoryId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
+        <label class="field"><span>채널 접두사</span><input name="partnerNamePrefix" value="<%= settings.partner.namePrefix %>" maxlength="30" /></label>
+        <label class="field"><span>채널 접미사</span><input name="partnerNameSuffix" value="<%= settings.partner.nameSuffix %>" maxlength="30" /></label>
+        <label class="field"><span>채널 이모지</span><input name="partnerNameEmoji" value="<%= settings.partner.nameEmoji %>" maxlength="8" /></label>
+        <label class="field"><span>임베드 제목</span><input name="partnerEmbedTitle" value="<%= settings.partner.embedTitle %>" data-partner-preview="title" /></label>
+        <label class="field full"><span>임베드 내용</span><textarea name="partnerEmbedDescription" rows="4" data-partner-preview="description"><%= settings.partner.embedDescription %></textarea></label>
+        <label class="field"><span>임베드 색상</span><input type="color" name="partnerEmbedColor" value="<%= settings.partner.embedColor %>" data-partner-preview="color" /></label>
+        <label class="field"><span>버튼 이름</span><input name="partnerButtonLabel" value="<%= settings.partner.buttonLabel %>" data-partner-preview="button" /></label>
+      </div>
+      <button class="primary" type="submit">파트너 설정 저장 및 임베드 동기화</button>
+    </form>
+  </article>
+
+  <article class="card section-panel">
+    <div class="section-head"><div><p class="eyebrow">Banner</p><h3>상단배너 설정</h3></div></div>
+    <div class="form-grid">
+      <label class="field toggle"><input type="checkbox" form="partner-settings-form" name="bannerEnabled" <%= settings.partner.banner.enabled ? 'checked' : '' %> /><span>상단배너 기능 활성화</span></label>
+      <label class="field"><span>배너 카테고리</span><select name="bannerCategoryId" form="partner-settings-form"><option value="">선택 안 함</option><% channels.categories.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.banner.categoryId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
+      <label class="field"><span>배너 접두사</span><input form="partner-settings-form" name="bannerNamePrefix" value="<%= settings.partner.banner.namePrefix %>" /></label>
+      <label class="field"><span>배너 접미사</span><input form="partner-settings-form" name="bannerNameSuffix" value="<%= settings.partner.banner.nameSuffix %>" /></label>
+      <label class="field"><span>배너 이모지</span><input form="partner-settings-form" name="bannerNameEmoji" value="<%= settings.partner.banner.nameEmoji %>" /></label>
+      <label class="field"><span>배너 제목</span><input form="partner-settings-form" name="bannerEmbedTitle" value="<%= settings.partner.banner.embedTitle %>" /></label>
+      <label class="field full"><span>배너 내용</span><textarea form="partner-settings-form" name="bannerEmbedDescription" rows="3"><%= settings.partner.banner.embedDescription %></textarea></label>
+      <label class="field"><span>배너 색상</span><input type="color" form="partner-settings-form" name="bannerEmbedColor" value="<%= settings.partner.banner.embedColor %>" /></label>
+    </div>
+  </article>
+
+  <article class="card section-panel">
+    <div class="section-head"><div><p class="eyebrow">Live Preview</p><h3>파트너 조건 미리보기</h3></div></div>
+    <div class="partner-preview" data-partner-preview-box>
+      <div class="partner-preview-bar" data-partner-preview-color></div>
+      <h4 data-partner-preview-title><%= settings.partner.embedTitle %></h4>
+      <p data-partner-preview-description><%= settings.partner.embedDescription %></p>
+      <button type="button" disabled data-partner-preview-button><%= settings.partner.buttonLabel %></button>
+    </div>
+  </article>
+
+  <article class="card section-panel">
+    <div class="section-head"><div><p class="eyebrow">Cleanup</p><h3>7일 이상 비활성 파트너</h3></div><span class="muted"><%= stalePartners.length %>개</span></div>
+    <div class="table-wrap"><table><thead><tr><th>제휴명</th><th>채널</th><th>마지막 활동</th><th>신청자</th><th>관리</th></tr></thead><tbody>
+      <% if (!stalePartners.length) { %><tr><td colspan="5" class="muted">정리할 비활성 파트너가 없습니다.</td></tr><% } %>
+      <% stalePartners.forEach((partner) => { %><tr><td><%= partner.affiliateName %></td><td><%= partner.channelId %></td><td><%= formatDate(partner.lastMessageAt || partner.approvedAt) %></td><td><%= partner.requesterTag || partner.requesterId %></td><td><form method="post" action="/guild/<%= guild.id %>/partner/<%= partner.id %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="ghost danger" type="submit">채널 삭제</button></form></td></tr><% }) %>
+    </tbody></table></div>
+  </article>
+</section>
+<script>
+  (() => {
+    const form = document.querySelector('#partner-settings-form');
+    if (!form) return;
+    const setText = (key, value) => { const node = document.querySelector(`[data-partner-preview-${key}]`); if (node) node.textContent = value; };
+    form.querySelectorAll('[data-partner-preview]').forEach((field) => field.addEventListener('input', () => {
+      const key = field.dataset.partnerPreview;
+      if (key === 'color') document.querySelector('[data-partner-preview-color]').style.background = field.value;
+      else setText(key, field.value);
+    }));
+    document.querySelector('[data-partner-preview-color]').style.background = form.querySelector('[name="partnerEmbedColor"]').value;
+  })();
+</script>

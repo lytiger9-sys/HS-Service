@@ -12,7 +12,9 @@ const guildStateSchema = new Schema(
     joinOrder: { type: [Schema.Types.Mixed], default: () => [] },
     tickets: { type: Schema.Types.Mixed, default: () => ({}) },
     polls: { type: Schema.Types.Mixed, default: () => ({}) },
-    tempChannels: { type: Schema.Types.Mixed, default: () => ({}) }
+    tempChannels: { type: Schema.Types.Mixed, default: () => ({}) },
+    partners: { type: [Schema.Types.Mixed], default: () => [] },
+    bannerSlots: { type: [Schema.Types.Mixed], default: () => [] }
   },
   {
     versionKey: false,

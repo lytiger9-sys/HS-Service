@@ -37,7 +37,9 @@ function normalizeGuildState(doc) {
     tempChannels: {
       ...defaults.tempChannels,
       ...(data.tempChannels || {})
-    }
+    },
+    partners: Array.isArray(data.partners) ? data.partners : [],
+    bannerSlots: Array.isArray(data.bannerSlots) ? data.bannerSlots : []
   };
 
   const logs = data.settings?.logs || {};
@@ -76,6 +78,14 @@ function normalizeGuildState(doc) {
   };
 
   normalized.settings.ticket = normalizeTicketSettings(data.settings?.ticket || defaults.settings.ticket);
+  normalized.settings.partner = {
+    ...defaults.settings.partner,
+    ...(data.settings?.partner || {}),
+    banner: {
+      ...defaults.settings.partner.banner,
+      ...(data.settings?.partner?.banner || {})
+    }
+  };
 
   return normalized;
 }

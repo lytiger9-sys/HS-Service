@@ -146,7 +146,7 @@ function sectionPayload(section, body) {
     };
   }
 
-  if (section === "logs") {
+    if (section === "logs") {
     return {
       logs: {
         enabled: readBoolean(body.logsEnabled),
@@ -158,8 +158,35 @@ function sectionPayload(section, body) {
       }
     };
   }
-
+  if (section === "partner") {
+    return {
+      partner: {
+        enabled: readBoolean(body.partnerEnabled),
+        conditionsChannelId: readDiscordId(body.partnerConditionsChannelId),
+        approvalChannelId: readDiscordId(body.partnerApprovalChannelId),
+        partnerCategoryId: readDiscordId(body.partnerCategoryId),
+        namePrefix: readText(body.partnerNamePrefix, "", 30),
+        nameSuffix: readText(body.partnerNameSuffix, "", 30),
+        nameEmoji: readText(body.partnerNameEmoji, "", 8),
+        embedTitle: readText(body.partnerEmbedTitle, "파트너 모집", 256),
+        embedDescription: readText(body.partnerEmbedDescription, "", 4000),
+        embedColor: /^#[0-9a-f]{6}$/i.test(body.partnerEmbedColor || "") ? body.partnerEmbedColor : "#3a7da8",
+        buttonLabel: readText(body.partnerButtonLabel, "파트너 신청", 80),
+        banner: {
+          enabled: readBoolean(body.bannerEnabled),
+          categoryId: readDiscordId(body.bannerCategoryId),
+          namePrefix: readText(body.bannerNamePrefix, "", 30),
+          nameSuffix: readText(body.bannerNameSuffix, "", 30),
+          nameEmoji: readText(body.bannerNameEmoji, "", 8),
+          embedTitle: readText(body.bannerEmbedTitle, "상단 배너", 256),
+          embedDescription: readText(body.bannerEmbedDescription, "", 4000),
+          embedColor: /^#[0-9a-f]{6}$/i.test(body.bannerEmbedColor || "") ? body.bannerEmbedColor : "#b89968"
+        }
+      }
+    };
+  }
   return null;
+
 }
 
 export function createApiRouter(context) {
@@ -195,6 +222,9 @@ export function createApiRouter(context) {
       if (section === "ticket") {
         await context.services.tickets.syncBoard(guildId).catch(() => null);
       }
+      if (section === "partner") {
+        await context.services.partners.syncConditionsMessage(guildId).catch(() => null);
+      }
 
       return saveResponse(res, req, { section });
     } catch (error) {
@@ -221,6 +251,18 @@ export function createApiRouter(context) {
       }
 
       return res.redirect("/?section=overview");
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/:guildId/partner/:partnerId/delete", async (req, res, next) => {
+    try {
+      const { guildId, partnerId } = req.params;
+      const access = await resolveDashboardAccess(context, req.user?.id);
+      if (!access.allowed || guildId !== access.guild.id) return res.status(403).send("접근할 수 없는 서버입니다.");
+      await context.services.partners.deletePartner(guildId, partnerId);
+      return wantsJson(req) ? res.json({ ok: true }) : res.redirect("/?section=partner");
     } catch (error) {
       next(error);
     }

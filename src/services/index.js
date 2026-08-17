@@ -13,6 +13,7 @@ import { createAssignmentService } from "./assignmentService.js";
 import { createMessageLogService } from "./messageLogService.js";
 import { createStaffService } from "./staffService.js";
 import { createLicenseService } from "./licenseService.js";
+import { createPartnerService } from "./partnerService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -32,6 +33,7 @@ export function createServices(context) {
     assignment: createAssignmentService(context, guildState),
     messageLogs: createMessageLogService(context),
     staff: createStaffService(context, guildState),
-    licenses: createLicenseService()
+    licenses: createLicenseService(),
+    partners: createPartnerService(context)
   };
 }

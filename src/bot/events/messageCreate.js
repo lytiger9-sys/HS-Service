@@ -6,6 +6,11 @@ export default async function handleMessageCreate(message, context) {
   }
 
   if (!isAllowedGuild(context, message.guild.id)) {
+    if (await context.services.partners.handleMessage(message)) return;
+    return;
+  }
+
+  if (await context.services.partners.handleMessage(message)) {
     return;
   }
 

@@ -6,7 +6,8 @@ import { handleModalInteraction } from "../interactions/modals.js";
 
 export default async function handleInteractionCreate(interaction, context) {
   try {
-    if (interaction.guildId && !isAllowedGuild(context, interaction.guildId)) {
+    const isPartnerInteraction = typeof interaction.customId === "string" && interaction.customId.startsWith("partner:");
+    if (interaction.guildId && !isAllowedGuild(context, interaction.guildId) && !isPartnerInteraction) {
       return interaction.reply({ content: "허용된 서버에서만 작동합니다.", ephemeral: true }).catch(() => null);
     }
 
