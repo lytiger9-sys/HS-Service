@@ -44,6 +44,8 @@ export function loadConfig() {
     discordClientSecret: readRequired("DISCORD_CLIENT_SECRET"),
     discordCallbackUrl: readRequired("DISCORD_CALLBACK_URL"),
     sessionSecret: readRequired("SESSION_SECRET"),
+    licenseAdminId: process.env.LICENSE_ADMIN_ID?.trim() || "",
+    licenseAdminPassword: process.env.LICENSE_ADMIN_PASSWORD || "",
     sessionCookieSecure: readBoolean("SESSION_COOKIE_SECURE", false),
     webHost: process.env.WEB_HOST?.trim() || "127.0.0.1",
     webPort: readNumber("WEB_PORT", 3000)

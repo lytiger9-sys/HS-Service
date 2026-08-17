@@ -12,6 +12,7 @@ import { createHoneypotService } from "./honeypotService.js";
 import { createAssignmentService } from "./assignmentService.js";
 import { createMessageLogService } from "./messageLogService.js";
 import { createStaffService } from "./staffService.js";
+import { createLicenseService } from "./licenseService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -30,6 +31,7 @@ export function createServices(context) {
     honeypot: createHoneypotService(context, guildState),
     assignment: createAssignmentService(context, guildState),
     messageLogs: createMessageLogService(context),
-    staff: createStaffService(context, guildState)
+    staff: createStaffService(context, guildState),
+    licenses: createLicenseService()
   };
 }

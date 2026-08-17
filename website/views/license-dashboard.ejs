@@ -1,0 +1,99 @@
+<%- include('partials/head', { title }) %>
+<body class="dashboard-page">
+  <div class="app-shell">
+    <main class="content">
+      <section class="hero card">
+        <div class="hero-top">
+          <div>
+            <p class="eyebrow">License Administration</p>
+            <h1>라이선스 관리</h1>
+            <p class="muted">플랜별 라이선스를 발급하고 사용 상태와 만료일을 관리합니다.</p>
+          </div>
+          <form method="post" action="/license/logout">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button class="ghost" type="submit">로그아웃</button>
+          </form>
+        </div>
+      </section>
+
+      <% if (issuedKey) { %>
+        <section class="card notice success">
+          <strong>새 라이선스가 발급되었습니다.</strong>
+          <p>이 키는 다시 표시되지 않을 수 있으므로 지금 안전한 곳에 복사하세요.</p>
+          <code><%= issuedKey %></code>
+        </section>
+      <% } %>
+      <% if (errorMessage) { %>
+        <section class="card notice danger"><%= errorMessage %></section>
+      <% } %>
+
+      <section class="grid two-up">
+        <article class="card">
+          <p class="eyebrow">Issue</p>
+          <h2>라이선스 발급</h2>
+          <form method="post" action="/license/issue" class="stack-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <label class="field">
+              <span>플랜</span>
+              <select name="plan">
+                <option value="basic">Basic</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>사용 기간(일)</span>
+              <input type="number" name="durationDays" min="1" max="3650" value="30" required />
+            </label>
+            <button class="primary" type="submit">라이선스 발급</button>
+          </form>
+        </article>
+        <article class="card">
+          <p class="eyebrow">Policy</p>
+          <h2>운영 정책</h2>
+          <p class="muted">발급된 키는 MongoDB에 SHA-256 해시로 저장되며, 발급 직후에만 평문 키가 표시됩니다.</p>
+          <p class="muted">현재 활성화 로직은 다음 단계에서 구매자 서버 로그인과 연결할 수 있도록 준비되어 있습니다.</p>
+        </article>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Inventory</p>
+            <h2>라이선스 목록</h2>
+          </div>
+          <span class="muted"><%= licenses.length %>개</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>키</th><th>플랜</th><th>기간</th><th>상태</th><th>서버</th><th>만료일</th><th>작업</th></tr></thead>
+            <tbody>
+              <% if (!licenses.length) { %>
+                <tr><td colspan="7" class="muted">발급된 라이선스가 없습니다.</td></tr>
+              <% } %>
+              <% licenses.forEach((license) => { %>
+                <tr>
+                  <td><code>HS-••••-••••-<%= license.keyLast4 %></code></td>
+                  <td><%= license.plan %></td>
+                  <td><%= license.durationDays %>일</td>
+                  <td><span class="status-badge status-<%= license.status %>"><%= license.status %></span></td>
+                  <td><%= license.assignedGuildId || '-' %></td>
+                  <td><%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR') : '-' %></td>
+                  <td>
+                    <% if (license.status === 'available' || license.status === 'active') { %>
+                      <form method="post" action="/license/<%= license._id %>/revoke">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <button class="ghost danger" type="submit">폐기</button>
+                      </form>
+                    <% } else { %>-<% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
