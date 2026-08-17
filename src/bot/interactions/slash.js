@@ -5,6 +5,7 @@ function commandFeature(commandName) {
   if (["저장", "저장내용"].includes(commandName)) return "ticket";
   if (commandName === "tempvoice") return "voice";
   if (commandName === "staff") return "administrators";
+  if (["honeypotban", "honeypotkick"].includes(commandName)) return "honeypot";
   return null;
 }
 

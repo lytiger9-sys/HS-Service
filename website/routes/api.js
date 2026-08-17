@@ -36,7 +36,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", notice: "notice", polls: "polls", assignment: "assignment", voice: "voice", honeypot: "honeypot", logs: "logs", partner: "partner" };
+  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", notice: "notice", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", partner: "partner" };
   return map[section] || null;
 }
 
@@ -126,16 +126,6 @@ function sectionPayload(section, body) {
         categoryId: readDiscordId(body.voiceCategoryId),
         defaultName: readText(body.voiceDefaultName, "임시 채널", 100),
         maxUsers: readNumber(body.voiceMaxUsers, 0, 0, 99)
-      }
-    };
-  }
-
-  if (section === "honeypot") {
-    return {
-      honeypot: {
-        enabled: readBoolean(body.honeypotEnabled),
-        channelId: readDiscordId(body.honeypotChannelId),
-        logChannelId: readDiscordId(body.honeypotLogChannelId)
       }
     };
   }
@@ -234,10 +224,6 @@ export function createApiRouter(context) {
       }
 
       await context.services.settings.updateSettings(guildId, payload);
-
-      if (section === "honeypot") {
-        await context.services.honeypot.syncStatusMessage(guildId).catch(() => null);
-      }
 
       if (section === "staff") {
         await context.services.staff.syncStaffBoard(guildId).catch(() => null);

@@ -14,7 +14,6 @@ const featureLabels = {
   staff: "관리자 기능 사용",
   assignment: "할당 기능 사용",
   voice: "음성 기능 사용",
-  honeypot: "허니팟 기능 사용",
   notice: "공지 기능 사용",
   polls: "투표 기능 사용",
   logs: "로그 기능 사용"

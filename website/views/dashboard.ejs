@@ -296,44 +296,6 @@
         </article>
       </section>
 
-      <section class="panel-stack <%= panelClass('honeypot') %>" data-panel="honeypot">
-        <article class="card section-panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Honeypot</p>
-              <h3>허니팟 채널</h3>
-            </div>
-            <label class="field toggle section-toggle">
-              <input type="checkbox" form="honeypot-settings-form" name="honeypotEnabled" <%= settings.honeypot.enabled !== false ? 'checked' : '' %> />
-              <span>허니팟 기능 활성화</span>
-            </label>
-          </div>
-
-          <form class="settings-form" id="honeypot-settings-form" method="post" action="/guild/<%= guild.id %>/settings/honeypot">
-            <div class="form-grid">
-              <label class="field">
-                <span>허니팟 채널</span>
-                <select name="honeypotChannelId">
-                  <option value="">선택 안 함</option>
-                  <% channels.text.forEach((channel) => { %>
-                    <option value="<%= channel.id %>" <%= settings.honeypot.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
-                  <% }) %>
-                </select>
-              </label>
-              <label class="field">
-                <span>허니팟 로그 채널</span>
-                <select name="honeypotLogChannelId">
-                  <option value="">선택 안 함</option>
-                  <% channels.text.forEach((channel) => { %>
-                    <option value="<%= channel.id %>" <%= settings.honeypot.logChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
-                  <% }) %>
-                </select>
-              </label>
-            </div>
-            <button class="primary" type="submit">저장</button>
-          </form>
-        </article>
-      </section>
 
       <section class="panel-stack <%= panelClass('notice') %>" data-panel="notice">
         <article class="card section-panel">

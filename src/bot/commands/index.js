@@ -7,6 +7,8 @@ import clear from "./clear.js";
 import punishments from "./punishments.js";
 import tempvoice from "./tempvoice.js";
 import staff from "./staff.js";
+import honeypotban from "./honeypotban.js";
+import honeypotkick from "./honeypotkick.js";
 
 export const commandList = [
   notice,
@@ -17,7 +19,9 @@ export const commandList = [
   clear,
   punishments,
   tempvoice,
-  staff
+  staff,
+  honeypotban,
+  honeypotkick
 ];
 
 export const commandMap = new Map(commandList.map((command) => [command.data.name, command]));

@@ -63,7 +63,6 @@ function buildSections() {
     { id: "security", label: "보안", description: "차단 규칙" },
     { id: "assignment", label: "할당", description: "메시지 역할" },
     { id: "voice", label: "음성", description: "임시 채널" },
-    { id: "honeypot", label: "허니팟", description: "유입 감시" },
     { id: "notice", label: "공지", description: "서버 안내" },
     { id: "polls", label: "투표", description: "버튼 투표" },
     { id: "logs", label: "로그", description: "채널 연결" },

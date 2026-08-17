@@ -16,17 +16,43 @@ async function resolveTextChannel(guild, channelId) {
 
 export function createHoneypotService(context, guildState) {
   async function buildStatusEmbed(guild, settings) {
+    const action = settings.honeypot.action === "ban" ? "차단" : "추방";
     return buildBaseEmbed({
       title: "허니팟 감시 채널",
       description: [
-        "이 채널에 메시지를 남긴 계정은 자동으로 추방됩니다.",
+        `이 채널에 메시지를 남긴 계정은 자동으로 ${action}됩니다.`,
+        "메시지를 보내면 최근 메시지가 삭제되고 제재됩니다.",
         "",
-        `현재 적발 인원: **${settings.honeypot.caughtCount}명**`
+        `현재 ${action}된 사용자 수: **${settings.honeypot.caughtCount}명**`
       ].join("\n"),
       color: palette.danger,
       footer: guild.name,
       timestamp: Date.now()
     });
+  }
+
+  async function configureChannel(guildId, channelId, action) {
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    if (!guild) throw new Error("서버를 찾을 수 없습니다.");
+    const channel = await resolveTextChannel(guild, channelId);
+    if (!channel) throw new Error("텍스트 채널만 허니팟 채널로 지정할 수 있습니다.");
+    if (!["ban", "kick"].includes(action)) throw new Error("허용되지 않는 허니팟 제재 방식입니다.");
+    await guildState.patch(guildId, (guildStateValue) => {
+      guildStateValue.settings.honeypot.enabled = true;
+      guildStateValue.settings.honeypot.channelId = channel.id;
+      guildStateValue.settings.honeypot.action = action;
+      guildStateValue.settings.honeypot.statusMessageId = "";
+      return guildStateValue.settings.honeypot;
+    });
+    return syncStatusMessage(guildId);
+  }
+
+  async function deleteRecentMessages(channel, limit = 100) {
+    const messages = await channel.messages.fetch({ limit }).catch(() => null);
+    if (!messages?.size) return 0;
+    const deletable = messages.filter((entry) => Date.now() - entry.createdTimestamp < 14 * 24 * 60 * 60 * 1000);
+    const deleted = await channel.bulkDelete(deletable, true).catch(() => null);
+    return deleted?.size || 0;
   }
 
   async function syncStatusMessage(guildId) {
@@ -89,13 +115,17 @@ export function createHoneypotService(context, guildState) {
       return false;
     }
 
-    const kicked = await member.kick("honeypot violation").then(() => true).catch(() => false);
-    if (!kicked) {
+    await deleteRecentMessages(message.channel);
+    const action = settings.action === "ban" ? "ban" : "kick";
+    const punished = action === "ban"
+      ? await member.ban({ reason: "honeypot violation" }).then(() => true).catch(() => false)
+      : await member.kick("honeypot violation").then(() => true).catch(() => false);
+    if (!punished) {
       await context.services.logs.sendHoneypotLog(message.guild.id, {
         embeds: [
           buildBaseEmbed({
-            title: "허니팟 추방 실패",
-            description: `${member.user.tag} 을(를) 추방하지 못했습니다.`,
+            title: `허니팟 ${action === "ban" ? "차단" : "추방"} 실패`,
+            description: `${member.user.tag} 을(를) ${action === "ban" ? "차단" : "추방"}하지 못했습니다.`,
             color: palette.danger,
             timestamp: Date.now()
           })
@@ -105,7 +135,7 @@ export function createHoneypotService(context, guildState) {
     }
 
     const record = await context.services.punishments.addPunishment(message.guild.id, {
-      type: "kick",
+      type: action,
       memberId: member.id,
       memberTag: member.user.tag,
       moderatorId: context.client.user.id,
@@ -125,7 +155,7 @@ export function createHoneypotService(context, guildState) {
       embeds: [
         buildBaseEmbed({
           title: "허니팟 적발",
-          description: `${member.user.tag} 을(를) 추방했습니다.`,
+          description: `${member.user.tag} 을(를) ${action === "ban" ? "차단" : "추방"}했습니다.`,
           color: parseColor("#8d2d2d"),
           fields: [
             { name: "채널", value: `<#${message.channelId}>`, inline: true },
@@ -141,6 +171,7 @@ export function createHoneypotService(context, guildState) {
   }
 
   return {
+    configureChannel,
     syncStatusMessage,
     handleMessage
   };

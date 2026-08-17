@@ -32,6 +32,7 @@ export function createDefaultGuildSettings() {
       enabled: true,
       channelId: "",
       logChannelId: "",
+      action: "kick",
       caughtCount: 0,
       statusMessageId: ""
     },

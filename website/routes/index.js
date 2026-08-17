@@ -61,7 +61,7 @@ export function createIndexRouter(context) {
       }
 
       const plan = getPlanDefinition(activeLicense.plan);
-      const tabs = plan.tabs.map((id) => ({ id, label: PLAN_TAB_LABELS[id] || id }));
+      const tabs = plan.tabs.filter((id) => id !== "honeypot").map((id) => ({ id, label: PLAN_TAB_LABELS[id] || id }));
       const requestedTab = typeof req.query.tab === "string" ? req.query.tab : "overview";
       const activeTab = tabs.some((tab) => tab.id === requestedTab) ? requestedTab : "overview";
       return res.render("plan-dashboard", {
