@@ -4,8 +4,12 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ChannelType,
+  ContainerBuilder,
   EmbedBuilder,
-  PermissionFlagsBits
+  MessageFlags,
+  PermissionFlagsBits,
+  SeparatorBuilder,
+  TextDisplayBuilder
 } from "discord.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -31,21 +35,34 @@ function buildChannelName(settings, affiliateName, banner = false) {
     .toLowerCase();
 }
 
-function partnerEmbed(settings) {
-  return new EmbedBuilder()
-    .setTitle(settings.embedTitle || "파트너 모집")
-    .setDescription(settings.embedDescription || "파트너 조건을 확인한 후 신청해 주세요.")
-    .setColor(settings.embedColor || "#3a7da8")
-    .setFooter({ text: "HS Service Partner" });
+function colorNumber(value, fallback = 0x3a7da8) {
+  const normalized = String(value || "").replace(/^#/, "");
+  const parsed = Number.parseInt(normalized, 16);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function conditionComponents(settings) {
-  return [new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("partner:apply")
-      .setLabel(settings.buttonLabel || "파트너 신청")
-      .setStyle(ButtonStyle.Primary)
-  )];
+  const container = new ContainerBuilder()
+    .setAccentColor(colorNumber(settings.embedColor))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${settings.embedTitle || "파트너 모집"}\n${settings.embedDescription || "파트너 조건을 확인한 후 신청해 주세요."}`))
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent("파트너 조건을 확인했다면 아래 버튼을 눌러 신청서를 제출하세요."))
+    .addActionRowComponents(new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("partner:apply")
+        .setLabel(settings.buttonLabel || "파트너 신청")
+        .setStyle(ButtonStyle.Primary)
+    ));
+  return { flags: MessageFlags.IsComponentsV2, components: [container] };
+}
+
+function bannerComponents(settings, details) {
+  const container = new ContainerBuilder()
+    .setAccentColor(colorNumber(settings.embedColor, 0xb89968))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${settings.embedTitle || "상단 배너"}\n${settings.embedDescription || "상단 배너 안내"}`))
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**서버명:** ${details.serverName}\n**서버 링크:** ${details.serverLink}\n**홍보 웹훅:** ${details.promoWebhook}`));
+  return { flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
 function applicationEmbed(application) {
@@ -84,7 +101,7 @@ export function createPartnerService(context) {
     if (!settings?.enabled || !settings.conditionsChannelId) return null;
     const channel = await guild.channels.fetch(settings.conditionsChannelId).catch(() => null);
     if (!channel?.isTextBased()) return null;
-    const payload = { embeds: [partnerEmbed(settings)], components: conditionComponents(settings) };
+    const payload = conditionComponents(settings);
     let message = settings.conditionsMessageId
       ? await channel.messages.fetch(settings.conditionsMessageId).catch(() => null)
       : null;
@@ -265,7 +282,11 @@ export function createPartnerService(context) {
       parent: category.id,
       permissionOverwrites: [{ id: guild.id, allow: [PermissionFlagsBits.ViewChannel], deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.MentionEveryone] }]
     });
-    await channel.send({ embeds: [new EmbedBuilder().setTitle(settings.embedTitle).setDescription(`${settings.embedDescription}\\n\\n서버: ${text(serverName, "-", 80)}\\n링크: ${text(serverLink, "-", 500)}\\n홍보 웹훅: ${text(promoWebhook, "-", 500)}`).setColor(settings.embedColor)] });
+    await channel.send(bannerComponents(settings, {
+      serverName: text(serverName, "-", 80),
+      serverLink: text(serverLink, "-", 500),
+      promoWebhook: text(promoWebhook, "-", 500)
+    }));
     const slot = { id: shortId(), licenseId: String(license._id), channelId: channel.id, serverName: text(serverName, "서버", 80), serverLink: text(serverLink, "", 500), promoWebhook: text(promoWebhook, "", 500), expiresAt: license.expiresAt, createdAt: nowIso() };
     await patch(guildId, (draft) => { draft.bannerSlots ??= []; draft.bannerSlots.push(slot); });
     return slot;
@@ -295,3 +316,5 @@ export function createPartnerService(context) {
 
   return { syncConditionsMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner, issueBannerLicense, createBanner, cleanupExpiredBanners };
 }
+
+export { conditionComponents, bannerComponents };
