@@ -11,6 +11,7 @@ export default async function handleReady(client, context) {
     }
     await guild.commands.set(commandList.map((command) => command.data.toJSON())).catch(() => null);
     await context.services.honeypot.syncStatusMessage(guild.id).catch(() => null);
+    await context.services.overviewChannels.syncGuild(guild).catch((error) => console.error(`[overview] sync failed for ${guild.id}:`, error));
   }
 
   const cleanupExpiredBanners = async () => {

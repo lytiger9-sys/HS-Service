@@ -4,7 +4,13 @@ import { isAllowedGuild } from "../../shared/guards.js";
 import { canUseFeature } from "../../shared/planAccess.js";
 
 export default async function handleGuildMemberAdd(member, context) {
-  if (!(await isAllowedGuild(context, member.guild.id)) || member.user.bot) {
+  if (!(await isAllowedGuild(context, member.guild.id))) {
+    return;
+  }
+  await context.services.overviewChannels.syncGuild(member.guild).catch((error) => {
+    console.error(`[overview] member addition sync failed for ${member.guild.id}:`, error);
+  });
+  if (member.user.bot) {
     return;
   }
   const access = await canUseFeature(context, member.guild.id, "welcome");
