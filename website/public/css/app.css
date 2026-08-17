@@ -1887,3 +1887,38 @@ a {
   .license-auth-shell { width: min(100% - 24px, 520px); padding: 24px 0; }
   .license-auth-card { padding: 26px 22px; }
 }
+
+/* Activation and plan dashboard */
+.activation-shell { align-items: center; }
+.activation-shell .license-auth-card { max-width: 560px; }
+.license-auth-card .license-form label { display: grid; gap: 7px; color: #52616d; font-size: 0.84rem; font-weight: 600; }
+.activation-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 16px; color: #80909b; font-size: 0.78rem; }
+.activation-divider::before, .activation-divider::after { content: ""; height: 1px; flex: 1; background: #dce4e9; }
+.activation-divider span { white-space: nowrap; }
+.license-admin-login { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; border: 1px solid #b8c6d0; border-radius: 9px; color: #304756; font-weight: 600; }
+.license-admin-login:hover { border-color: #3a7da8; background: #f2f7fa; color: #1d3445; }
+.license-help { margin: 14px 0 0; color: #81909b; font-size: 0.78rem; line-height: 1.6; }
+.plan-summary { display: grid; justify-items: end; gap: 8px; }
+.plan-pill, .coming-soon-label { display: inline-flex; align-items: center; padding: 7px 11px; border-radius: 999px; background: #e5f0f6; color: #24516d; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.05em; }
+.plan-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 22px; align-items: start; }
+.plan-sidebar { position: sticky; top: 22px; }
+.plan-nav { display: grid; gap: 5px; margin: 16px 0 22px; }
+.plan-nav-link { display: block; padding: 10px 12px; border-radius: 8px; color: #52616d; font-size: 0.9rem; }
+.plan-nav-link:hover, .plan-nav-link.is-active { background: #eaf2f6; color: #1d3445; font-weight: 700; }
+.plan-sidebar .license-form { margin: 0 0 14px; }
+.plan-sidebar .ghost { width: 100%; }
+.plan-panel { min-height: 340px; }
+.plan-panel h2 { margin: 0 0 18px; font-size: 1.65rem; }
+.plan-panel > p { color: #52616d; }
+.plan-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 30px; }
+.plan-metrics > div { display: grid; gap: 6px; padding: 18px; border: 1px solid #e0e7eb; border-radius: 10px; background: #f9fbfc; }
+.plan-metrics span { color: #7b8b95; font-size: 0.76rem; }
+.plan-metrics strong { color: #1d3445; font-size: 1.12rem; }
+.coming-soon-panel { display: grid; place-items: start; gap: 10px; min-height: 220px; padding: 28px; border: 1px dashed #bccbd3; border-radius: 12px; background: #f8fbfc; }
+.coming-soon-panel p { margin: 0; color: #52616d; }
+@media (max-width: 760px) {
+  .plan-layout { grid-template-columns: 1fr; }
+  .plan-sidebar { position: static; }
+  .plan-summary { justify-items: start; }
+  .plan-metrics { grid-template-columns: 1fr; }
+}

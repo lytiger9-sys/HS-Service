@@ -1,0 +1,54 @@
+<%- include('partials/head', { title }) %>
+<body class="license-page plan-page">
+  <main class="license-shell">
+    <section class="license-hero license-card">
+      <div class="hero-top">
+        <div>
+          <p class="eyebrow">HS Service Dashboard</p>
+          <h1><%= plan.label %> 플랜</h1>
+          <p class="muted">연결된 서버: <strong><%= license.assignedGuildId %></strong></p>
+        </div>
+        <div class="plan-summary">
+          <span class="plan-pill"><%= plan.label %></span>
+          <span class="muted">만료: <%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR') : '-' %></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="plan-layout">
+      <aside class="license-card plan-sidebar">
+        <p class="eyebrow">Available Features</p>
+        <nav class="plan-nav" aria-label="플랜 기능">
+          <% tabs.forEach((tab) => { %>
+            <a class="plan-nav-link <%= activeTab === tab.id ? 'is-active' : '' %>" href="/?tab=<%= tab.id %>"><%= tab.label %></a>
+          <% }) %>
+        </nav>
+        <form method="post" action="/license/switch" class="license-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="ghost" type="submit">다른 라이선스 연결</button>
+        </form>
+        <a class="license-admin-login" href="/auth/discord">관리자 로그인</a>
+      </aside>
+
+      <section class="license-card plan-panel">
+        <p class="eyebrow"><%= plan.label %> · <%= plan.description %></p>
+        <h2><%= tabs.find((tab) => tab.id === activeTab)?.label || '개요' %></h2>
+        <% if (activeTab === 'overview') { %>
+          <p>현재 라이선스가 정상적으로 연결되었습니다. 왼쪽 메뉴에서 사용할 수 있는 기능을 선택하세요.</p>
+          <div class="plan-metrics">
+            <div><span>플랜</span><strong><%= plan.label %></strong></div>
+            <div><span>사용 가능한 탭</span><strong><%= tabs.length %>개</strong></div>
+            <div><span>상태</span><strong>활성</strong></div>
+          </div>
+        <% } else { %>
+          <div class="coming-soon-panel">
+            <span class="coming-soon-label">준비 중</span>
+            <p>이 플랜에 포함된 <strong><%= tabs.find((tab) => tab.id === activeTab)?.label %></strong> 기능을 준비하고 있습니다.</p>
+            <p class="muted">기능이 준비되면 이 탭에서 바로 설정할 수 있습니다.</p>
+          </div>
+        <% } %>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

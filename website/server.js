@@ -44,7 +44,7 @@ export async function startWebsite(context) {
   app.locals.botName = context.config.botName;
 
   app.use("/auth", createAuthRouter(context));
-  app.use("/", createIndexRouter(context));
+  app.use("/", csrfProtection, createIndexRouter(context));
   app.use("/guild", csrfProtection, createApiRouter(context));
   app.use("/license", csrfProtection, createLicenseRouter(context));
 

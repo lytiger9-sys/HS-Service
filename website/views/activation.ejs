@@ -1,0 +1,29 @@
+<%- include('partials/head', { title }) %>
+<body class="license-auth-page">
+  <main class="license-auth-shell activation-shell">
+    <section class="license-auth-card">
+      <p class="eyebrow">HS Service</p>
+      <h1>서버 연결하기</h1>
+      <p class="muted">Discord 서버 ID와 라이선스 키를 입력하면 해당 플랜에 맞는 기능을 사용할 수 있습니다.</p>
+      <% if (message) { %>
+        <p class="license-notice license-notice-danger"><%= message %></p>
+      <% } %>
+      <form method="post" action="/activate" class="license-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <label>
+          <span>Discord 서버 ID</span>
+          <input type="text" name="guildId" inputmode="numeric" pattern="[0-9]{15,22}" placeholder="서버 설정 → 고급 → 개발자 모드에서 복사" required />
+        </label>
+        <label>
+          <span>라이선스 키</span>
+          <input type="text" name="licenseKey" placeholder="HS-XXXXXX-XXXXXX-XXXXXX" autocomplete="off" required />
+        </label>
+        <button class="primary" type="submit">서버 연결</button>
+      </form>
+      <div class="activation-divider"><span>관리자라면</span></div>
+      <a class="license-admin-login" href="/auth/discord">Discord 계정으로 관리자 로그인</a>
+      <p class="license-help">관리자 로그인은 `.env`에 설정된 관리 서버에서 Discord 관리자 권한이 있는 계정만 기존 관리 대시보드에 접근할 수 있습니다.</p>
+    </section>
+  </main>
+</body>
+</html>
