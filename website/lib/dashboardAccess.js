@@ -1,6 +1,6 @@
 import { PermissionFlagsBits } from "discord.js";
 
-export async function getAllowedGuild(context) {
+export async function getAllowedGuild(context, guildId = context.config.allowedGuildId) {
   if (typeof context.client?.isReady === "function" && !context.client.isReady()) {
     return {
       guild: null,
@@ -9,7 +9,7 @@ export async function getAllowedGuild(context) {
     };
   }
 
-  const guild = await context.client.guilds.fetch(context.config.allowedGuildId).catch(() => null);
+  const guild = await context.client.guilds.fetch(String(guildId)).catch(() => null);
   if (!guild) {
     return {
       guild: null,
@@ -25,8 +25,8 @@ export async function getAllowedGuild(context) {
   };
 }
 
-export async function resolveDashboardAccess(context, userId) {
-  const guildResult = await getAllowedGuild(context);
+export async function resolveDashboardAccess(context, userId, guildId = context.config.allowedGuildId) {
+  const guildResult = await getAllowedGuild(context, guildId);
   if (!guildResult.guild) {
     return {
       ...guildResult,
@@ -82,4 +82,13 @@ export function getAccessMessage(access) {
     default:
       return "대시보드에 접근할 수 없습니다.";
   }
+}
+
+export async function resolveGuildAdministrator(context, guildId, userId) {
+  const guild = await context.client.guilds.fetch(String(guildId)).catch(() => null);
+  if (!guild || !userId) return { guild, member: null, allowed: false, status: guild ? 401 : 404, reason: guild ? "unauthenticated" : "guild_missing" };
+  const member = await guild.members.fetch(String(userId)).catch(() => null);
+  if (!member) return { guild, member: null, allowed: false, status: 403, reason: "not_member" };
+  const allowed = member.permissions.has(PermissionFlagsBits.Administrator);
+  return { guild, member, allowed, status: allowed ? 200 : 403, reason: allowed ? "admin" : "not_admin" };
 }

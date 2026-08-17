@@ -239,11 +239,22 @@ export function createPartnerService(context) {
     return (state(guildId).partners || []).filter((partner) => partner.status === "active" && new Date(partner.lastMessageAt || partner.approvedAt).getTime() < cutoff);
   }
 
-  async function createBanner(guildId, { licenseKey, serverName, serverLink, promoWebhook }) {
+  async function issueBannerLicense(guildId, issuerUserId, durationDays) {
+    const serviceLicense = await context.services.licenses.getActiveByGuild(guildId);
+    if (!serviceLicense) throw new Error("활성 서비스 라이선스가 필요합니다.");
+    return context.services.licenses.issueBanner({
+      durationDays,
+      issuerGuildId: guildId,
+      issuerUserId,
+      issuerPlan: serviceLicense.plan
+    });
+  }
+
+  async function createBanner(guildId, { licenseKey, serverName, serverLink, promoWebhook, recipientUserId }) {
     const current = state(guildId);
     const settings = current.settings?.partner?.banner;
     if (!settings?.enabled || !settings.categoryId) throw new Error("상단배너 기능 또는 배너 카테고리가 설정되지 않았습니다.");
-    const license = await context.services.licenses.activate(licenseKey, guildId);
+    const license = await context.services.licenses.activateBanner(licenseKey, guildId, recipientUserId);
     if (!license || !["pro", "enterprise"].includes(license.plan)) throw new Error("상단배너를 사용할 수 있는 플랜이 아닙니다.");
     const category = await context.client.channels.fetch(settings.categoryId).catch(() => null);
     if (!category || category.type !== ChannelType.GuildCategory) throw new Error("상단배너 카테고리를 찾을 수 없습니다.");
@@ -282,5 +293,5 @@ export function createPartnerService(context) {
     return partner;
   }
 
-  return { syncConditionsMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner, createBanner, cleanupExpiredBanners };
+  return { syncConditionsMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner, issueBannerLicense, createBanner, cleanupExpiredBanners };
 }

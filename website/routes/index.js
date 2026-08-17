@@ -22,7 +22,10 @@ export function createIndexRouter(context) {
   router.get("/", async (req, res, next) => {
     try {
       if (res.locals.isAuthenticated) {
-        const access = await resolveDashboardAccess(context, req.user?.id);
+        const sessionLicense = req.session?.activeLicenseId && req.session?.activeGuildId
+          ? await context.services.licenses.getActiveById(req.session.activeLicenseId, req.session.activeGuildId)
+          : null;
+        const access = await resolveDashboardAccess(context, req.user?.id, sessionLicense ? req.session.activeGuildId : undefined);
         if (access.allowed) {
           const viewModel = await buildDashboardViewModel(context, access.guild);
           const requestedSection = typeof req.query.section === "string" ? req.query.section : "";
@@ -33,7 +36,9 @@ export function createIndexRouter(context) {
             ...viewModel,
             currentUser: req.user,
             activeSection,
-            saved: req.query.saved || ""
+            saved: req.query.saved || "",
+            issuedBannerKey: req.query.bannerKey || "",
+            bannerError: req.query.bannerError || ""
           });
         }
         if (access.status === 503 || access.status === 404) {

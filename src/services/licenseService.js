@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { LicenseModel } from "../database/models/license.js";
 import { PLAN_IDS } from "../config/plans.js";
+import { planHasFeature } from "../shared/planAccess.js";
 
 export function normalizePlan(plan) {
   return PLAN_IDS.has(plan) ? plan : "free";
@@ -64,6 +65,30 @@ export function createLicenseService() {
       throw new Error("라이선스 키 생성에 실패했습니다.");
     },
 
+    async issueBanner({ durationDays, issuerGuildId, issuerUserId, issuerPlan }) {
+      if (!planHasFeature(issuerPlan, "partner")) throw new Error("파트너 플랜에서만 상단배너 라이선스를 발급할 수 있습니다.");
+      const days = normalizeDurationDays(durationDays);
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const plainKey = createPlainKey();
+        try {
+          await LicenseModel.create({
+            keyHash: hashKey(plainKey),
+            keyLast4: plainKey.slice(-4),
+            plan: issuerPlan,
+            kind: "banner",
+            durationDays: days,
+            issuerGuildId: String(issuerGuildId),
+            issuerUserId: String(issuerUserId),
+            createdBy: String(issuerUserId)
+          });
+          return { key: plainKey, kind: "banner", durationDays: days };
+        } catch (error) {
+          if (error?.code !== 11000 || attempt === 4) throw error;
+        }
+      }
+      throw new Error("상단배너 라이선스 키 생성에 실패했습니다.");
+    },
+
     async revoke(id) {
       const result = await LicenseModel.findOneAndUpdate(
         { _id: id, status: { $in: ["available", "active"] } },
@@ -84,7 +109,7 @@ export function createLicenseService() {
     },
 
     async getActiveByGuild(guildId) {
-      const licenses = await LicenseModel.find({ assignedGuildId: String(guildId), status: "active" }).sort({ expiresAt: -1 });
+      const licenses = await LicenseModel.find({ assignedGuildId: String(guildId), kind: "service", status: "active" }).sort({ expiresAt: -1 });
       const license = licenses[0];
       if (!license) return null;
       refreshExpiredStatus(license);
@@ -93,7 +118,7 @@ export function createLicenseService() {
     },
 
     async getActiveById(id, guildId) {
-      const license = await LicenseModel.findOne({ _id: id, assignedGuildId: String(guildId) });
+      const license = await LicenseModel.findOne({ _id: id, assignedGuildId: String(guildId), kind: "service" });
       if (!license) return null;
       refreshExpiredStatus(license);
       if (license.isModified("status")) await license.save();
@@ -102,10 +127,23 @@ export function createLicenseService() {
 
     async activate(key, guildId) {
       const license = await this.findByKey(key);
-      if (!license || license.status !== "available") return null;
+      if (!license || license.kind !== "service" || license.status !== "available") return null;
       const now = new Date();
       license.status = "active";
       license.assignedGuildId = String(guildId);
+      license.activatedAt = now;
+      license.expiresAt = new Date(now.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
+      await license.save();
+      return license.toObject();
+    },
+
+    async activateBanner(key, guildId, recipientUserId) {
+      const license = await this.findByKey(key);
+      if (!license || license.kind !== "banner" || license.status !== "available") return null;
+      const now = new Date();
+      license.status = "active";
+      license.assignedGuildId = String(guildId);
+      license.recipientUserId = String(recipientUserId || "");
       license.activatedAt = now;
       license.expiresAt = new Date(now.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
       await license.save();

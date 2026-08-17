@@ -1,5 +1,5 @@
 import express from "express";
-import { getAccessMessage, resolveDashboardAccess } from "../lib/dashboardAccess.js";
+import { getAccessMessage, resolveDashboardAccess, resolveGuildAdministrator } from "../lib/dashboardAccess.js";
 import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
 import { canUseFeature, featureDeniedMessage } from "../../src/shared/planAccess.js";
 
@@ -284,22 +284,35 @@ export function createApiRouter(context) {
     }
   });
 
+  router.post("/:guildId/partner/banner-license", async (req, res, next) => {
+    try {
+      const { guildId } = req.params;
+      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      if (!access.allowed) return res.status(403).send("발급 서버의 관리자만 배너 라이선스를 발급할 수 있습니다.");
+      const featureAccess = await requireFeature(context, guildId, "partner");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
+      const issued = await context.services.partners.issueBannerLicense(guildId, req.user.id, req.body.bannerDurationDays);
+      return wantsJson(req) ? res.json({ ok: true, key: issued.key, durationDays: issued.durationDays }) : res.redirect(`/?section=partner&bannerKey=${encodeURIComponent(issued.key)}`);
+    } catch (error) {
+      return res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
+    }
+  });
+
   router.post("/:guildId/partner/banner", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveDashboardAccess(context, req.user?.id);
-      if (!access.allowed || guildId !== access.guild.id) return res.status(403).send("접근할 수 없는 서버입니다.");
-      const featureAccess = await requireFeature(context, guildId, "partner");
-      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
+      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      if (!access.allowed) return res.status(403).send("수령 서버의 관리자만 배너를 등록할 수 있습니다.");
       await context.services.partners.createBanner(guildId, {
         licenseKey: String(req.body.bannerLicenseKey || "").trim(),
         serverName: String(req.body.bannerServerName || "").trim(),
         serverLink: String(req.body.bannerServerLink || "").trim(),
-        promoWebhook: String(req.body.bannerPromoWebhook || "").trim()
+        promoWebhook: String(req.body.bannerPromoWebhook || "").trim(),
+        recipientUserId: req.user?.id || ""
       });
       return wantsJson(req) ? res.json({ ok: true }) : res.redirect("/?section=partner");
     } catch (error) {
-      return res.redirect(`/?section=partner&error=${encodeURIComponent(error.message)}`);
+      return res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
     }
   });
 
