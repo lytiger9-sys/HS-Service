@@ -47,7 +47,7 @@ export function loadConfig() {
     licenseAdminId: process.env.LICENSE_ADMIN_ID?.trim() || "",
     licenseAdminPassword: process.env.LICENSE_ADMIN_PASSWORD || "",
     sessionCookieSecure: readBoolean("SESSION_COOKIE_SECURE", false),
-    webHost: process.env.WEB_HOST?.trim() || "127.0.0.1",
-    webPort: readNumber("WEB_PORT", 3000)
+    webHost: process.env.WEB_HOST?.trim() || "0.0.0.0",
+    webPort: readNumber("PORT", readNumber("WEB_PORT", 3000))
   };
 }

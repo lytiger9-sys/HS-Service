@@ -27,6 +27,9 @@ export async function startWebsite(context) {
   app.get("/HS.gif", (_req, res) => {
     res.sendFile(path.join(__dirname, "..", "HS.gif"));
   });
+  app.get("/health", (_req, res) => {
+    res.status(200).json({ ok: true, service: "hs-service" });
+  });
 
   configureWebAuth(app, context);
   app.use(ensureCsrfToken);
