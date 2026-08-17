@@ -237,6 +237,7 @@ function setupEmbedPanel() {
   const previewDescription = document.querySelector("[data-embed-preview-description]");
   const previewDescriptionText = document.querySelector("[data-embed-preview-description-text]");
   const previewComponents = document.querySelector("[data-embed-preview-components]");
+  const previewFooter = document.querySelector("[data-embed-preview-footer]");
   const previewComponentsCard = document.querySelector("[data-embed-preview-components-card]");
   const previewLegacyCard = document.querySelector("[data-embed-preview-legacy-card]");
   const previewCard = document.querySelector("[data-embed-preview-card]");
@@ -271,9 +272,19 @@ function setupEmbedPanel() {
     if (previewTitle) previewTitle.textContent = titleInput?.value || "서버 공지";
     if (previewDescription) previewDescription.textContent = description;
     if (previewDescriptionText) previewDescriptionText.textContent = description;
+    if (previewFooter) previewFooter.textContent = form.querySelector('[name="embedFooter"]')?.value || "";
     if (previewCard && titleInput) previewCard.style.setProperty("--embed-preview-color", form.querySelector('[name="embedColor"]')?.value || "#1a1d23");
     if (previewComponents) {
       previewComponents.replaceChildren();
+      const addPreviewText = (value, className = "discord-component-text") => {
+        if (!value) return;
+        const text = document.createElement("div");
+        text.className = className;
+        text.textContent = value;
+        previewComponents.append(text);
+      };
+      addPreviewText(titleInput?.value ? `# ${titleInput.value}` : "", "discord-component-heading");
+      addPreviewText(description, "discord-component-text");
       String(form.querySelector('[name="embedComponentsBody"]')?.value || "").split(/\r?\n/).forEach((line) => {
         const trimmed = line.trim();
         const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
@@ -305,6 +316,7 @@ function setupEmbedPanel() {
   };
   titleInput?.addEventListener("input", updatePreview);
   descriptionInput?.addEventListener("input", updatePreview);
+  form.querySelector('[name="embedFooter"]')?.addEventListener("input", updatePreview);
   form.querySelector('[name="embedColor"]')?.addEventListener("input", updatePreview);
   modeSelect?.addEventListener("change", () => {
     const isComponents = modeSelect.value === "components";
@@ -324,6 +336,7 @@ function setupEmbedPanel() {
   });
   modeSelect?.dispatchEvent(new Event("change"));
   form.querySelector('[name="embedComponentsBody"]')?.addEventListener("input", updatePreview);
+  updatePreview();
 
   sendButton?.addEventListener("click", async () => {
     if (!channelSelect?.value) {

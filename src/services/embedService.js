@@ -35,7 +35,7 @@ const DEFAULTS = {
 };
 
 function normalizeSettings(settings = {}) {
-  const embed = { ...DEFAULTS, ...(settings.embed || {}) };
+  const embed = { ...DEFAULTS, ...(settings.embed || {}), mode: "components" };
   embed.mentionRoleIds = Array.isArray(embed.mentionRoleIds)
     ? embed.mentionRoleIds.filter((id) => /^\d{15,22}$/.test(String(id)))
     : [];
@@ -97,7 +97,11 @@ function legacyPayload(guild, settings) {
 
 function componentsPayload(settings, guild) {
   const container = new ContainerBuilder();
-  const lines = normalizeRoleMentions(settings.componentsBody || settings.description || "", guild).split(/\r?\n/);
+  const contentParts = [];
+  if (settings.title) contentParts.push(`# ${settings.title}`);
+  if (settings.description) contentParts.push(settings.description);
+  if (settings.componentsBody) contentParts.push(settings.componentsBody);
+  const lines = normalizeRoleMentions(contentParts.join("\n\n"), guild).split(/\r?\n/);
   let text = [];
   const flush = () => {
     if (!text.length) return;
@@ -130,7 +134,10 @@ function componentsPayload(settings, guild) {
     }
   }
   flush();
-  if (!lines.length) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(" "));
+  if (settings.footer) {
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${normalizeRoleMentions(settings.footer, guild)}`));
+  }
+  if (!lines.length && !settings.footer) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(" "));
   return { flags: MessageFlags.IsComponentsV2, components: [container], ...mentionPayload(settings, guild) };
 }
 

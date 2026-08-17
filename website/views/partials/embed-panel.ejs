@@ -4,7 +4,7 @@
       <div>
         <p class="eyebrow">Embed & Notice</p>
         <h3>임베드 및 공지</h3>
-        <p class="muted">전송 형식에 따라 사용할 수 있는 입력 요소가 자동으로 바뀝니다.</p>
+        <p class="muted">Components V2 전용 메시지 작성기입니다.</p>
       </div>
       <label class="field toggle section-toggle">
         <input type="checkbox" form="embed-settings-form" name="embedEnabled" <%= settings.embed.enabled !== false ? 'checked' : '' %> />
@@ -13,14 +13,11 @@
     </div>
     <form class="settings-form" id="embed-settings-form" method="post" action="/guild/<%= guild.id %>/settings/embed" data-embed-form>
       <div class="form-grid">
-        <label class="field">
+        <div class="field full">
           <span>전송 형식</span>
-          <select name="embedMode" data-embed-mode>
-            <option value="components" <%= settings.embed.mode !== 'legacy' ? 'selected' : '' %>>Components V2</option>
-            <option value="legacy" <%= settings.embed.mode === 'legacy' ? 'selected' : '' %>>기본 임베드</option>
-          </select>
-          <small class="muted" data-embed-format-help>텍스트, 줄바꿈, 실선을 조합해 Discord Components V2 메시지를 만듭니다.</small>
-        </label>
+          <strong>Components V2</strong>
+          <small class="muted">Text Display, Separator, Media Gallery, Thumbnail을 조합해 Discord 메시지를 만듭니다.</small>
+        </div>
         <label class="field full">
           <span>전송 채널 검색</span>
           <input type="search" placeholder="이 탭에서 채널 이름을 입력해 검색" data-channel-search="embed-channel-select" autocomplete="off" />
@@ -67,31 +64,11 @@
           <small class="muted">입력한 순서대로 표시됩니다. 빈 줄은 줄바꿈, `--`는 실선, `[image] https://이미지주소`는 큰 이미지, `[thumbnail] https://이미지주소`는 썸네일입니다.</small>
         </div>
 
-        <div class="field full" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
+        <label class="field full">
           <span>푸터</span>
-          <input type="text" name="embedFooter" value="<%= settings.embed.footer %>" />
-        </div>
-        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
-          <span>작성자 이름</span>
-          <input type="text" name="embedAuthorName" value="<%= settings.embed.authorName %>" />
-        </div>
-        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
-          <span>작성자 링크</span>
-          <input type="url" name="embedAuthorUrl" value="<%= settings.embed.authorUrl %>" />
-        </div>
-        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
-          <span>썸네일 URL</span>
-          <input type="url" name="embedThumbnailUrl" value="<%= settings.embed.thumbnailUrl %>" />
-        </div>
-        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
-          <span>이미지 URL</span>
-          <input type="url" name="embedImageUrl" value="<%= settings.embed.imageUrl %>" />
-        </div>
-        <div class="field full" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
-          <span>필드</span>
-          <textarea name="embedFields" rows="5"><%= JSON.stringify(settings.embed.fields || []) %></textarea>
-          <small class="muted">JSON 형식: [{"name":"항목명","value":"내용","inline":true}] · 최대 25개</small>
-        </div>
+          <input type="text" name="embedFooter" value="<%= settings.embed.footer %>" data-embed-preview="footer" placeholder="메시지 하단에 표시할 푸터" />
+          <small class="muted">입력한 푸터는 Components V2 메시지의 마지막 Text Display로 추가됩니다.</small>
+        </label>
 
         <label class="field check-field full">
           <input type="checkbox" name="embedScheduleEnabled" <%= settings.embed.scheduleEnabled ? 'checked' : '' %> />
@@ -117,11 +94,12 @@
         <div class="discord-avatar"><%= guild.name.slice(0, 1) %></div>
         <div class="discord-message-content">
           <div class="discord-message-meta"><strong><%= guild.name %></strong><span>오늘 오전 12:00</span></div>
-          <div class="discord-message-text" data-embed-preview-description-text><%= settings.embed.description %></div>
+          <div class="discord-message-text" data-embed-preview-description-text hidden><%= settings.embed.description %></div>
           <div class="discord-components-message" data-embed-preview-components-card>
             <div class="discord-components-preview" data-embed-preview-components></div>
+            <div class="discord-component-footer" data-embed-preview-footer><%= settings.embed.footer %></div>
           </div>
-          <div class="discord-embed-card" data-embed-preview-legacy-card>
+          <div class="discord-embed-card" data-embed-preview-legacy-card hidden>
             <div class="discord-embed-accent"></div>
             <div class="discord-embed-inner">
               <h4 data-embed-preview-title><%= settings.embed.title %></h4>
