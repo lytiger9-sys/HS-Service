@@ -1,15 +1,14 @@
 <%- include('partials/head', { title }) %>
-<body class="dashboard-page">
-  <div class="app-shell">
-    <main class="content">
-      <section class="hero card">
+<body class="license-page">
+  <main class="license-shell">
+    <section class="license-hero license-card">
         <div class="hero-top">
           <div>
             <p class="eyebrow">License Administration</p>
             <h1>라이선스 관리</h1>
             <p class="muted">플랜별 라이선스를 발급하고 사용 상태와 만료일을 관리합니다.</p>
           </div>
-          <form method="post" action="/license/logout">
+          <form method="post" action="/license/logout" class="license-inline-form">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <button class="ghost" type="submit">로그아웃</button>
           </form>
@@ -17,21 +16,21 @@
       </section>
 
       <% if (issuedKey) { %>
-        <section class="card notice success">
+        <section class="license-notice license-notice-success">
           <strong>새 라이선스가 발급되었습니다.</strong>
           <p>이 키는 다시 표시되지 않을 수 있으므로 지금 안전한 곳에 복사하세요.</p>
           <code><%= issuedKey %></code>
         </section>
       <% } %>
       <% if (errorMessage) { %>
-        <section class="card notice danger"><%= errorMessage %></section>
+        <section class="license-notice license-notice-danger"><%= errorMessage %></section>
       <% } %>
 
-      <section class="grid two-up">
-        <article class="card">
+      <section class="license-grid">
+        <article class="license-card">
           <p class="eyebrow">Issue</p>
           <h2>라이선스 발급</h2>
-          <form method="post" action="/license/issue" class="stack-form">
+          <form method="post" action="/license/issue" class="license-form">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <label class="field">
               <span>플랜</span>
@@ -50,7 +49,7 @@
             <button class="primary" type="submit">라이선스 발급</button>
           </form>
         </article>
-        <article class="card">
+        <article class="license-card">
           <p class="eyebrow">Policy</p>
           <h2>운영 정책</h2>
           <p class="muted">발급된 키는 MongoDB에 SHA-256 해시로 저장되며, 발급 직후에만 평문 키가 표시됩니다.</p>
@@ -58,7 +57,7 @@
         </article>
       </section>
 
-      <section class="card">
+      <section class="license-card">
         <div class="section-head">
           <div>
             <p class="eyebrow">Inventory</p>
@@ -95,7 +94,6 @@
           </table>
         </div>
       </section>
-    </main>
-  </div>
+  </main>
 </body>
 </html>

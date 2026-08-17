@@ -1761,3 +1761,129 @@ a {
 .status-active { color: #245e88; border-color: #6c9fc3; }
 .status-expired, .status-revoked { color: #8e2f23; border-color: #c48579; }
 @media (max-width: 720px) { .auth-shell { padding: 18px; } .auth-card { padding: 26px; } }
+
+/* Standalone license administration layout */
+.license-page,
+.license-auth-page {
+  min-height: 100vh;
+  background: #eef2f5;
+  color: #17202a;
+}
+.license-shell {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 48px 0 72px;
+  display: grid;
+  gap: 22px;
+}
+.license-card {
+  background: #ffffff;
+  border: 1px solid #d8e0e6;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(38, 57, 73, 0.07);
+  padding: 28px;
+}
+.license-hero { padding: 34px; }
+.license-hero .hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.license-hero h1,
+.license-card h2,
+.license-auth-card h1 {
+  margin: 0 0 10px;
+  color: #17202a;
+  font-family: var(--sans);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.license-hero h1 { font-size: clamp(2rem, 4vw, 3.2rem); }
+.license-card h2 { font-size: 1.35rem; }
+.license-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+.license-form { display: grid; gap: 16px; margin-top: 22px; }
+.license-form .field { display: grid; gap: 7px; }
+.license-form .field span { color: #52616d; font-size: 0.84rem; font-weight: 600; }
+.license-form input,
+.license-form select,
+.license-auth-card input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #c8d3dc;
+  border-radius: 9px;
+  background: #fbfcfd;
+  color: #17202a;
+  padding: 10px 12px;
+  font: inherit;
+}
+.license-form input:focus,
+.license-form select:focus,
+.license-auth-card input:focus {
+  outline: 3px solid rgba(58, 125, 168, 0.18);
+  border-color: #3a7da8;
+}
+.license-form .primary,
+.license-auth-card .primary {
+  border: 0;
+  border-radius: 9px;
+  background: #1d3445;
+  color: #ffffff;
+  padding: 12px 18px;
+  cursor: pointer;
+}
+.license-form .primary:hover,
+.license-auth-card .primary:hover { background: #2b5068; }
+.license-inline-form { margin: 0; }
+.license-inline-form .ghost,
+.license-card .ghost {
+  border: 1px solid #b8c6d0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #304756;
+  padding: 9px 13px;
+  cursor: pointer;
+}
+.license-card .ghost.danger { color: #a03d32; border-color: #d8a39c; }
+.license-notice {
+  padding: 18px 22px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+.license-notice-success { background: #edf8f0; border-color: #a8d1b2; color: #265d35; }
+.license-notice-danger { background: #fff1ef; border-color: #e2aaa2; color: #8b3027; }
+.license-notice code {
+  display: block;
+  margin-top: 10px;
+  padding: 12px;
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.75);
+  color: inherit;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+}
+.license-card .section-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.license-card .section-head h2 { margin-bottom: 0; }
+.license-card .table-wrap { overflow-x: auto; }
+.license-card table { width: 100%; min-width: 760px; border-collapse: collapse; }
+.license-card th, .license-card td { padding: 13px 12px; border-bottom: 1px solid #e2e8ed; text-align: left; white-space: nowrap; }
+.license-card th { color: #60717d; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.license-auth-shell { width: min(520px, calc(100% - 40px)); min-height: 100vh; margin: 0 auto; display: grid; place-items: center; padding: 40px 0; }
+.license-auth-card { width: 100%; padding: 38px; border: 1px solid #d8e0e6; border-radius: 16px; background: #ffffff; box-shadow: 0 16px 38px rgba(38, 57, 73, 0.1); }
+.license-auth-card h1 { font-size: 2rem; }
+.license-auth-card .license-form { margin: 26px 0 18px; }
+.license-auth-card .license-form label { display: grid; gap: 7px; color: #52616d; font-size: 0.84rem; font-weight: 600; }
+.license-auth-card > a { color: #52616d; font-size: 0.9rem; }
+.license-auth-card > a:hover { color: #1d3445; }
+@media (max-width: 760px) {
+  .license-shell { width: min(100% - 24px, 620px); padding: 24px 0 42px; }
+  .license-hero, .license-card { padding: 22px; }
+  .license-hero .hero-top { align-items: flex-start; flex-direction: column; }
+  .license-grid { grid-template-columns: 1fr; }
+  .license-auth-shell { width: min(100% - 24px, 520px); padding: 24px 0; }
+  .license-auth-card { padding: 26px 22px; }
+}

@@ -1,7 +1,7 @@
 <%- include('partials/head', { title }) %>
-<body class="auth-page">
-  <main class="auth-shell">
-    <section class="auth-card card">
+<body class="license-auth-page">
+  <main class="license-auth-shell">
+    <section class="license-auth-card">
       <p class="eyebrow">License Administration</p>
       <h1>라이선스 관리자</h1>
       <p class="muted">운영자 계정으로 로그인하면 라이선스를 발급하고 관리할 수 있습니다.</p>
@@ -11,7 +11,7 @@
       <% if (message) { %>
         <p class="notice danger"><%= message %></p>
       <% } %>
-      <form method="post" action="/license/login" class="stack-form">
+      <form method="post" action="/license/login" class="license-form">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <label class="field">
           <span>관리자 아이디</span>
