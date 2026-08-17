@@ -43,7 +43,19 @@ function normalizeSettings(settings = {}) {
   return embed;
 }
 
-function mentionPayload(settings) {
+function normalizeRoleMentions(value, guild) {
+  let text = String(value || "");
+  const roles = [...(guild?.roles?.cache?.values?.() || [])]
+    .filter((role) => role.id !== guild.id && role.name)
+    .sort((a, b) => b.name.length - a.name.length);
+  for (const role of roles) {
+    const escaped = role.name.replace(/[.*+?^${}()|[\\]\\]/g, "\\\\$&");
+    text = text.replace(new RegExp(`@${escaped}(?![\\w])`, "g"), `<@&${role.id}>`);
+  }
+  return text;
+}
+
+function mentionPayload(settings, guild) {
   const source = [
     settings.title,
     settings.description,
@@ -51,7 +63,7 @@ function mentionPayload(settings) {
     settings.authorName,
     settings.componentsBody,
     ...(settings.fields || []).flatMap((field) => [field?.name, field?.value])
-  ].filter(Boolean).join("\n");
+  ].filter(Boolean).map((value) => normalizeRoleMentions(value, guild)).join("\n");
   const everyone = /@everyone\b/.test(source);
   const here = /@here\b/.test(source);
   const roles = [...source.matchAll(/<@&(\d{15,22})>/g)].map((match) => match[1]);
@@ -80,12 +92,12 @@ function legacyPayload(guild, settings) {
     .slice(0, 25)
     .map((field) => ({ name: String(field.name).slice(0, 256), value: String(field.value).slice(0, 1024), inline: Boolean(field.inline) }));
   if (fields.length) embed.addFields(fields);
-  return { embeds: [embed], ...mentionPayload(settings), username: guild?.name };
+  return { embeds: [embed], ...mentionPayload(settings, guild), username: guild?.name };
 }
 
-function componentsPayload(settings) {
+function componentsPayload(settings, guild) {
   const container = new ContainerBuilder();
-  const lines = String(settings.componentsBody || settings.description || "").split(/\r?\n/);
+  const lines = normalizeRoleMentions(settings.componentsBody || settings.description || "", guild).split(/\r?\n/);
   let text = [];
   const flush = () => {
     if (!text.length) return;
@@ -96,7 +108,7 @@ function componentsPayload(settings) {
     const trimmed = line.trim();
     const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
     const thumbnailMatch = trimmed.match(/^\[thumbnail\]\s+(https?:\/\/\S+)$/i);
-    if (trimmed === "---" || trimmed === "___") {
+    if (trimmed === "--" || trimmed === "---" || trimmed === "___") {
       flush();
       container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
     } else if (imageMatch) {
@@ -119,7 +131,7 @@ function componentsPayload(settings) {
   }
   flush();
   if (!lines.length) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(" "));
-  return { flags: MessageFlags.IsComponentsV2, components: [container], ...mentionPayload(settings) };
+  return { flags: MessageFlags.IsComponentsV2, components: [container], ...mentionPayload(settings, guild) };
 }
 
 export function createEmbedService(context) {
@@ -128,9 +140,9 @@ export function createEmbedService(context) {
     return channel?.isTextBased?.() ? channel : null;
   }
 
-  function buildPayload(guild, settings) {
+    function buildPayload(guild, settings) {
     const normalized = normalizeSettings({ embed: settings });
-    return normalized.mode === "legacy" ? legacyPayload(guild, normalized) : componentsPayload(normalized);
+    return normalized.mode === "legacy" ? legacyPayload(guild, normalized) : componentsPayload(normalized, guild);
   }
 
   async function sendConfigured(guild, channelId, settingsOverride = null) {

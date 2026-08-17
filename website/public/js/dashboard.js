@@ -241,6 +241,23 @@ function setupEmbedPanel() {
   const previewLegacyCard = document.querySelector("[data-embed-preview-legacy-card]");
   const previewCard = document.querySelector("[data-embed-preview-card]");
   const formatHelp = form.querySelector("[data-embed-format-help]");
+  const componentInput = form.querySelector('[name="embedComponentsBody"]');
+  const roleSelect = form.querySelector("[data-component-role]");
+  const insertComponentSyntax = (syntax) => {
+    if (!componentInput) return;
+    const current = componentInput.value.trimEnd();
+    componentInput.value = `${current ? `${current}\n` : ""}${syntax}`;
+    componentInput.focus();
+    componentInput.setSelectionRange(componentInput.value.length, componentInput.value.length);
+    componentInput.dispatchEvent(new Event("input", { bubbles: true }));
+  };
+  form.querySelectorAll("[data-component-insert]").forEach((button) => {
+    button.addEventListener("click", () => insertComponentSyntax(button.dataset.componentInsert || ""));
+  });
+  roleSelect?.addEventListener("change", () => {
+    if (roleSelect.value) insertComponentSyntax(`@${roleSelect.value}`);
+    roleSelect.value = "";
+  });
 
   channelSearch?.addEventListener("input", () => {
     const query = channelSearch.value.trim().toLowerCase();
@@ -261,7 +278,7 @@ function setupEmbedPanel() {
         const trimmed = line.trim();
         const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
         const thumbnailMatch = trimmed.match(/^\[thumbnail\]\s+(https?:\/\/\S+)$/i);
-        if (trimmed === "---" || trimmed === "___") {
+        if (trimmed === "--" || trimmed === "---" || trimmed === "___") {
           const divider = document.createElement("div");
           divider.className = "discord-component-divider";
           previewComponents.append(divider);
@@ -298,7 +315,7 @@ function setupEmbedPanel() {
       field.setAttribute("aria-hidden", String(!visible));
     });
     if (formatHelp) formatHelp.textContent = isComponents
-      ? "일반 문장, 빈 줄, --- 또는 ___ 기호로 Components V2의 표시 순서를 작성합니다."
+      ? "기능 버튼을 누르거나 일반 문장을 입력하세요. --는 실선, @역할이름은 역할 멘션, [image]는 사진, [thumbnail]은 썸네지를 추가합니다."
       : "제목·설명·색상·푸터·작성자·이미지·필드로 기본 Discord 임베드를 작성합니다.";
     if (previewComponentsCard) previewComponentsCard.hidden = !isComponents;
     if (previewLegacyCard) previewLegacyCard.hidden = isComponents;
