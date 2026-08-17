@@ -10,6 +10,7 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 const featureLabels = {
   welcome: "환영 기능 사용",
   ticket: "티켓 기능 사용",
+  administrators: "관리자 기능 사용",
   staff: "관리자 기능 사용",
   assignment: "할당 기능 사용",
   voice: "음성 기능 사용",
@@ -127,6 +128,16 @@ function getSectionFromAction(form) {
 
 function injectFeatureToggles() {
   const settings = window.dashboardSettings || {};
+  const allowFeatureToggle = window.dashboardPlan?.allowFeatureToggle === true;
+
+  document.querySelectorAll(".section-toggle").forEach((toggle) => {
+    toggle.hidden = !allowFeatureToggle;
+    toggle.setAttribute("aria-hidden", String(!allowFeatureToggle));
+  });
+
+  if (!allowFeatureToggle) {
+    return;
+  }
 
   forms.forEach((form) => {
     if (!form.classList.contains("settings-form")) {

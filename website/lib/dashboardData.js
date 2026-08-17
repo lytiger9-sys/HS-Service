@@ -1,6 +1,7 @@
 import { ChannelType } from "discord.js";
 import { normalizeTicketSettings } from "../../src/shared/ticket.js";
-import { planHasFeature } from "../../src/shared/planAccess.js";
+import { planHasFeature, planAllowsFeatureToggle } from "../../src/shared/planAccess.js";
+import { getPlanDefinition } from "../../src/config/plans.js";
 
 function formatDate(value) {
   if (!value) {
@@ -136,8 +137,11 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
   return {
     botName: context.config.botName,
     guild,
-    sections: buildSections().filter((section) => section.id === "overview" || section.id === "administrators" || planHasFeature(planId, section.id)),
+    sections: buildSections().filter((section) => planHasFeature(planId, section.id)),
     activeSection: "overview",
+    plan: getPlanDefinition(planId),
+    planId,
+    allowFeatureToggle: planAllowsFeatureToggle(planId),
     overview: dashboardOverview,
     administrators,
     adminCount: administrators.length,

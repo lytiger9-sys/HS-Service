@@ -1,6 +1,8 @@
-import { getPlanDefinition } from "../config/plans.js";
+import { getPlanDefinition, normalizeFeatureId } from "../config/plans.js";
 
 export const FEATURE_LABELS = {
+  administrators: "관리자",
+  staff: "관리자",
   welcome: "환영 메시지",
   notice: "공지",
   security: "보안",
@@ -12,14 +14,18 @@ export const FEATURE_LABELS = {
   events: "이벤트",
   shop: "상점",
   banner: "상단배너 등록",
-  assignment: "메시지 역할",
-  voice: "임시 음성 채널",
+  assignment: "역할",
+  voice: "음성",
   honeypot: "허니팟",
   logs: "로그"
 };
 
 export function planHasFeature(planId, feature) {
-  return getPlanDefinition(planId).tabs.includes(feature);
+  return getPlanDefinition(planId).tabs.includes(normalizeFeatureId(feature));
+}
+
+export function planAllowsFeatureToggle(planId) {
+  return getPlanDefinition(planId).allowFeatureToggle === true;
 }
 
 export function interactionFeature(customId = "") {
@@ -28,7 +34,7 @@ export function interactionFeature(customId = "") {
   if (scope === "banner") return "banner";
   if (scope === "ticket") return "ticket";
   if (scope === "poll") return "polls";
-  if (scope === "staff") return null;
+  if (scope === "staff") return "administrators";
   return null;
 }
 

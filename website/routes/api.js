@@ -1,7 +1,7 @@
 import express from "express";
 import { getAccessMessage, resolveDashboardAccess, resolveGuildAdministrator } from "../lib/dashboardAccess.js";
 import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
-import { canUseFeature, featureDeniedMessage } from "../../src/shared/planAccess.js";
+import { canUseFeature, featureDeniedMessage, planAllowsFeatureToggle } from "../../src/shared/planAccess.js";
 
 function readBoolean(value) {
   return value === "on" || value === "true" || value === "1";
@@ -36,7 +36,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", security: "security", notice: "notice", polls: "polls", assignment: "assignment", voice: "voice", honeypot: "honeypot", logs: "logs", partner: "partner" };
+  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", notice: "notice", polls: "polls", assignment: "assignment", voice: "voice", honeypot: "honeypot", logs: "logs", partner: "partner" };
   return map[section] || null;
 }
 
@@ -223,6 +223,14 @@ export function createApiRouter(context) {
       const payload = sectionPayload(section, req.body);
       if (!payload) {
         return res.status(400).send("지원하지 않는 섹션입니다.");
+      }
+
+      if (!featureAccess.bypass && !planAllowsFeatureToggle(featureAccess.plan)) {
+        const settingsKey = section === "staff" ? "staff" : section;
+        const sectionSettings = payload[settingsKey];
+        if (sectionSettings && Object.prototype.hasOwnProperty.call(sectionSettings, "enabled")) {
+          sectionSettings.enabled = true;
+        }
       }
 
       await context.services.settings.updateSettings(guildId, payload);

@@ -516,5 +516,6 @@
 
   <script>
     window.dashboardSettings = <%- JSON.stringify(settings) %>;
+    window.dashboardPlan = <%- JSON.stringify({ id: planId, allowFeatureToggle }) %>;
   </script>
   <%- include('partials/footer') %>
