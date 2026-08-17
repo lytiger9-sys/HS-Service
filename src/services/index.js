@@ -15,6 +15,7 @@ import { createStaffService } from "./staffService.js";
 import { createLicenseService } from "./licenseService.js";
 import { createPartnerService } from "./partnerService.js";
 import { createOverviewChannelService } from "./overviewChannelService.js";
+import { createEmbedService } from "./embedService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -36,6 +37,7 @@ export function createServices(context) {
     staff: createStaffService(context, guildState),
     licenses: createLicenseService(),
     partners: createPartnerService(context),
-    overviewChannels: createOverviewChannelService(context)
+    overviewChannels: createOverviewChannelService(context),
+    embeds: createEmbedService(context)
   };
 }

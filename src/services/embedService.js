@@ -1,0 +1,150 @@
+import {
+  ContainerBuilder,
+  EmbedBuilder,
+  MessageFlags,
+  SeparatorBuilder,
+  TextDisplayBuilder
+} from "discord.js";
+import { parseColor } from "../shared/embeds.js";
+
+const DEFAULTS = {
+  enabled: true,
+  mode: "components",
+  channelId: "",
+  title: "서버 공지",
+  description: "공지사항이 아직 설정되지 않았습니다.",
+  color: "#1a1d23",
+  footer: "",
+  authorName: "",
+  authorUrl: "",
+  thumbnailUrl: "",
+  imageUrl: "",
+  fields: [],
+  componentsBody: "",
+  mentionEveryone: false,
+  mentionHere: false,
+  mentionRoleIds: [],
+  scheduleEnabled: false,
+  scheduleIntervalMinutes: 60,
+  lastSentAt: null,
+  updatedAt: null
+};
+
+function normalizeSettings(settings = {}) {
+  const embed = { ...DEFAULTS, ...(settings.embed || {}) };
+  embed.mentionRoleIds = Array.isArray(embed.mentionRoleIds)
+    ? embed.mentionRoleIds.filter((id) => /^\d{15,22}$/.test(String(id)))
+    : [];
+  embed.fields = Array.isArray(embed.fields) ? embed.fields.slice(0, 25) : [];
+  return embed;
+}
+
+function mentionPayload(settings) {
+  const mentions = [];
+  if (settings.mentionEveryone) mentions.push("@everyone");
+  if (settings.mentionHere) mentions.push("@here");
+  mentions.push(...settings.mentionRoleIds.map((id) => `<@&${id}>`));
+  return {
+    content: mentions.join(" ") || undefined,
+    allowedMentions: {
+      parse: [settings.mentionEveryone ? "everyone" : null, settings.mentionHere ? "everyone" : null].filter(Boolean),
+      roles: settings.mentionRoleIds
+    }
+  };
+}
+
+function legacyPayload(guild, settings) {
+  const embed = new EmbedBuilder()
+    .setTitle(String(settings.title || "서버 공지").slice(0, 256))
+    .setDescription(String(settings.description || "").slice(0, 4000))
+    .setColor(parseColor(settings.color));
+  if (settings.footer) embed.setFooter({ text: String(settings.footer).slice(0, 2048) });
+  if (settings.authorName) embed.setAuthor({ name: String(settings.authorName).slice(0, 256), url: settings.authorUrl || undefined });
+  if (settings.thumbnailUrl) embed.setThumbnail(settings.thumbnailUrl);
+  if (settings.imageUrl) embed.setImage(settings.imageUrl);
+  const fields = settings.fields
+    .filter((field) => field?.name && field?.value)
+    .slice(0, 25)
+    .map((field) => ({ name: String(field.name).slice(0, 256), value: String(field.value).slice(0, 1024), inline: Boolean(field.inline) }));
+  if (fields.length) embed.addFields(fields);
+  return { embeds: [embed], ...mentionPayload(settings), username: guild?.name };
+}
+
+function componentsPayload(settings) {
+  const container = new ContainerBuilder();
+  const lines = String(settings.componentsBody || settings.description || "").split(/\r?\n/);
+  let text = [];
+  const flush = () => {
+    if (!text.length) return;
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(text.join("\n")));
+    text = [];
+  };
+  for (const line of lines) {
+    if (line.trim() === "---" || line.trim() === "___") {
+      flush();
+      container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+    } else {
+      text.push(line);
+    }
+  }
+  flush();
+  if (!lines.length) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(" "));
+  return { flags: MessageFlags.IsComponentsV2, components: [container], ...mentionPayload(settings) };
+}
+
+export function createEmbedService(context) {
+  async function resolveChannel(guild, channelId) {
+    const channel = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
+    return channel?.isTextBased?.() ? channel : null;
+  }
+
+  function buildPayload(guild, settings) {
+    const normalized = normalizeSettings({ embed: settings });
+    return normalized.mode === "legacy" ? legacyPayload(guild, normalized) : componentsPayload(normalized);
+  }
+
+  async function sendConfigured(guild, channelId, settingsOverride = null) {
+    const settings = settingsOverride || normalizeSettings(await context.services.settings.getSettings(guild.id));
+    const target = await resolveChannel(guild, channelId || settings.channelId);
+    if (!target) throw new Error("전송할 텍스트 채널을 찾을 수 없습니다.");
+    const message = await target.send(buildPayload(guild, settings));
+    await context.services.settings.updateSettings(guild.id, {
+      embed: { lastSentAt: new Date().toISOString() }
+    });
+    return message;
+  }
+
+  async function sendFromBody(guild, body) {
+    let fields = [];
+    try {
+      fields = typeof body.fields === "string" ? JSON.parse(body.fields || "[]") : (body.fields || []);
+    } catch {
+      fields = [];
+    }
+    const bool = (value) => value === true || value === "true" || value === "on" || value === "1";
+    const settings = normalizeSettings({
+      embed: {
+        ...body,
+        fields,
+        mentionEveryone: bool(body.mentionEveryone),
+        mentionHere: bool(body.mentionHere),
+        scheduleEnabled: bool(body.scheduleEnabled)
+      }
+    });
+    return sendConfigured(guild, body.channelId, settings);
+  }
+
+  async function processSchedules() {
+    for (const guild of context.client?.guilds.cache.values() || []) {
+      const settings = normalizeSettings(await context.services.settings.getSettings(guild.id));
+      if (!settings.scheduleEnabled || !settings.channelId) continue;
+      const interval = Math.max(1, Number(settings.scheduleIntervalMinutes) || 60) * 60 * 1000;
+      const last = settings.lastSentAt ? Date.parse(settings.lastSentAt) : 0;
+      if (!last || Date.now() - last >= interval) {
+        await sendConfigured(guild, settings.channelId, settings).catch(() => null);
+      }
+    }
+  }
+
+  return { buildPayload, sendConfigured, sendFromBody, processSchedules };
+}

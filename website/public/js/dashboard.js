@@ -224,6 +224,68 @@ function setupForms() {
   });
 }
 
+function setupEmbedPanel() {
+  const form = document.querySelector("[data-embed-form]");
+  if (!form) return;
+  const channelSelect = form.querySelector("[data-embed-channel]");
+  const channelSearch = form.querySelector('[data-channel-search="embed-channel-select"]');
+  const sendButton = form.querySelector("[data-embed-send]");
+  const modeSelect = form.querySelector("[data-embed-mode]");
+  const titleInput = form.querySelector('[data-embed-preview="title"]');
+  const descriptionInput = form.querySelector('[data-embed-preview="description"]');
+  const previewTitle = document.querySelector("[data-embed-preview-title]");
+  const previewDescription = document.querySelector("[data-embed-preview-description]");
+  const previewCard = document.querySelector("[data-embed-preview-card]");
+
+  channelSearch?.addEventListener("input", () => {
+    const query = channelSearch.value.trim().toLowerCase();
+    Array.from(channelSelect?.options || []).forEach((option, index) => {
+      if (index === 0) return;
+      option.hidden = Boolean(query) && !option.textContent.toLowerCase().includes(query);
+    });
+  });
+  const updatePreview = () => {
+    if (previewTitle) previewTitle.textContent = titleInput?.value || "서버 공지";
+    if (previewDescription) previewDescription.textContent = descriptionInput?.value || "";
+    if (previewCard && titleInput) previewCard.style.setProperty("--embed-preview-color", form.querySelector('[name="embedColor"]')?.value || "#1a1d23");
+  };
+  titleInput?.addEventListener("input", updatePreview);
+  descriptionInput?.addEventListener("input", updatePreview);
+  form.querySelector('[name="embedColor"]')?.addEventListener("input", updatePreview);
+  modeSelect?.addEventListener("change", () => {
+    const componentsField = form.querySelector('[name="embedComponentsBody"]')?.closest(".field");
+    const legacyField = form.querySelector('[name="embedFields"]')?.closest(".field");
+    if (componentsField) componentsField.hidden = modeSelect.value === "legacy";
+    if (legacyField) legacyField.hidden = modeSelect.value !== "legacy";
+  });
+  modeSelect?.dispatchEvent(new Event("change"));
+
+  sendButton?.addEventListener("click", async () => {
+    if (!channelSelect?.value) {
+      showToast("전송할 채널을 선택하세요.");
+      return;
+    }
+    sendButton.disabled = true;
+    try {
+      const data = new URLSearchParams();
+      new FormData(form).forEach((value, key) => data.append(key, value));
+      form.querySelectorAll('input[type="checkbox"]').forEach((input) => data.set(input.name, input.checked ? "on" : "off"));
+      const response = await fetch(sendButton.dataset.sendUrl, {
+        method: "POST",
+        headers: { "X-Requested-With": "fetch", Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+        body: data
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.ok) throw new Error(payload?.message || "임베드 전송에 실패했습니다.");
+      showToast("임베드 전송이 완료되었습니다.");
+    } catch (error) {
+      showToast(error.message || "임베드 전송에 실패했습니다.");
+    } finally {
+      sendButton.disabled = false;
+    }
+  });
+}
+
 function setupTabs() {
   const activeFromDom = normalizeTab(document.querySelector(".sidebar-tab.is-active")?.dataset.tab || defaultTab);
   activateTab(activeFromDom);
@@ -265,5 +327,6 @@ function setupSearch() {
 
 setupTabs();
 setupSearch();
+setupEmbedPanel();
 injectFeatureToggles();
 setupForms();

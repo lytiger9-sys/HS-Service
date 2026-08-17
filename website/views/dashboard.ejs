@@ -297,30 +297,7 @@
       </section>
 
 
-      <section class="panel-stack <%= panelClass('notice') %>" data-panel="notice">
-        <article class="card section-panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Notice</p>
-              <h3>서버 공지</h3>
-            </div>
-            <label class="field toggle section-toggle">
-              <input type="checkbox" form="notice-settings-form" name="noticeEnabled" <%= settings.notice.enabled !== false ? 'checked' : '' %> />
-              <span>공지 기능 활성화</span>
-            </label>
-          </div>
-
-          <form class="settings-form" id="notice-settings-form" method="post" action="/guild/<%= guild.id %>/settings/notice">
-            <div class="form-grid">
-              <label class="field full">
-                <span>공지 내용</span>
-                <textarea name="noticeContent" rows="6"><%= settings.notice.content %></textarea>
-              </label>
-            </div>
-            <button class="primary" type="submit">저장</button>
-          </form>
-        </article>
-      </section>
+            <%- include('partials/embed-panel', { guild, channels, roles, settings, panelClass }) %>
 
       <section class="panel-stack <%= panelClass('polls') %>" data-panel="polls">
         <article class="card section-panel">

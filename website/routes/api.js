@@ -36,7 +36,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", notice: "notice", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", partner: "partner" };
+  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", partner: "partner" };
   return map[section] || null;
 }
 
@@ -130,11 +130,33 @@ function sectionPayload(section, body) {
     };
   }
 
-  if (section === "notice") {
+  if (section === "embed" || section === "notice") {
+    let fields = [];
+    try {
+      fields = JSON.parse(String(body.embedFields || "[]"));
+    } catch {
+      fields = [];
+    }
     return {
-      notice: {
-        enabled: readBoolean(body.noticeEnabled),
-        content: readText(body.noticeContent, "", 4000),
+      embed: {
+        enabled: readBoolean(body.embedEnabled ?? body.noticeEnabled),
+        mode: body.embedMode === "legacy" ? "legacy" : "components",
+        channelId: readDiscordId(body.embedChannelId),
+        title: readText(body.embedTitle, "서버 공지", 256),
+        description: readText(body.embedDescription ?? body.noticeContent, "", 4000),
+        color: /^#[0-9a-f]{6}$/i.test(body.embedColor || "") ? body.embedColor : "#1a1d23",
+        footer: readText(body.embedFooter, "", 2048),
+        authorName: readText(body.embedAuthorName, "", 256),
+        authorUrl: readText(body.embedAuthorUrl, "", 500),
+        thumbnailUrl: readText(body.embedThumbnailUrl, "", 500),
+        imageUrl: readText(body.embedImageUrl, "", 500),
+        fields: Array.isArray(fields) ? fields.slice(0, 25) : [],
+        componentsBody: readText(body.embedComponentsBody, "", 8000),
+        mentionEveryone: readBoolean(body.embedMentionEveryone),
+        mentionHere: readBoolean(body.embedMentionHere),
+        mentionRoleIds: splitLines(body.embedMentionRoleIds, 20, 22).filter((id) => /^\d{15,22}$/.test(id)),
+        scheduleEnabled: readBoolean(body.embedScheduleEnabled),
+        scheduleIntervalMinutes: readNumber(body.embedScheduleIntervalMinutes, 60, 1, 10080),
         updatedAt: new Date().toISOString()
       }
     };
@@ -240,6 +262,23 @@ export function createApiRouter(context) {
       return saveResponse(res, req, { section });
     } catch (error) {
       next(error);
+    }
+  });
+
+  router.post("/:guildId/embed/send", async (req, res, next) => {
+    try {
+      const { guildId } = req.params;
+      const access = await resolveDashboardAccess(context, req.user?.id);
+      if (!access.allowed || guildId !== access.guild.id) {
+        return res.status(403).json({ ok: false, message: "접근할 수 없는 서버입니다." });
+      }
+      const featureAccess = await requireFeature(context, guildId, "embed");
+      if (!featureAccess.allowed) return res.status(403).json({ ok: false, message: featureAccess.message });
+      const body = { ...req.body, channelId: readDiscordId(req.body.channelId) };
+      const message = await context.services.embeds.sendFromBody(access.guild, body);
+      return res.json({ ok: true, messageId: message.id, message: "임베드를 전송했습니다." });
+    } catch (error) {
+      return res.status(400).json({ ok: false, message: error.message || "임베드 전송에 실패했습니다." });
     }
   });
 

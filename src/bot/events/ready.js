@@ -22,4 +22,7 @@ export default async function handleReady(client, context) {
   await cleanupExpiredBanners();
   const cleanupTimer = setInterval(cleanupExpiredBanners, 60 * 60 * 1000);
   cleanupTimer.unref?.();
+  await context.services.embeds.processSchedules().catch(() => null);
+  const embedScheduleTimer = setInterval(() => void context.services.embeds.processSchedules().catch(() => null), 60 * 1000);
+  embedScheduleTimer.unref?.();
 }

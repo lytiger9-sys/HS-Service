@@ -23,6 +23,28 @@ export function createDefaultGuildSettings() {
     polls: {
       enabled: true
     },
+    embed: {
+      enabled: true,
+      mode: "components",
+      channelId: "",
+      title: "서버 공지",
+      description: "공지사항이 아직 설정되지 않았습니다.",
+      color: "#1a1d23",
+      footer: "",
+      authorName: "",
+      authorUrl: "",
+      thumbnailUrl: "",
+      imageUrl: "",
+      fields: [],
+      componentsBody: "",
+      mentionEveryone: false,
+      mentionHere: false,
+      mentionRoleIds: [],
+      scheduleEnabled: false,
+      scheduleIntervalMinutes: 60,
+      lastSentAt: null,
+      updatedAt: null
+    },
     notice: {
       enabled: true,
       content: "공지사항이 아직 설정되지 않았습니다.",

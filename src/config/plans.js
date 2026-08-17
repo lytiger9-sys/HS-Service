@@ -1,7 +1,8 @@
 const FEATURE_ALIASES = {
   administrators: "administrators",
   staff: "administrators",
-  assignment: "assignment"
+  assignment: "assignment",
+  notice: "embed"
 };
 
 export const PLAN_DEFINITIONS = [
@@ -11,7 +12,7 @@ export const PLAN_DEFINITIONS = [
     description: "기본 서버 운영 기능",
     order: 1,
     allowFeatureToggle: false,
-    tabs: ["overview", "administrators", "assignment", "voice", "honeypot", "notice", "polls"]
+    tabs: ["overview", "administrators", "assignment", "voice", "honeypot", "embed", "polls"]
   },
   {
     id: "basic",
@@ -19,7 +20,7 @@ export const PLAN_DEFINITIONS = [
     description: "기본 서버 관리 기능",
     order: 2,
     allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "assignment", "voice", "honeypot", "notice", "polls", "logs", "nickname"]
+    tabs: ["overview", "administrators", "welcome", "ticket", "assignment", "voice", "honeypot", "embed", "polls", "logs", "nickname"]
   },
   {
     id: "standard",
@@ -27,7 +28,7 @@ export const PLAN_DEFINITIONS = [
     description: "성장 서버 운영 기능",
     order: 3,
     allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "notice", "polls", "logs", "nickname", "embed", "events"]
+    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "nickname", "events"]
   },
   {
     id: "pro",
@@ -35,7 +36,7 @@ export const PLAN_DEFINITIONS = [
     description: "고급 서버 운영 및 파트너 기능",
     order: 4,
     allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "notice", "polls", "logs", "partner", "nickname", "embed", "events"]
+    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "events"]
   },
   {
     id: "enterprise",
@@ -43,7 +44,7 @@ export const PLAN_DEFINITIONS = [
     description: "전체 기능 및 확장 운영",
     order: 5,
     allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "notice", "polls", "logs", "partner", "nickname", "embed", "events", "shop"],
+    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "events", "shop"],
     includesFutureFeatures: true
   }
 ];
@@ -59,7 +60,7 @@ export const PLAN_TAB_LABELS = {
   assignment: "역할",
   voice: "음성",
   honeypot: "허니팟",
-  notice: "공지",
+  embed: "임베드 및 공지",
   polls: "투표",
   logs: "로그",
   partner: "파트너",

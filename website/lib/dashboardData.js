@@ -63,7 +63,7 @@ function buildSections() {
     { id: "security", label: "보안", description: "차단 규칙" },
     { id: "assignment", label: "할당", description: "메시지 역할" },
     { id: "voice", label: "음성", description: "임시 채널" },
-    { id: "notice", label: "공지", description: "서버 안내" },
+    { id: "embed", label: "임베드", description: "임베드 및 공지" },
     { id: "polls", label: "투표", description: "버튼 투표" },
     { id: "logs", label: "로그", description: "채널 연결" },
     { id: "partner", label: "파트너", description: "제휴 신청 및 채널" }
@@ -124,7 +124,29 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
   const normalizedSettings = {
     ...settings,
     staff: staffSettings,
-    ticket: ticketSettings
+    ticket: ticketSettings,
+    embed: {
+      enabled: true,
+      mode: "components",
+      channelId: "",
+      title: "서버 공지",
+      description: "공지사항이 아직 설정되지 않았습니다.",
+      color: "#1a1d23",
+      footer: "",
+      authorName: "",
+      authorUrl: "",
+      thumbnailUrl: "",
+      imageUrl: "",
+      fields: [],
+      componentsBody: "",
+      mentionEveryone: false,
+      mentionHere: false,
+      mentionRoleIds: [],
+      scheduleEnabled: false,
+      scheduleIntervalMinutes: 60,
+      lastSentAt: null,
+      ...(settings.embed || {})
+    }
   };
 
   const groupedChannels = groupChannels(guild);

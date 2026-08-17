@@ -1,5 +1,4 @@
 import { SlashCommandBuilder } from "discord.js";
-import { buildNoticeEmbed } from "../../shared/embeds.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -8,10 +7,9 @@ export default {
 
   async execute(interaction, context) {
     const settings = await context.services.settings.getSettings(interaction.guildId);
-    if (settings.notice?.enabled === false) {
-      return interaction.reply({ content: "현재 공지 기능이 꺼져 있습니다.", ephemeral: true });
+    if (settings.embed?.enabled === false) {
+      return interaction.reply({ content: "현재 임베드 및 공지 기능이 꺼져 있습니다.", ephemeral: true });
     }
-    const embed = buildNoticeEmbed(interaction.guild, settings.notice);
-    return interaction.reply({ embeds: [embed] });
+    return interaction.reply(context.services.embeds.buildPayload(interaction.guild, settings.embed));
   }
 };
