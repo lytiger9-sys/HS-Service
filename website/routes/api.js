@@ -36,7 +36,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", security: "security", notice: "notice", polls: "polls", partner: "partner" };
+  const map = { welcome: "welcome", ticket: "ticket", security: "security", notice: "notice", polls: "polls", assignment: "assignment", voice: "voice", honeypot: "honeypot", logs: "logs", partner: "partner" };
   return map[section] || null;
 }
 

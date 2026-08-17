@@ -27,7 +27,7 @@ export function createIndexRouter(context) {
           : null;
         const access = await resolveDashboardAccess(context, req.user?.id, sessionLicense ? req.session.activeGuildId : undefined);
         if (access.allowed) {
-          const viewModel = await buildDashboardViewModel(context, access.guild);
+          const viewModel = await buildDashboardViewModel(context, access.guild, access.plan);
           const requestedSection = typeof req.query.section === "string" ? req.query.section : "";
           const activeSection = viewModel.sections.some((section) => section.id === requestedSection)
             ? requestedSection

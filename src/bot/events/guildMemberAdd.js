@@ -1,11 +1,14 @@
 import { buildWelcomeEmbeds } from "../../shared/embeds.js";
 import { buildBaseEmbed, palette } from "../../shared/embeds.js";
 import { isAllowedGuild } from "../../shared/guards.js";
+import { canUseFeature } from "../../shared/planAccess.js";
 
 export default async function handleGuildMemberAdd(member, context) {
-  if (!isAllowedGuild(context, member.guild.id) || member.user.bot) {
+  if (!(await isAllowedGuild(context, member.guild.id)) || member.user.bot) {
     return;
   }
+  const access = await canUseFeature(context, member.guild.id, "welcome");
+  if (!access.featureAllowed) return;
 
   await context.services.guildState.patch(member.guild.id, (guild) => {
     guild.joinOrder.unshift({

@@ -44,7 +44,7 @@ export async function createBot(context) {
   client.on("voiceStateUpdate", (oldState, newState) => void handleVoiceStateUpdate(oldState, newState, context).catch((error) => console.error("[bot] voiceStateUpdate error:", error)));
 
   client.on("guildDelete", async (guild) => {
-    if (!isAllowedGuild(context, guild.id)) {
+    if (!(await isAllowedGuild(context, guild.id))) {
       return;
     }
     console.log(`[bot] left allowed guild ${guild.id}`);

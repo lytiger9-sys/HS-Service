@@ -7,7 +7,7 @@ export default async function handleMessageCreate(message, context) {
   }
 
   const partnerAccess = await canUseFeature(context, message.guild.id, "partner");
-  if (!isAllowedGuild(context, message.guild.id)) {
+  if (!(await isAllowedGuild(context, message.guild.id))) {
     if (partnerAccess.featureAllowed && await context.services.partners.handleMessage(message)) return;
     return;
   }
@@ -16,14 +16,22 @@ export default async function handleMessageCreate(message, context) {
     return;
   }
 
-  if (await context.services.honeypot.handleMessage(message)) {
+  const honeypotAccess = await canUseFeature(context, message.guild.id, "honeypot");
+  if (honeypotAccess.featureAllowed && await context.services.honeypot.handleMessage(message)) {
     return;
   }
 
-  if (await context.services.tickets.handleCloseShortcut(message)) {
+  const ticketAccess = await canUseFeature(context, message.guild.id, "ticket");
+  if (ticketAccess.featureAllowed && await context.services.tickets.handleCloseShortcut(message)) {
     return;
   }
 
-  await context.services.moderation.evaluateMessage(message).catch(() => null);
-  await context.services.assignment.handleMessage(message).catch(() => null);
+  const securityAccess = await canUseFeature(context, message.guild.id, "security");
+  if (securityAccess.featureAllowed) {
+    await context.services.moderation.evaluateMessage(message).catch(() => null);
+  }
+  const assignmentAccess = await canUseFeature(context, message.guild.id, "assignment");
+  if (assignmentAccess.featureAllowed) {
+    await context.services.assignment.handleMessage(message).catch(() => null);
+  }
 }

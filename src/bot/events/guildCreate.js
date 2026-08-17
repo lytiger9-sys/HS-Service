@@ -1,8 +1,8 @@
-import { isAllowedGuild } from "../../shared/guards.js";
+import { isAllowedGuild, scheduleGuildValidation } from "../../shared/guards.js";
 
 export default async function handleGuildCreate(guild, context) {
-  if (!isAllowedGuild(context, guild.id)) {
-    await guild.leave().catch(() => null);
+  if (!(await isAllowedGuild(context, guild.id))) {
+    scheduleGuildValidation(context, guild);
     return;
   }
 

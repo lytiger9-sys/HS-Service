@@ -8,7 +8,8 @@ import { canUseFeature, featureDeniedMessage, interactionFeature } from "../../s
 export default async function handleInteractionCreate(interaction, context) {
   try {
     const feature = interactionFeature(interaction.customId || "");
-    if (interaction.guildId && !isAllowedGuild(context, interaction.guildId) && !feature) {
+    const guildAllowed = interaction.guildId ? await isAllowedGuild(context, interaction.guildId) : false;
+    if (interaction.guildId && !guildAllowed && !feature) {
       return interaction.reply({ content: "허용된 서버에서만 작동합니다.", ephemeral: true }).catch(() => null);
     }
     if (interaction.guildId && feature) {

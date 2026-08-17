@@ -1,12 +1,28 @@
-import { isAllowedGuild } from "../../shared/guards.js";
+import { canUseFeature, featureDeniedMessage, getGuildPlanAccess } from "../../shared/planAccess.js";
+
+function commandFeature(commandName) {
+  if (commandName === "공지") return "notice";
+  if (["저장", "저장내용"].includes(commandName)) return "ticket";
+  if (commandName === "tempvoice") return "voice";
+  return null;
+}
 
 export async function handleSlashCommand(interaction, context) {
   if (!interaction.inGuild()) {
     return interaction.reply({ content: "서버 안에서만 사용할 수 있습니다.", ephemeral: true });
   }
 
-  if (!isAllowedGuild(context, interaction.guildId)) {
-    return interaction.reply({ content: "허용된 서버에서만 작동합니다.", ephemeral: true });
+  const access = await getGuildPlanAccess(context, interaction.guildId);
+  if (!access.allowed) {
+    return interaction.reply({ content: "활성 라이선스가 있는 서버에서만 사용할 수 있습니다.", ephemeral: true });
+  }
+
+  const feature = commandFeature(interaction.commandName);
+  if (feature) {
+    const featureAccess = await canUseFeature(context, interaction.guildId, feature);
+    if (!featureAccess.featureAllowed) {
+      return interaction.reply({ content: featureDeniedMessage(feature), ephemeral: true });
+    }
   }
 
   const command = context.commands.get(interaction.commandName);

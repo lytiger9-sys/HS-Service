@@ -1,5 +1,6 @@
 import { ChannelType } from "discord.js";
 import { normalizeTicketSettings } from "../../src/shared/ticket.js";
+import { planHasFeature } from "../../src/shared/planAccess.js";
 
 function formatDate(value) {
   if (!value) {
@@ -85,7 +86,7 @@ function normalizeStaffSettings(settings = {}) {
   };
 }
 
-export async function buildDashboardViewModel(context, guild) {
+export async function buildDashboardViewModel(context, guild, planId = "enterprise") {
   const [overview, settings, notes, polls, tempChannels, stalePartners] = await Promise.all([
     context.services.serverInfo.getDashboardSnapshot(guild),
     context.services.settings.getSettings(guild.id),
@@ -135,7 +136,7 @@ export async function buildDashboardViewModel(context, guild) {
   return {
     botName: context.config.botName,
     guild,
-    sections: buildSections(),
+    sections: buildSections().filter((section) => section.id === "overview" || section.id === "administrators" || planHasFeature(planId, section.id)),
     activeSection: "overview",
     overview: dashboardOverview,
     administrators,
