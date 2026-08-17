@@ -1,4 +1,3 @@
-import notice from "./notice.js";
 import serverinfo from "./serverinfo.js";
 import joinorder from "./joinorder.js";
 import save from "./save.js";
@@ -11,7 +10,6 @@ import honeypotban from "./honeypotban.js";
 import honeypotkick from "./honeypotkick.js";
 
 export const commandList = [
-  notice,
   serverinfo,
   joinorder,
   save,

@@ -1,7 +1,6 @@
 import { canUseFeature, featureDeniedMessage, getGuildPlanAccess } from "../../shared/planAccess.js";
 
 function commandFeature(commandName) {
-  if (commandName === "공지") return "notice";
   if (["저장", "저장내용"].includes(commandName)) return "ticket";
   if (commandName === "tempvoice") return "voice";
   if (commandName === "staff") return "administrators";

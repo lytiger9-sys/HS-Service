@@ -40,15 +40,24 @@ function normalizeSettings(settings = {}) {
 }
 
 function mentionPayload(settings) {
-  const mentions = [];
-  if (settings.mentionEveryone) mentions.push("@everyone");
-  if (settings.mentionHere) mentions.push("@here");
-  mentions.push(...settings.mentionRoleIds.map((id) => `<@&${id}>`));
+  const source = [
+    settings.title,
+    settings.description,
+    settings.footer,
+    settings.authorName,
+    settings.componentsBody,
+    ...(settings.fields || []).flatMap((field) => [field?.name, field?.value])
+  ].filter(Boolean).join("\n");
+  const everyone = /@everyone\b/.test(source);
+  const here = /@here\b/.test(source);
+  const roles = [...source.matchAll(/<@&(\d{15,22})>/g)].map((match) => match[1]);
+  const uniqueRoles = [...new Set(roles)];
+  const mentions = [everyone ? "@everyone" : "", here ? "@here" : "", ...uniqueRoles.map((id) => `<@&${id}>`)].filter(Boolean);
   return {
     content: mentions.join(" ") || undefined,
     allowedMentions: {
-      parse: [settings.mentionEveryone ? "everyone" : null, settings.mentionHere ? "everyone" : null].filter(Boolean),
-      roles: settings.mentionRoleIds
+      parse: everyone || here ? ["everyone"] : [],
+      roles: uniqueRoles
     }
   };
 }

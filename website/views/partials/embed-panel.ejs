@@ -4,7 +4,7 @@
       <div>
         <p class="eyebrow">Embed & Notice</p>
         <h3>임베드 및 공지</h3>
-        <p class="muted">Components V2를 기본값으로 사용하며, 기존 임베드 형식도 선택할 수 있습니다.</p>
+        <p class="muted">전송 형식에 따라 사용할 수 있는 입력 요소가 자동으로 바뀝니다.</p>
       </div>
       <label class="field toggle section-toggle">
         <input type="checkbox" form="embed-settings-form" name="embedEnabled" <%= settings.embed.enabled !== false ? 'checked' : '' %> />
@@ -17,16 +17,17 @@
           <span>전송 형식</span>
           <select name="embedMode" data-embed-mode>
             <option value="components" <%= settings.embed.mode !== 'legacy' ? 'selected' : '' %>>Components V2</option>
-            <option value="legacy" <%= settings.embed.mode === 'legacy' ? 'selected' : '' %>>기존 임베드</option>
+            <option value="legacy" <%= settings.embed.mode === 'legacy' ? 'selected' : '' %>>기본 임베드</option>
           </select>
+          <small class="muted" data-embed-format-help>텍스트, 줄바꿈, 실선을 조합해 Discord Components V2 메시지를 만듭니다.</small>
         </label>
         <label class="field full">
           <span>전송 채널 검색</span>
-          <input type="search" placeholder="채널 이름으로 검색" data-channel-search="embed-channel-select" />
+          <input type="search" placeholder="이 탭에서 채널 이름을 입력해 검색" data-channel-search="embed-channel-select" autocomplete="off" />
           <select id="embed-channel-select" name="embedChannelId" data-embed-channel>
             <option value="">전송할 채널 선택</option>
             <% channels.text.forEach((channel) => { %>
-              <option value="<%= channel.id %>" <%= settings.embed.channelId === channel.id ? 'selected' : '' %>> <%= channel.label %></option>
+              <option value="<%= channel.id %>" <%= settings.embed.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
             <% }) %>
           </select>
         </label>
@@ -40,52 +41,42 @@
         </label>
         <label class="field full">
           <span>설명</span>
-          <textarea name="embedDescription" rows="4" data-embed-preview="description"><%= settings.embed.description %></textarea>
+          <textarea name="embedDescription" rows="5" data-embed-preview="description"><%= settings.embed.description %></textarea>
         </label>
-        <label class="field">
+
+        <div class="field full" data-embed-format="components">
+          <span>메시지 내용</span>
+          <textarea name="embedComponentsBody" rows="9" data-embed-preview="components"><%= settings.embed.componentsBody %></textarea>
+          <small class="muted">입력한 순서대로 표시됩니다. 빈 줄은 줄바꿈으로 표시되고, 한 줄에 `---` 또는 `___`만 입력하면 실선으로 표시됩니다. `@everyone`, `@here`, `<@&역할ID>`는 자동 멘션으로 변환됩니다.</small>
+        </div>
+
+        <div class="field full" data-embed-format="legacy">
           <span>푸터</span>
           <input type="text" name="embedFooter" value="<%= settings.embed.footer %>" />
-        </label>
-        <label class="field">
+        </div>
+        <div class="field" data-embed-format="legacy">
           <span>작성자 이름</span>
           <input type="text" name="embedAuthorName" value="<%= settings.embed.authorName %>" />
-        </label>
-        <label class="field">
+        </div>
+        <div class="field" data-embed-format="legacy">
           <span>작성자 링크</span>
           <input type="url" name="embedAuthorUrl" value="<%= settings.embed.authorUrl %>" />
-        </label>
-        <label class="field">
+        </div>
+        <div class="field" data-embed-format="legacy">
           <span>썸네일 URL</span>
           <input type="url" name="embedThumbnailUrl" value="<%= settings.embed.thumbnailUrl %>" />
-        </label>
-        <label class="field">
+        </div>
+        <div class="field" data-embed-format="legacy">
           <span>이미지 URL</span>
           <input type="url" name="embedImageUrl" value="<%= settings.embed.imageUrl %>" />
-        </label>
-        <label class="field full">
-          <span>Components V2 요소 입력</span>
-          <textarea name="embedComponentsBody" rows="8"><%= settings.embed.componentsBody %></textarea>
-          <small class="muted">입력한 순서대로 배치됩니다. 일반 문장은 Text Display, `---` 또는 `___` 한 줄은 실선, 빈 줄은 줄바꿈으로 처리됩니다.</small>
-        </label>
-        <label class="field full">
-          <span>기존 임베드 필드(JSON)</span>
-          <textarea name="embedFields" rows="4"><%= JSON.stringify(settings.embed.fields || []) %></textarea>
-          <small class="muted">예: [{"name":"안내","value":"내용","inline":true}] 형식으로 최대 25개까지 입력할 수 있습니다.</small>
-        </label>
-        <label class="field check-field">
-          <input type="checkbox" name="embedMentionEveryone" <%= settings.embed.mentionEveryone ? 'checked' : '' %> />
-          <span>@everyone 멘션</span>
-        </label>
-        <label class="field check-field">
-          <input type="checkbox" name="embedMentionHere" <%= settings.embed.mentionHere ? 'checked' : '' %> />
-          <span>@here 멘션</span>
-        </label>
-        <label class="field full">
-          <span>멘션할 역할 ID</span>
-          <textarea name="embedMentionRoleIds" rows="2"><%= (settings.embed.mentionRoleIds || []).join('\n') %></textarea>
-          <small class="muted">역할 ID를 줄바꿈 또는 쉼표로 입력하면 해당 역할을 멘션합니다.</small>
-        </label>
-        <label class="field check-field">
+        </div>
+        <div class="field full" data-embed-format="legacy">
+          <span>필드</span>
+          <textarea name="embedFields" rows="5"><%= JSON.stringify(settings.embed.fields || []) %></textarea>
+          <small class="muted">JSON 형식: [{"name":"항목명","value":"내용","inline":true}] · 최대 25개</small>
+        </div>
+
+        <label class="field check-field full">
           <input type="checkbox" name="embedScheduleEnabled" <%= settings.embed.scheduleEnabled ? 'checked' : '' %> />
           <span>주기적으로 자동 전송</span>
         </label>
@@ -103,17 +94,27 @@
   <aside class="preview-column">
     <div class="card">
       <div class="section-head compact">
-        <div><p class="eyebrow">Live Preview</p><h3>임베드 미리보기</h3></div>
+        <div><p class="eyebrow">Discord Preview</p><h3>실제 메시지 미리보기</h3></div>
       </div>
-      <div class="discord-preview" data-embed-preview-card>
-        <div class="preview-bar"></div>
-        <div class="preview-body">
-          <h4 data-embed-preview-title><%= settings.embed.title %></h4>
-          <p data-embed-preview-description><%= settings.embed.description %></p>
-          <div class="preview-footer"><span><%= guild.name %></span><span data-embed-preview-time>방금 전</span></div>
+      <div class="discord-message" data-embed-preview-card>
+        <div class="discord-avatar"><%= guild.name.slice(0, 1) %></div>
+        <div class="discord-message-content">
+          <div class="discord-message-meta"><strong><%= guild.name %></strong><span>오늘 오전 12:00</span></div>
+          <div class="discord-message-text" data-embed-preview-description-text><%= settings.embed.description %></div>
+          <div class="discord-components-message" data-embed-preview-components-card>
+            <div class="discord-components-preview" data-embed-preview-components></div>
+          </div>
+          <div class="discord-embed-card" data-embed-preview-legacy-card>
+            <div class="discord-embed-accent"></div>
+            <div class="discord-embed-inner">
+              <h4 data-embed-preview-title><%= settings.embed.title %></h4>
+              <p data-embed-preview-description><%= settings.embed.description %></p>
+              <div class="discord-embed-footer"><%= settings.embed.footer || guild.name %></div>
+            </div>
+          </div>
         </div>
       </div>
-      <p class="muted preview-help">전송 완료 시 화면 오른쪽 아래에 완료 팝업이 표시됩니다.</p>
+      <p class="muted preview-help">Discord의 어두운 메시지 레이아웃을 기준으로 표시합니다.</p>
     </div>
   </aside>
 </section>

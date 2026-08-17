@@ -235,7 +235,12 @@ function setupEmbedPanel() {
   const descriptionInput = form.querySelector('[data-embed-preview="description"]');
   const previewTitle = document.querySelector("[data-embed-preview-title]");
   const previewDescription = document.querySelector("[data-embed-preview-description]");
+  const previewDescriptionText = document.querySelector("[data-embed-preview-description-text]");
+  const previewComponents = document.querySelector("[data-embed-preview-components]");
+  const previewComponentsCard = document.querySelector("[data-embed-preview-components-card]");
+  const previewLegacyCard = document.querySelector("[data-embed-preview-legacy-card]");
   const previewCard = document.querySelector("[data-embed-preview-card]");
+  const formatHelp = form.querySelector("[data-embed-format-help]");
 
   channelSearch?.addEventListener("input", () => {
     const query = channelSearch.value.trim().toLowerCase();
@@ -245,20 +250,45 @@ function setupEmbedPanel() {
     });
   });
   const updatePreview = () => {
+    const description = descriptionInput?.value || "";
     if (previewTitle) previewTitle.textContent = titleInput?.value || "서버 공지";
-    if (previewDescription) previewDescription.textContent = descriptionInput?.value || "";
+    if (previewDescription) previewDescription.textContent = description;
+    if (previewDescriptionText) previewDescriptionText.textContent = description;
     if (previewCard && titleInput) previewCard.style.setProperty("--embed-preview-color", form.querySelector('[name="embedColor"]')?.value || "#1a1d23");
+    if (previewComponents) {
+      previewComponents.replaceChildren();
+      String(form.querySelector('[name="embedComponentsBody"]')?.value || "").split(/\r?\n/).forEach((line) => {
+        if (line.trim() === "---" || line.trim() === "___") {
+          const divider = document.createElement("div");
+          divider.className = "discord-component-divider";
+          previewComponents.append(divider);
+        } else {
+          const text = document.createElement("div");
+          text.className = "discord-component-text";
+          text.textContent = line || "\u00a0";
+          previewComponents.append(text);
+        }
+      });
+    }
   };
   titleInput?.addEventListener("input", updatePreview);
   descriptionInput?.addEventListener("input", updatePreview);
   form.querySelector('[name="embedColor"]')?.addEventListener("input", updatePreview);
   modeSelect?.addEventListener("change", () => {
-    const componentsField = form.querySelector('[name="embedComponentsBody"]')?.closest(".field");
-    const legacyField = form.querySelector('[name="embedFields"]')?.closest(".field");
-    if (componentsField) componentsField.hidden = modeSelect.value === "legacy";
-    if (legacyField) legacyField.hidden = modeSelect.value !== "legacy";
+    const isComponents = modeSelect.value === "components";
+    form.querySelectorAll("[data-embed-format]").forEach((field) => {
+      field.hidden = field.dataset.embedFormat !== modeSelect.value;
+    });
+    if (formatHelp) formatHelp.textContent = isComponents
+      ? "일반 문장, 빈 줄, --- 또는 ___ 기호로 Components V2의 표시 순서를 작성합니다."
+      : "제목·설명·색상·푸터·작성자·이미지·필드로 기본 Discord 임베드를 작성합니다.";
+    if (previewComponentsCard) previewComponentsCard.hidden = !isComponents;
+    if (previewLegacyCard) previewLegacyCard.hidden = isComponents;
+    if (previewDescriptionText) previewDescriptionText.hidden = isComponents;
+    updatePreview();
   });
   modeSelect?.dispatchEvent(new Event("change"));
+  form.querySelector('[name="embedComponentsBody"]')?.addEventListener("input", updatePreview);
 
   sendButton?.addEventListener("click", async () => {
     if (!channelSelect?.value) {
