@@ -4,6 +4,18 @@ export async function handleModalInteraction(interaction, context) {
     return interaction.reply({ content: "파트너 신청이 접수되었습니다. 관리자 검토 후 안내드리겠습니다.", ephemeral: true });
   }
 
+  if (interaction.customId === "banner:registration") {
+    await interaction.deferReply({ ephemeral: true });
+    const slot = await context.services.partners.createBanner(interaction.guildId, {
+      licenseKey: interaction.fields.getTextInputValue("banner-license-key"),
+      serverName: interaction.fields.getTextInputValue("banner-server-name"),
+      serverLink: interaction.fields.getTextInputValue("banner-server-link"),
+      promoWebhook: interaction.fields.getTextInputValue("banner-promo-webhook"),
+      recipientUserId: interaction.user.id
+    });
+    return interaction.editReply({ content: `상단배너 채널이 생성되었습니다. <#${slot.channelId}>` });
+  }
+
   if (interaction.customId === "save-note") {
     const title = interaction.fields.getTextInputValue("save-note-title");
     const content = interaction.fields.getTextInputValue("save-note-content");

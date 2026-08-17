@@ -92,13 +92,16 @@ export function createDefaultGuildSettings() {
       buttonLabel: "파트너 신청",
       banner: {
         enabled: false,
+        channelId: "",
+        messageId: "",
         categoryId: "",
         namePrefix: "배너-",
         nameSuffix: "",
         nameEmoji: "",
         embedTitle: "상단 배너",
         embedDescription: "상단 배너 안내",
-        embedColor: "#b89968"
+        embedColor: "#b89968",
+        buttonLabel: "상단배너 신청"
       }
     }
   };

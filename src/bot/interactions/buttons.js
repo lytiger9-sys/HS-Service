@@ -17,6 +17,20 @@ function buildFreeTextModal(pollId) {
   return modal;
 }
 
+function buildBannerRegistrationModal() {
+  const modal = new ModalBuilder().setCustomId("banner:registration").setTitle("상단배너 등록");
+  const fields = [
+    ["banner-license-key", "배너 라이선스 키", TextInputStyle.Short],
+    ["banner-server-name", "서버명", TextInputStyle.Short],
+    ["banner-server-link", "서버 링크", TextInputStyle.Short],
+    ["banner-promo-webhook", "우리 서버 홍보 웹훅", TextInputStyle.Paragraph]
+  ];
+  modal.addComponents(...fields.map(([id, label, style]) => new ActionRowBuilder().addComponents(
+    new TextInputBuilder().setCustomId(id).setLabel(label).setStyle(style).setRequired(true).setMaxLength(500)
+  )));
+  return modal;
+}
+
 function buildPartnerApplicationModal() {
   const modal = new ModalBuilder().setCustomId("partner:application").setTitle("파트너 신청");
   const fields = [
@@ -37,6 +51,10 @@ export async function handleButtonInteraction(interaction, context) {
 
   if (interaction.customId === "partner:apply") {
     return interaction.showModal(buildPartnerApplicationModal());
+  }
+
+  if (interaction.customId === "banner:register") {
+    return interaction.showModal(buildBannerRegistrationModal());
   }
 
   if (scope === "partner" && action === "approve") {

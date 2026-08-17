@@ -56,12 +56,23 @@ function conditionComponents(settings) {
   return { flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
-function bannerComponents(settings, details) {
+function bannerComponents(settings, details = null) {
   const container = new ContainerBuilder()
     .setAccentColor(colorNumber(settings.embedColor, 0xb89968))
     .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${settings.embedTitle || "상단 배너"}\n${settings.embedDescription || "상단 배너 안내"}`))
-    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**서버명:** ${details.serverName}\n**서버 링크:** ${details.serverLink}\n**홍보 웹훅:** ${details.promoWebhook}`));
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+  if (details) {
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`**서버명:** ${details.serverName}\n**서버 링크:** ${details.serverLink}\n**홍보 웹훅:** ${details.promoWebhook}`));
+  } else {
+    container
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent("상단배너 라이선스를 받은 서버 관리자는 아래 버튼을 눌러 서버 정보를 등록하세요."))
+      .addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId("banner:register")
+          .setLabel(settings.buttonLabel || "상단배너 신청")
+          .setStyle(ButtonStyle.Primary)
+      ));
+  }
   return { flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
@@ -110,6 +121,21 @@ export function createPartnerService(context) {
     await patch(guildId, (draft) => {
       draft.settings.partner.conditionsMessageId = message.id;
     });
+    return message;
+  }
+
+  async function syncBannerMessage(guildId) {
+    const guild = await context.client.guilds.fetch(guildId);
+    const current = state(guildId);
+    const settings = current.settings?.partner?.banner;
+    if (!settings?.enabled || !settings.channelId) return null;
+    const channel = await guild.channels.fetch(settings.channelId).catch(() => null);
+    if (!channel?.isTextBased()) return null;
+    const payload = bannerComponents(settings);
+    let message = settings.messageId ? await channel.messages.fetch(settings.messageId).catch(() => null) : null;
+    if (message) await message.edit(payload);
+    else message = await channel.send(payload);
+    await patch(guildId, (draft) => { draft.settings.partner.banner.messageId = message.id; });
     return message;
   }
 
@@ -314,7 +340,7 @@ export function createPartnerService(context) {
     return partner;
   }
 
-  return { syncConditionsMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner, issueBannerLicense, createBanner, cleanupExpiredBanners };
+  return { syncConditionsMessage, syncBannerMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner, issueBannerLicense, createBanner, cleanupExpiredBanners };
 }
 
 export { conditionComponents, bannerComponents };

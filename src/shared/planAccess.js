@@ -11,6 +11,7 @@ export const FEATURE_LABELS = {
   embed: "임베드 전송",
   events: "이벤트",
   shop: "상점",
+  banner: "상단배너 등록",
   assignment: "메시지 역할",
   voice: "임시 음성 채널",
   honeypot: "허니팟",
@@ -24,6 +25,7 @@ export function planHasFeature(planId, feature) {
 export function interactionFeature(customId = "") {
   const scope = String(customId).split(":")[0];
   if (scope === "partner") return "partner";
+  if (scope === "banner") return "banner";
   if (scope === "ticket") return "ticket";
   if (scope === "poll") return "polls";
   if (scope === "staff") return null;
@@ -41,7 +43,10 @@ export async function getGuildPlanAccess(context, guildId) {
 
 export async function canUseFeature(context, guildId, feature) {
   const access = await getGuildPlanAccess(context, guildId);
-  return { ...access, feature, featureAllowed: access.allowed && (access.bypass || planHasFeature(access.plan, feature)) };
+  const featureAllowed = feature === "banner"
+    ? access.allowed
+    : access.allowed && (access.bypass || planHasFeature(access.plan, feature));
+  return { ...access, feature, featureAllowed };
 }
 
 export function featureDeniedMessage(feature) {

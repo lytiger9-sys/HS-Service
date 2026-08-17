@@ -186,13 +186,15 @@ function sectionPayload(section, body) {
         buttonLabel: readText(body.partnerButtonLabel, "파트너 신청", 80),
         banner: {
           enabled: readBoolean(body.bannerEnabled),
+          channelId: readDiscordId(body.bannerChannelId),
           categoryId: readDiscordId(body.bannerCategoryId),
           namePrefix: readText(body.bannerNamePrefix, "", 30),
           nameSuffix: readText(body.bannerNameSuffix, "", 30),
           nameEmoji: readText(body.bannerNameEmoji, "", 8),
           embedTitle: readText(body.bannerEmbedTitle, "상단 배너", 256),
           embedDescription: readText(body.bannerEmbedDescription, "", 4000),
-          embedColor: /^#[0-9a-f]{6}$/i.test(body.bannerEmbedColor || "") ? body.bannerEmbedColor : "#b89968"
+          embedColor: /^#[0-9a-f]{6}$/i.test(body.bannerEmbedColor || "") ? body.bannerEmbedColor : "#b89968",
+          buttonLabel: readText(body.bannerButtonLabel, "상단배너 신청", 80)
         }
       }
     };
@@ -238,6 +240,7 @@ export function createApiRouter(context) {
       }
       if (section === "partner") {
         await context.services.partners.syncConditionsMessage(guildId).catch(() => null);
+        await context.services.partners.syncBannerMessage(guildId).catch(() => null);
       }
 
       return saveResponse(res, req, { section });
