@@ -44,33 +44,33 @@
           <textarea name="embedDescription" rows="5" data-embed-preview="description"><%= settings.embed.description %></textarea>
         </label>
 
-        <div class="field full" data-embed-format="components">
+        <div class="field full" data-embed-format="components" style="<%= settings.embed.mode === 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode === 'legacy' ? 'true' : 'false' %>">
           <span>메시지 내용</span>
           <textarea name="embedComponentsBody" rows="9" data-embed-preview="components"><%= settings.embed.componentsBody %></textarea>
           <small class="muted">입력한 순서대로 표시됩니다. 빈 줄은 줄바꿈으로 표시되고, 한 줄에 `---` 또는 `___`만 입력하면 실선으로 표시됩니다. `@everyone`, `@here`, `<@&역할ID>`는 자동 멘션으로 변환됩니다.</small>
         </div>
 
-        <div class="field full" data-embed-format="legacy">
+        <div class="field full" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
           <span>푸터</span>
           <input type="text" name="embedFooter" value="<%= settings.embed.footer %>" />
         </div>
-        <div class="field" data-embed-format="legacy">
+        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
           <span>작성자 이름</span>
           <input type="text" name="embedAuthorName" value="<%= settings.embed.authorName %>" />
         </div>
-        <div class="field" data-embed-format="legacy">
+        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
           <span>작성자 링크</span>
           <input type="url" name="embedAuthorUrl" value="<%= settings.embed.authorUrl %>" />
         </div>
-        <div class="field" data-embed-format="legacy">
+        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
           <span>썸네일 URL</span>
           <input type="url" name="embedThumbnailUrl" value="<%= settings.embed.thumbnailUrl %>" />
         </div>
-        <div class="field" data-embed-format="legacy">
+        <div class="field" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
           <span>이미지 URL</span>
           <input type="url" name="embedImageUrl" value="<%= settings.embed.imageUrl %>" />
         </div>
-        <div class="field full" data-embed-format="legacy">
+        <div class="field full" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">
           <span>필드</span>
           <textarea name="embedFields" rows="5"><%= JSON.stringify(settings.embed.fields || []) %></textarea>
           <small class="muted">JSON 형식: [{"name":"항목명","value":"내용","inline":true}] · 최대 25개</small>

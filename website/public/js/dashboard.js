@@ -277,7 +277,10 @@ function setupEmbedPanel() {
   modeSelect?.addEventListener("change", () => {
     const isComponents = modeSelect.value === "components";
     form.querySelectorAll("[data-embed-format]").forEach((field) => {
-      field.hidden = field.dataset.embedFormat !== modeSelect.value;
+      const visible = field.dataset.embedFormat === modeSelect.value;
+      field.hidden = !visible;
+      field.style.display = visible ? "" : "none";
+      field.setAttribute("aria-hidden", String(!visible));
     });
     if (formatHelp) formatHelp.textContent = isComponents
       ? "일반 문장, 빈 줄, --- 또는 ___ 기호로 Components V2의 표시 순서를 작성합니다."
