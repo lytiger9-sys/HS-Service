@@ -10,6 +10,12 @@ test("plan feature gates match the five plan definitions", () => {
   assert.equal(planHasFeature("standard", "partner"), false);
   assert.equal(planHasFeature("pro", "partner"), true);
   assert.equal(planHasFeature("enterprise", "shop"), true);
+  for (const plan of ["free", "basic", "standard", "pro", "enterprise"]) {
+    assert.equal(planHasFeature(plan, "assignment"), false);
+    assert.equal(planHasFeature(plan, "voice"), false);
+    assert.equal(planHasFeature(plan, "honeypot"), false);
+    assert.equal(planHasFeature(plan, "logs"), false);
+  }
 });
 
 test("licensed guilds are allowed while unlicensed guilds are rejected", async () => {
