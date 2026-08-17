@@ -31,7 +31,7 @@ export default {
       return interaction.editReply({ content: "봇이 만든 티켓 채널에서만 사용할 수 있습니다." });
     }
 
-    const notes = await context.services.notes.listNotes(interaction.guildId);
+    const notes = await context.services.notes.listNotes(interaction.guildId, interaction.channelId);
     if (!notes.length) {
       return interaction.editReply({ content: "저장된 내용이 없습니다." });
     }

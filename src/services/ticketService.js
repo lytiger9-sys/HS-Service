@@ -270,6 +270,7 @@ export function createTicketService(context, guildState) {
 
     setTimeout(async () => {
       await channel.delete(`티켓 삭제 확정: ${closedBy.user?.tag || closedBy.tag || closedBy.id}`).catch(() => null);
+      await context.services.notes.deleteNotesByTicket(guild.id, channel.id).catch(() => null);
     }, 10000);
 
     await guildState.patch(guild.id, (guildStateValue) => {

@@ -9,6 +9,7 @@ import handleReady from "./events/ready.js";
 import handleGuildCreate from "./events/guildCreate.js";
 import handleGuildMemberAdd from "./events/guildMemberAdd.js";
 import handleGuildMemberRemove from "./events/guildMemberRemove.js";
+import handleChannelDelete from "./events/channelDelete.js";
 import handleMessageCreate from "./events/messageCreate.js";
 import handleMessageUpdate from "./events/messageUpdate.js";
 import handleMessageDelete from "./events/messageDelete.js";
@@ -38,6 +39,7 @@ export async function createBot(context) {
   client.on("guildCreate", (guild) => void handleGuildCreate(guild, context).catch((error) => console.error("[bot] guildCreate error:", error)));
   client.on("guildMemberAdd", (member) => void handleGuildMemberAdd(member, context).catch((error) => console.error("[bot] guildMemberAdd error:", error)));
   client.on("guildMemberRemove", (member) => void handleGuildMemberRemove(member, context).catch((error) => console.error("[bot] guildMemberRemove error:", error)));
+  client.on("channelDelete", (channel) => void handleChannelDelete(channel, context).catch((error) => console.error("[bot] channelDelete error:", error)));
   client.on("messageCreate", (message) => void handleMessageCreate(message, context).catch((error) => console.error("[bot] messageCreate error:", error)));
   client.on("messageUpdate", (oldMessage, newMessage) => void handleMessageUpdate(oldMessage, newMessage, context).catch((error) => console.error("[bot] messageUpdate error:", error)));
   client.on("messageDelete", (message) => void handleMessageDelete(message, context).catch((error) => console.error("[bot] messageDelete error:", error)));

@@ -17,6 +17,10 @@ export async function handleModalInteraction(interaction, context) {
   }
 
   if (interaction.customId === "save-note") {
+    const isTicketChannel = await context.services.tickets.isBotTicketChannel(interaction.guildId, interaction.channelId).catch(() => false);
+    if (!isTicketChannel) {
+      return interaction.reply({ content: "봇이 만든 티켓 채널에서만 사용할 수 있습니다.", ephemeral: true });
+    }
     const title = interaction.fields.getTextInputValue("save-note-title");
     const content = interaction.fields.getTextInputValue("save-note-content");
 
@@ -24,7 +28,8 @@ export async function handleModalInteraction(interaction, context) {
       title,
       content,
       authorId: interaction.user.id,
-      authorTag: interaction.user.tag
+      authorTag: interaction.user.tag,
+      ticketChannelId: interaction.channelId
     });
 
     return interaction.reply({
