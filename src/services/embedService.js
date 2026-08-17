@@ -1,9 +1,13 @@
 import {
   ContainerBuilder,
   EmbedBuilder,
+  MediaGalleryBuilder,
+  MediaGalleryItemBuilder,
   MessageFlags,
+  SectionBuilder,
   SeparatorBuilder,
-  TextDisplayBuilder
+  TextDisplayBuilder,
+  ThumbnailBuilder
 } from "discord.js";
 import { parseColor } from "../shared/embeds.js";
 
@@ -89,9 +93,26 @@ function componentsPayload(settings) {
     text = [];
   };
   for (const line of lines) {
-    if (line.trim() === "---" || line.trim() === "___") {
+    const trimmed = line.trim();
+    const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
+    const thumbnailMatch = trimmed.match(/^\[thumbnail\]\s+(https?:\/\/\S+)$/i);
+    if (trimmed === "---" || trimmed === "___") {
       flush();
       container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+    } else if (imageMatch) {
+      flush();
+      container.addMediaGalleryComponents(
+        new MediaGalleryBuilder().addItems(
+          new MediaGalleryItemBuilder().setURL(imageMatch[1])
+        )
+      );
+    } else if (thumbnailMatch) {
+      flush();
+      container.addSectionComponents(
+        new SectionBuilder()
+          .addTextDisplayComponents(new TextDisplayBuilder().setContent(" "))
+          .setThumbnailAccessory(new ThumbnailBuilder({ media: { url: thumbnailMatch[1] } }))
+      );
     } else {
       text.push(line);
     }

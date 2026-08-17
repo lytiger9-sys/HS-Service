@@ -258,10 +258,25 @@ function setupEmbedPanel() {
     if (previewComponents) {
       previewComponents.replaceChildren();
       String(form.querySelector('[name="embedComponentsBody"]')?.value || "").split(/\r?\n/).forEach((line) => {
-        if (line.trim() === "---" || line.trim() === "___") {
+        const trimmed = line.trim();
+        const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
+        const thumbnailMatch = trimmed.match(/^\[thumbnail\]\s+(https?:\/\/\S+)$/i);
+        if (trimmed === "---" || trimmed === "___") {
           const divider = document.createElement("div");
           divider.className = "discord-component-divider";
           previewComponents.append(divider);
+        } else if (imageMatch) {
+          const image = document.createElement("img");
+          image.className = "discord-component-image";
+          image.src = imageMatch[1];
+          image.alt = "Components V2 이미지 미리보기";
+          previewComponents.append(image);
+        } else if (thumbnailMatch) {
+          const thumbnail = document.createElement("img");
+          thumbnail.className = "discord-component-thumbnail";
+          thumbnail.src = thumbnailMatch[1];
+          thumbnail.alt = "Components V2 썸네일 미리보기";
+          previewComponents.append(thumbnail);
         } else {
           const text = document.createElement("div");
           text.className = "discord-component-text";

@@ -47,7 +47,7 @@
         <div class="field full" data-embed-format="components" style="<%= settings.embed.mode === 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode === 'legacy' ? 'true' : 'false' %>">
           <span>메시지 내용</span>
           <textarea name="embedComponentsBody" rows="9" data-embed-preview="components"><%= settings.embed.componentsBody %></textarea>
-          <small class="muted">입력한 순서대로 표시됩니다. 빈 줄은 줄바꿈으로 표시되고, 한 줄에 `---` 또는 `___`만 입력하면 실선으로 표시됩니다. `@everyone`, `@here`, `<@&역할ID>`는 자동 멘션으로 변환됩니다.</small>
+          <small class="muted">입력한 순서대로 표시됩니다. 빈 줄은 줄바꿈, `---` 또는 `___`는 실선, `[image] https://이미지주소`는 큰 이미지, `[thumbnail] https://이미지주소`는 썸네일입니다. `@everyone`, `@here`, `<@&역할ID>`는 자동 멘션으로 변환됩니다.</small>
         </div>
 
         <div class="field full" data-embed-format="legacy" style="<%= settings.embed.mode !== 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode !== 'legacy' ? 'true' : 'false' %>">

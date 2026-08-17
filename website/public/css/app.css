@@ -1960,3 +1960,5 @@ a {
 .discord-component-divider { height: 1px; margin: 8px 0; background: #4e5058; }
 .discord-components-message { max-width: 520px; padding: 12px 14px; border-radius: 4px; background: #2b2d31; color: #dbdee1; }
 .discord-components-message .discord-components-preview { margin: 0; }
+.discord-component-image { display: block; width: min(100%, 480px); max-height: 320px; object-fit: cover; margin: 8px 0; border-radius: 4px; }
+.discord-component-thumbnail { display: block; width: 80px; height: 80px; object-fit: cover; margin: 8px 0; border-radius: 4px; }
