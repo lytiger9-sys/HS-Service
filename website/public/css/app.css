@@ -2852,3 +2852,35 @@ body.dashboard-page { background: var(--ink-deep); }
 .dashboard-page .status-chip {
   letter-spacing: 0;
 }
+
+/* Embed component tools: regular tools above, mention tools below */
+.dashboard-page .component-tool-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.dashboard-page .component-tool-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+.dashboard-page .component-tool-row button,
+.dashboard-page .component-tool-row select {
+  flex: 0 1 auto;
+  min-width: 148px;
+}
+.dashboard-page .component-tool-row-mentions button,
+.dashboard-page .component-tool-row-mentions select {
+  min-width: 178px;
+}
+@media (max-width: 760px) {
+  .dashboard-page .component-tool-row button,
+  .dashboard-page .component-tool-row select,
+  .dashboard-page .component-tool-row-mentions button,
+  .dashboard-page .component-tool-row-mentions select {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+}

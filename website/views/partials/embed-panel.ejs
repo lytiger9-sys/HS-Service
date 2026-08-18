@@ -53,17 +53,21 @@
           <div class="component-tools" data-component-tools>
             <p class="component-tools-title">사용 가능한 기능</p>
             <div class="component-tool-list">
-              <button type="button" class="ghost" data-component-insert="--">-- <span>실선 추가</span></button>
-              <button type="button" class="ghost" data-component-insert="@everyone">@everyone <span>전체 멘션</span></button>
-              <button type="button" class="ghost" data-component-insert="@here">@here <span>온라인 멤버 멘션</span></button>
-              <button type="button" class="ghost" data-component-insert="[image] ">[image] <span>사진 링크 입력</span></button>
-              <button type="button" class="ghost" data-component-insert="[thumbnail] ">[thumbnail] <span>썸네일 링크 입력</span></button>
-              <select data-component-role aria-label="멘션할 역할 선택">
-                <option value="">역할 멘션 추가</option>
-                <% roles.filter((role) => role.id !== guild.id).forEach((role) => { %>
-                  <option value="<%= role.name %>">@<%= role.name %></option>
-                <% }) %>
-              </select>
+              <div class="component-tool-row component-tool-row-main">
+                <button type="button" class="ghost" data-component-insert="--">-- <span>실선 추가</span></button>
+                <button type="button" class="ghost" data-component-insert="[image] ">[image] <span>사진 링크 입력</span></button>
+                <button type="button" class="ghost" data-component-insert="[thumbnail] ">[thumbnail] <span>썸네일 링크 입력</span></button>
+              </div>
+              <div class="component-tool-row component-tool-row-mentions">
+                <button type="button" class="ghost" data-component-insert="@everyone">@everyone <span>전체 멘션</span></button>
+                <button type="button" class="ghost" data-component-insert="@here">@here <span>온라인 멤버 멘션</span></button>
+                <select data-component-role aria-label="멘션할 역할 선택">
+                  <option value="">역할 멘션 추가</option>
+                  <% roles.filter((role) => role.id !== guild.id).forEach((role) => { %>
+                    <option value="<%= role.name %>">@<%= role.name %></option>
+                  <% }) %>
+                </select>
+              </div>
             </div>
             <small class="muted">버튼을 누르면 현재 내용의 다음 줄에 문법이 추가됩니다. 역할은 `@역할이름` 형식으로 입력되고 실제 전송 시 해당 역할 멘션으로 변환됩니다.</small>
           </div>
