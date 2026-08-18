@@ -278,29 +278,10 @@ export function createApiRouter(context) {
       const featureAccess = await requireFeature(context, guildId, featureForSection(section));
       if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
 
-      const requestBodySummary = Object.fromEntries(Object.entries(req.body || {})
-        .filter(([key]) => key.endsWith("Enabled") || key === "_csrf" || key.includes("ChannelId") || key.includes("Title") || key.includes("Description"))
-        .map(([key, value]) => [key, key === "_csrf" ? "<present>" : value]));
-      console.info("[web] settings request", {
-        guildId,
-        section,
-        bodyKeys: Object.keys(req.body || {}),
-        values: requestBodySummary
-      });
-
       const payload = sectionPayload(section, req.body);
       if (!payload) {
         return res.status(400).send("지원하지 않는 섹션입니다.");
       }
-
-      console.info("[web] settings payload", {
-        guildId,
-        section,
-        payload: Object.fromEntries(Object.entries(payload).map(([key, value]) => [key, {
-          enabled: value && typeof value === "object" ? value.enabled : undefined,
-          keys: value && typeof value === "object" ? Object.keys(value) : []
-        }]))
-      });
 
       if (!featureAccess.bypass && !planAllowsFeatureToggle(featureAccess.plan)) {
         const settingsKey = section === "staff" ? "staff" : section;

@@ -1,4 +1,21 @@
+import { MessageFlags } from "discord.js";
 import { buildBaseEmbed, palette, parseColor } from "../shared/embeds.js";
+
+function textDisplay(content) {
+  return { type: 10, content: String(content).slice(0, 4000) };
+}
+
+function separator() {
+  return { type: 14, divider: true };
+}
+
+function container(components, accentColor) {
+  return {
+    type: 17,
+    accentColor: parseColor(accentColor, palette.danger),
+    components
+  };
+}
 
 async function resolveTextChannel(guild, channelId) {
   if (!channelId) {
@@ -15,20 +32,23 @@ async function resolveTextChannel(guild, channelId) {
 }
 
 export function createHoneypotService(context, guildState) {
-  async function buildStatusEmbed(guild, settings) {
+  async function buildStatusComponents(guild, settings) {
     const action = settings.honeypot.action === "ban" ? "차단" : "추방";
-    return buildBaseEmbed({
-      title: "허니팟 감시 채널",
-      description: [
-        `이 채널에 메시지를 남긴 계정은 자동으로 ${action}됩니다.`,
-        "메시지를 보내면 최근 메시지가 삭제되고 제재됩니다.",
-        "",
-        `현재 ${action}된 사용자 수: **${settings.honeypot.caughtCount}명**`
-      ].join("\n"),
-      color: palette.danger,
-      footer: guild.name,
-      timestamp: Date.now()
-    });
+    return {
+      flags: MessageFlags.IsComponentsV2,
+      components: [
+        container([
+          textDisplay(`## 허니팟 감시 채널\n${guild.name}`),
+          separator(),
+          textDisplay([
+            `이 채널에 메시지를 남긴 계정은 자동으로 ${action}됩니다.`,
+            "메시지를 보내면 최근 메시지가 삭제되고 제재됩니다.",
+            "",
+            `현재 ${action}된 사용자 수: **${settings.honeypot.caughtCount}명**`
+          ].join("\n"))
+        ], palette.danger)
+      ]
+    };
   }
 
   async function configureChannel(guildId, channelId, action) {
@@ -74,8 +94,7 @@ export function createHoneypotService(context, guildState) {
       return null;
     }
 
-    const embed = await buildStatusEmbed(guild, settings);
-    const payload = { embeds: [embed] };
+    const payload = await buildStatusComponents(guild, settings);
 
     let message = null;
     if (settings.honeypot.statusMessageId) {

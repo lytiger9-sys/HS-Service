@@ -14,13 +14,6 @@ function storedBoolean(value, fallback = false) {
   return fallback;
 }
 
-function summarizeSettings(settings = {}) {
-  return Object.fromEntries(Object.entries(settings).map(([section, value]) => [section, {
-    enabled: value && typeof value === "object" ? value.enabled : undefined,
-    keys: value && typeof value === "object" ? Object.keys(value) : []
-  }]));
-}
-
 function normalizeGuildState(doc) {
   if (!doc) {
     return null;
@@ -158,12 +151,6 @@ export class StateStore {
     this.ready = (async () => {
       await connectMongo({ uri: this.mongoUri, dbName: this.mongoDbName });
       const docs = await GuildStateModel.find({}).lean();
-      console.info("[storage] loaded guild states", {
-        database: mongoose.connection.name,
-        collection: GuildStateModel.collection.name,
-        count: docs.length,
-        settings: summarizeSettings(docs[0]?.settings)
-      });
       this.state = structuredClone(this.initialState);
       this.state.guilds = {};
 
@@ -183,26 +170,11 @@ export class StateStore {
       return null;
     }
 
-    const serialized = serializeGuildState(guildId, guildState);
-    const result = await GuildStateModel.replaceOne(
+    await GuildStateModel.replaceOne(
       { guildId },
-      serialized,
+      serializeGuildState(guildId, guildState),
       { upsert: true }
     );
-    const persisted = await GuildStateModel.findOne({ guildId }, { guildId: 1, settings: 1, shop: 1 }).lean();
-    if (!persisted) {
-      throw new Error(`GuildState persistence verification failed for ${guildId}`);
-    }
-    console.info("[storage] persisted guild state", {
-      guildId,
-      database: mongoose.connection.name,
-      collection: GuildStateModel.collection.name,
-      acknowledged: result.acknowledged,
-      matchedCount: result.matchedCount,
-      modifiedCount: result.modifiedCount,
-      upsertedCount: result.upsertedCount,
-      settings: summarizeSettings(persisted.settings)
-    });
 
     return guildState;
   }
