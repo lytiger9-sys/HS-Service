@@ -475,8 +475,15 @@ export function createApiRouter(context) {
       const featureAccess = await requireFeature(context, guildId, "polls");
       if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
 
+      const pollChannelId = req.body.pollChannelId || "";
+      if (!pollChannelId) {
+        return wantsJson(req)
+          ? res.status(400).json({ ok: false, message: "투표를 게시할 채널을 선택해 주세요." })
+          : res.status(400).send("투표를 게시할 채널을 선택해 주세요.");
+      }
+
       const poll = await context.services.polls.createPoll(guildId, {
-        channelId: req.body.pollChannelId || "",
+        channelId: pollChannelId,
         question: req.body.pollQuestion || "",
         description: req.body.pollDescription || "",
         options: splitLines(req.body.pollOptions),
@@ -492,7 +499,8 @@ export function createApiRouter(context) {
       if (wantsJson(req)) return res.json({ ok: true, section: "polls", message: "투표를 게시했습니다." });
       return res.redirect("/?section=polls&saved=1");
     } catch (error) {
-      next(error);
+      if (wantsJson(req)) return res.status(400).json({ ok: false, message: error.message || "투표 게시에 실패했습니다." });
+      return res.status(400).send(error.message || "투표 게시에 실패했습니다.");
     }
   });
 
