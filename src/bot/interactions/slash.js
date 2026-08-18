@@ -7,7 +7,7 @@ function commandFeature(commandName) {
   if (["honeypotban", "honeypotkick"].includes(commandName)) return "honeypot";
   if (["nickapply", "nickrandom", "nickinit"].includes(commandName)) return "nickname";
   if (["도박", "캐시", "캐시지급"].includes(commandName)) return "shop";
-  if (["이모지스틸", "이모지목록", "사운드스틸", "사운드목록", "사운드삭제"].includes(commandName)) return "voice";
+  if (["이모지스틸", "이모지목록", "이모지삭제", "사운드스틸", "사운드목록", "사운드삭제"].includes(commandName)) return "voice";
   return null;
 }
 

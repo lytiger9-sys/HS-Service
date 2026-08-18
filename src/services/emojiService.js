@@ -15,6 +15,8 @@ export function createEmojiService(context) {
     if (!me?.permissions.has(PermissionFlagsBits.CreateGuildExpressions)) throw new Error("봇에게 이모지 생성 권한이 없습니다.");
     const name = String(requestedName || source.name).replace(/[^\w~+-]/g, "").slice(0, 32);
     if (name.length < 2) throw new Error("이모지 이름은 2자 이상이어야 합니다.");
+    await guild.emojis.fetch();
+    if (guild.emojis.cache.some((emoji) => emoji.name === name)) throw new Error(`이미 같은 이름의 이모지 '${name}'가 있습니다.`);
     const extension = source.animated ? "gif" : "png";
     const response = await fetch(`https://cdn.discordapp.com/emojis/${source.id}.${extension}?size=256&quality=lossless`);
     if (!response.ok) throw new Error("원본 이모지 이미지를 가져오지 못했습니다.");
@@ -31,8 +33,20 @@ export function createEmojiService(context) {
   }
 
   async function list(guild) {
+    await guild.emojis.fetch();
     return [...guild.emojis.cache.values()].sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  return { importEmoji, list };
+  async function remove(guild, emojiId, member) {
+    if (!member?.permissions.has(PermissionFlagsBits.ManageGuildExpressions)) throw new Error("이모지 관리 권한이 필요합니다.");
+    const emoji = await guild.emojis.fetch(emojiId).catch(() => null);
+    if (!emoji) throw new Error("해당 이모지를 찾을 수 없습니다.");
+    await emoji.delete("이모지 스틸 관리자가 삭제");
+    await context.services.guildState.patch(guild.id, (state) => {
+      if (state.expressions?.emojis) state.expressions.emojis = state.expressions.emojis.filter((entry) => entry.id !== emoji.id);
+    });
+    return emoji;
+  }
+
+  return { importEmoji, list, remove };
 }
