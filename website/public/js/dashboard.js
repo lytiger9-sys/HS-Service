@@ -231,6 +231,21 @@ function ensureToggleFallbacks(form) {
 }
 
 function setupForms() {
+  // 일부 패널은 저장 버튼을 form 밖에 배치하고 `form` 속성으로 연결한다.
+  // 브라우저의 암시적 제출에 의존하지 않고 클릭 시 명시적으로 submit을 발생시킨다.
+  document.querySelectorAll("button[type=submit][form]").forEach((button) => {
+    const form = document.getElementById(button.getAttribute("form"));
+    if (!form || !form.classList.contains("settings-form")) return;
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (typeof form.requestSubmit === "function") {
+        form.requestSubmit(button);
+      } else {
+        form.dispatchEvent(new SubmitEvent("submit", { bubbles: true, cancelable: true, submitter: button }));
+      }
+    });
+  });
+
   forms.forEach((form) => {
     ensureToggleFallbacks(form);
     form.addEventListener("submit", async (event) => {

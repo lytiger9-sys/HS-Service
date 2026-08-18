@@ -8,6 +8,12 @@ function readBoolean(value) {
   return value === "on" || value === "true" || value === "1" || value === true;
 }
 
+// 체크박스가 폼 밖에 있거나 일부 브라우저/클라이언트가 필드를 생략해도
+// 상세 설정 저장이 기존 enabled 상태를 false로 덮어쓰지 않게 한다.
+function readOptionalBoolean(value) {
+  return value === undefined ? undefined : readBoolean(value);
+}
+
 function readNumber(value, fallback = 0, min = -Infinity, max = Infinity) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
@@ -73,7 +79,7 @@ function sectionPayload(section, body) {
   if (section === "welcome") {
     return {
       welcome: {
-        enabled: readBoolean(body.welcomeEnabled),
+        enabled: readOptionalBoolean(body.welcomeEnabled),
         channelId: readDiscordId(body.welcomeChannelId),
         errorChannelId: readDiscordId(body.welcomeErrorChannelId),
         embedTitle: readText(body.welcomeEmbedTitle, "", 256),
@@ -95,7 +101,7 @@ function sectionPayload(section, body) {
   if (section === "staff") {
     return {
       staff: {
-        enabled: readBoolean(body.staffEnabled),
+        enabled: readOptionalBoolean(body.staffEnabled),
         channelId: readDiscordId(body.staffChannelId),
         embedTitle: readText(body.staffEmbedTitle, "", 256),
         embedDescription: readText(body.staffEmbedDescription, "", 4000),
@@ -107,7 +113,7 @@ function sectionPayload(section, body) {
   if (section === "security") {
     return {
       security: {
-        enabled: readBoolean(body.securityEnabled),
+        enabled: readOptionalBoolean(body.securityEnabled),
         massMentionEnabled: body.massMentionEnabled === undefined ? true : readBoolean(body.massMentionEnabled),
         spamEnabled: body.spamEnabled === undefined ? true : readBoolean(body.spamEnabled),
         profanityEnabled: body.profanityEnabled === undefined ? true : readBoolean(body.profanityEnabled),
@@ -126,7 +132,7 @@ function sectionPayload(section, body) {
   if (section === "assignment") {
     return {
       assignment: {
-        enabled: readBoolean(body.assignmentEnabled),
+        enabled: readOptionalBoolean(body.assignmentEnabled),
         channelId: readDiscordId(body.assignmentChannelId),
         roleId: readDiscordId(body.assignmentRoleId)
       }
@@ -136,7 +142,7 @@ function sectionPayload(section, body) {
   if (section === "voice") {
     return {
       voice: {
-        enabled: readBoolean(body.voiceEnabled),
+        enabled: readOptionalBoolean(body.voiceEnabled),
         categoryId: readDiscordId(body.voiceCategoryId),
         defaultName: readText(body.voiceDefaultName, "임시 채널", 100),
         maxUsers: readNumber(body.voiceMaxUsers, 0, 0, 99)
@@ -153,7 +159,7 @@ function sectionPayload(section, body) {
     }
     return {
       embed: {
-        enabled: readBoolean(body.embedEnabled ?? body.noticeEnabled),
+        enabled: readOptionalBoolean(body.embedEnabled ?? body.noticeEnabled),
         mode: body.embedMode === "legacy" ? "legacy" : "components",
         channelId: readDiscordId(body.embedChannelId),
         destinationType: body.embedDestinationType === "webhook" ? "webhook" : "channel",
@@ -181,7 +187,7 @@ function sectionPayload(section, body) {
   if (section === "polls") {
     return {
       polls: {
-        enabled: readBoolean(body.pollsEnabled)
+        enabled: readOptionalBoolean(body.pollsEnabled)
       }
     };
   }
@@ -189,7 +195,7 @@ function sectionPayload(section, body) {
     if (section === "logs") {
     return {
       logs: {
-        enabled: readBoolean(body.logsEnabled),
+        enabled: readOptionalBoolean(body.logsEnabled),
         moderationChannelId: readDiscordId(body.logModerationChannelId),
         securityChannelId: readDiscordId(body.logSecurityChannelId),
         serverChannelId: readDiscordId(body.logServerChannelId),
@@ -208,11 +214,11 @@ function sectionPayload(section, body) {
         suffix: readText(rule.suffix, "", 24)
       };
     }
-    return { nickname: { enabled: readBoolean(body.nicknameEnabled), rules } };
+    return { nickname: { enabled: readOptionalBoolean(body.nicknameEnabled), rules } };
   }
   if (section === "shop") {
     return { shop: {
-      enabled: readBoolean(body.shopEnabled),
+      enabled: readOptionalBoolean(body.shopEnabled),
       messageChannelId: readDiscordId(body.shopMessageChannelId),
       dailyReward: readNumber(body.shopDailyReward, 100, 0, 1000000),
       messageReward: readNumber(body.shopMessageReward, 10, 0, 1000000),
@@ -225,7 +231,7 @@ function sectionPayload(section, body) {
   if (section === "partner") {
     return {
       partner: {
-        enabled: readBoolean(body.partnerEnabled),
+        enabled: readOptionalBoolean(body.partnerEnabled),
         conditionsChannelId: readDiscordId(body.partnerConditionsChannelId),
         approvalChannelId: readDiscordId(body.partnerApprovalChannelId),
         partnerCategoryId: readDiscordId(body.partnerCategoryId),
@@ -237,7 +243,7 @@ function sectionPayload(section, body) {
         embedColor: /^#[0-9a-f]{6}$/i.test(body.partnerEmbedColor || "") ? body.partnerEmbedColor : "#3a7da8",
         buttonLabel: readText(body.partnerButtonLabel, "파트너 신청", 80),
         banner: {
-          enabled: readBoolean(body.bannerEnabled),
+          enabled: readOptionalBoolean(body.bannerEnabled),
           channelId: readDiscordId(body.bannerChannelId),
           categoryId: readDiscordId(body.bannerCategoryId),
           namePrefix: readText(body.bannerNamePrefix, "", 30),
@@ -280,7 +286,7 @@ export function createApiRouter(context) {
       if (!featureAccess.bypass && !planAllowsFeatureToggle(featureAccess.plan)) {
         const settingsKey = section === "staff" ? "staff" : section;
         const sectionSettings = payload[settingsKey];
-        if (sectionSettings && Object.prototype.hasOwnProperty.call(sectionSettings, "enabled")) {
+        if (sectionSettings && sectionSettings.enabled !== undefined) {
           sectionSettings.enabled = true;
         }
       }
