@@ -15,7 +15,8 @@ export default async function handleInteractionCreate(interaction, context) {
     if (interaction.guildId && feature) {
       const access = await canUseFeature(context, interaction.guildId, feature);
       if (!access.featureAllowed) {
-        return interaction.reply({ content: featureDeniedMessage(feature), ephemeral: true }).catch(() => null);
+        const message = access.reason === "work-stopped" ? "이 서버의 모든 작업이 라이센스 관리자에 의해 중지되었습니다." : featureDeniedMessage(feature);
+        return interaction.reply({ content: message, ephemeral: true }).catch(() => null);
       }
     }
 

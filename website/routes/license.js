@@ -55,7 +55,7 @@ export function createLicenseRouter(context) {
         title: "라이선스 관리",
         botName: context.config.botName,
         licenses,
-        issuedKey: req.query.key || "",
+        issuedKeys: req.query.keys ? String(req.query.keys).split("\n").filter(Boolean) : [],
         errorMessage: req.query.error || ""
       });
     } catch (error) {
@@ -67,12 +67,22 @@ export function createLicenseRouter(context) {
     try {
       const issued = await context.services.licenses.issue({
         plan: req.body.plan,
-        durationDays: req.body.durationDays
+        durationDays: req.body.durationDays,
+        count: req.body.count
       });
-      return res.redirect(`/license/dashboard?key=${encodeURIComponent(issued.key)}`);
+      return res.redirect(`/license/dashboard?keys=${encodeURIComponent(issued.map((entry) => entry.key).join("\n"))}`);
     } catch (error) {
       return res.redirect(`/license/dashboard?error=${encodeURIComponent(error.message)}`);
     }
+  });
+
+  router.post("/:id/work-stop", async (req, res, next) => {
+    try {
+      const stopped = String(req.body.stopped || "true") !== "false";
+      const updated = await context.services.licenses.setWorkStopped(req.params.id, stopped);
+      if (!updated) return res.redirect("/license/dashboard?error=활성화된 서버 라이센스만 작업중지할 수 있습니다.");
+      return res.redirect("/license/dashboard");
+    } catch (error) { return next(error); }
   });
 
   router.post("/:id/revoke", async (req, res, next) => {

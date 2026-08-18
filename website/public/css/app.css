@@ -1838,6 +1838,12 @@ a {
 }
 .license-form .primary:hover,
 .license-auth-card .primary:hover { background: #2b5068; }
+.license-login-button { position: relative; overflow: hidden; isolation: isolate; }
+.license-login-button::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #3a7da8; transform: translateX(-101%); transition: transform .35s ease; }
+.license-login-button:hover::before, .license-login-button:focus-visible::before { transform: translateX(0); }
+.license-login-button span { position: relative; z-index: 1; color: inherit; }
+.license-plain-key { display: inline-block; margin: 3px 6px 3px 0; padding: 5px 8px; border-radius: 6px; background: #edf3f7; color: #17202a; white-space: nowrap; }
+.license-card td form { display: inline-block; margin: 2px 4px 2px 0; }
 .license-inline-form { margin: 0; }
 .license-inline-form .ghost,
 .license-card .ghost {

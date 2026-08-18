@@ -7,6 +7,12 @@ export function normalizePlan(plan) {
   return PLAN_IDS.has(plan) ? plan : "free";
 }
 
+function normalizeCount(value) {
+  const count = Number(value ?? 1);
+  if (!Number.isInteger(count) || count < 1 || count > 100) throw new Error("한 번에 1개에서 100개까지 생성할 수 있습니다.");
+  return count;
+}
+
 function normalizeDurationDays(value) {
   const days = Number(value);
   if (!Number.isInteger(days) || days < 1 || days > 3650) {
@@ -44,25 +50,21 @@ export function createLicenseService() {
       return licenses.map((license) => refreshExpiredStatus(license));
     },
 
-    async issue({ plan, durationDays, createdBy = "license-admin" }) {
+    async issue({ plan, durationDays, count = 1, createdBy = "license-admin" }) {
       const normalizedPlan = normalizePlan(plan);
       const days = normalizeDurationDays(durationDays);
-      for (let attempt = 0; attempt < 5; attempt += 1) {
+      const total = normalizeCount(count);
+      const issued = [];
+      while (issued.length < total) {
         const plainKey = createPlainKey();
         try {
-          await LicenseModel.create({
-            keyHash: hashKey(plainKey),
-            keyLast4: plainKey.slice(-4),
-            plan: normalizedPlan,
-            durationDays: days,
-            createdBy
-          });
-          return { key: plainKey, plan: normalizedPlan, durationDays: days };
+          await LicenseModel.create({ key: plainKey, keyHash: hashKey(plainKey), keyLast4: plainKey.slice(-4), plan: normalizedPlan, durationDays: days, createdBy });
+          issued.push({ key: plainKey, plan: normalizedPlan, durationDays: days });
         } catch (error) {
-          if (error?.code !== 11000 || attempt === 4) throw error;
+          if (error?.code !== 11000) throw error;
         }
       }
-      throw new Error("라이선스 키 생성에 실패했습니다.");
+      return issued;
     },
 
     async issueBanner({ durationDays, issuerGuildId, issuerUserId, issuerPlan }) {
@@ -72,6 +74,7 @@ export function createLicenseService() {
         const plainKey = createPlainKey();
         try {
           await LicenseModel.create({
+            key: plainKey,
             keyHash: hashKey(plainKey),
             keyLast4: plainKey.slice(-4),
             plan: issuerPlan,
@@ -89,6 +92,13 @@ export function createLicenseService() {
       throw new Error("상단배너 라이선스 키 생성에 실패했습니다.");
     },
 
+    async setWorkStopped(id, stopped) {
+      return LicenseModel.findOneAndUpdate({ _id: id, kind: "service", status: "active" }, { $set: { workStopped: Boolean(stopped) } }, { new: true }).lean();
+    },
+    async isWorkStopped(guildId) {
+      const license = await LicenseModel.findOne({ assignedGuildId: String(guildId), kind: "service", status: "active" }).select("workStopped").lean();
+      return Boolean(license?.workStopped);
+    },
     async revoke(id) {
       const result = await LicenseModel.findOneAndUpdate(
         { _id: id, status: { $in: ["available", "active"] } },
@@ -101,7 +111,7 @@ export function createLicenseService() {
     async findByKey(key) {
       const normalizedKey = String(key || "").trim().toUpperCase();
       if (!/^HS-[A-Z0-9]{6}(?:-[A-Z0-9]{6}){2}$/.test(normalizedKey)) return null;
-      const license = await LicenseModel.findOne({ keyHash: hashKey(normalizedKey) });
+      const license = await LicenseModel.findOne({ $or: [{ key: normalizedKey }, { keyHash: hashKey(normalizedKey) }] });
       if (!license) return null;
       refreshExpiredStatus(license);
       if (license.isModified("status")) await license.save();

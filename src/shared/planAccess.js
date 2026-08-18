@@ -46,6 +46,7 @@ export async function getGuildPlanAccess(context, guildId) {
   }
   const license = await context.services.licenses.getActiveByGuild(guildId).catch(() => null);
   if (!license) return { allowed: false, bypass: false, plan: null, reason: "license-required" };
+  if (license.workStopped) return { allowed: false, bypass: false, plan: license.plan, license, reason: "work-stopped" };
   return { allowed: true, bypass: false, plan: license.plan, license, reason: "licensed" };
 }
 

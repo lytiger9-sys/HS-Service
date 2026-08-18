@@ -5,6 +5,7 @@ const { Schema, model, models } = mongoose;
 
 const licenseSchema = new Schema(
   {
+    key: { type: String, default: "", unique: true, sparse: true, index: true },
     keyHash: { type: String, required: true, unique: true, index: true },
     keyLast4: { type: String, required: true },
     plan: { type: String, required: true, enum: [...PLAN_IDS] },
@@ -18,6 +19,7 @@ const licenseSchema = new Schema(
     activatedAt: { type: Date, default: null },
     expiresAt: { type: Date, default: null },
     revokedAt: { type: Date, default: null },
+    workStopped: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     createdBy: { type: String, default: "license-admin" }
   },
