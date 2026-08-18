@@ -18,6 +18,7 @@ import exchange from "./exchange.js";
 import clone from "./clone.js";
 import { emojiSteal } from "./emoji.js";
 import emojiList from "./emoji.js";
+import { tts, ttsStop, ttsLeave } from "./tts.js";
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 
 export const commandList = [
@@ -42,6 +43,9 @@ export const commandList = [
   clone,
   emojiSteal,
   emojiList,
+  tts,
+  ttsStop,
+  ttsLeave,
   shop,
   balanceCommand,
   adminGrantCommand
