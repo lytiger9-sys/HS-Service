@@ -12,6 +12,10 @@ import exithoneypot from "./exithoneypot.js";
 import nickapply from "./nickapply.js";
 import nickrandom from "./nickrandom.js";
 import nickinit from "./nickinit.js";
+import { boostOn, boostOff } from "./boost.js";
+import profile from "./profile.js";
+import exchange from "./exchange.js";
+import clone from "./clone.js";
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 
 export const commandList = [
@@ -29,6 +33,11 @@ export const commandList = [
   nickapply,
   nickrandom,
   nickinit,
+  boostOn,
+  boostOff,
+  profile,
+  exchange,
+  clone,
   shop,
   balanceCommand,
   adminGrantCommand

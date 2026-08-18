@@ -101,6 +101,10 @@ export function createDefaultGuildSettings() {
       buttonLabel: "출퇴근",
       statuses: {}
     },
+    boost: {
+      enabled: false,
+      channelId: ""
+    },
     logs: {
       enabled: true,
       serverChannelId: "",

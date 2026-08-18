@@ -19,6 +19,9 @@ import { createEmbedService } from "./embedService.js";
 import { applyAllNicknames, randomizeNicknames, restoreNicknames, applyNickname, getBotManagedRoles } from "./nicknameService.js";
 import { createShopService } from "./shopService.js";
 import { createServerAuditLogService } from "./serverAuditLogService.js";
+import { createBoostService } from "./boostService.js";
+import { createExchangeService } from "./exchangeService.js";
+import { createCloneService } from "./cloneService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -44,6 +47,9 @@ export function createServices(context) {
     embeds: createEmbedService(context),
     nicknames: { applyAllNicknames, randomizeNicknames, restoreNicknames, applyNickname, getBotManagedRoles },
     shop: createShopService(context),
-    serverAuditLogs: createServerAuditLogService(context)
+    serverAuditLogs: createServerAuditLogService(context),
+    boost: createBoostService(context, guildState),
+    exchange: createExchangeService(),
+    cloner: createCloneService()
   };
 }

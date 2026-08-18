@@ -2,7 +2,9 @@ import { canUseFeature } from "../../shared/planAccess.js";
 import { isAllowedGuild } from "../../shared/guards.js";
 
 export default async function handleGuildMemberUpdate(oldMember, newMember, context) {
-  if (!newMember.guild || newMember.user?.bot || !(await isAllowedGuild(context, newMember.guild.id))) return;
+  if (!newMember.guild || !(await isAllowedGuild(context, newMember.guild.id))) return;
+  await context.services.boost.handleMemberUpdate(oldMember, newMember).catch(() => false);
+  if (newMember.user?.bot) return;
   const addedRole = newMember.roles.cache.some((role) => !oldMember.roles.cache.has(role.id));
   if (!addedRole) return;
   const access = await canUseFeature(context, newMember.guild.id, "nickname");
