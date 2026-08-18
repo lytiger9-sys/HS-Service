@@ -3,7 +3,9 @@
   toast.className = "save-toast site-toast";
   toast.hidden = true;
   toast.setAttribute("aria-live", "polite");
-  document.addEventListener("DOMContentLoaded", () => document.body.appendChild(toast));
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!toast.isConnected) document.body.appendChild(toast);
+    });
 
   function showSiteToast(message, type = "error") {
     if (!message) return;
@@ -95,14 +97,8 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('form[data-toast-form="true"]').forEach((form) => {
-      form.addEventListener("submit", submitWithToast);
-    });
-  });
-
   document.addEventListener("submit", (event) => {
     const form = event.target;
-    if (form instanceof HTMLFormElement) submitWithToast(event);
-  });
+    if (form && String(form.tagName).toLowerCase() === "form") submitWithToast(event);
+  }, true);
 })();
