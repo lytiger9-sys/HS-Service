@@ -105,12 +105,20 @@ export function createShopService(context) {
     await patch(message.guild.id, (guild) => {
       guild.shop = normalizeShop(guild.shop);
       const wallet = walletOf(guild.shop, message.author.id);
+      const today = todayKey();
+      if (wallet.attendanceDate !== today) {
+        const attendanceAmount = Number(settings.shop?.dailyReward ?? guild.shop.dailyReward ?? 100);
+        wallet.attendanceDate = today;
+        wallet.attendanceStreak = (wallet.attendanceStreak || 0) + 1;
+        wallet.balance += attendanceAmount;
+        result = { attendanceAmount, balance: wallet.balance };
+      }
       wallet.messageCount += 1;
       const threshold = Math.max(1, Number(settings.shop?.messageThreshold ?? guild.shop.messageThreshold));
       if (wallet.messageCount % threshold === 0) {
         const amount = Number(settings.shop?.messageReward ?? guild.shop.messageReward);
         wallet.balance += amount;
-        result = { amount, balance: wallet.balance };
+        result = { ...(result || {}), amount, balance: wallet.balance };
       }
     });
     return result;

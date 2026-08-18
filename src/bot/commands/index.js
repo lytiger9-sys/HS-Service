@@ -12,7 +12,7 @@ import exithoneypot from "./exithoneypot.js";
 import nickapply from "./nickapply.js";
 import nickrandom from "./nickrandom.js";
 import nickinit from "./nickinit.js";
-import shop, { attendanceCommand, balanceCommand, adminGrantCommand } from "./shop.js";
+import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 
 export const commandList = [
   serverinfo,
@@ -30,7 +30,6 @@ export const commandList = [
   nickrandom,
   nickinit,
   shop,
-  attendanceCommand,
   balanceCommand,
   adminGrantCommand
 ];

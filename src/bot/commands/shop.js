@@ -14,13 +14,6 @@ export default {
   }
 };
 
-export const attendanceCommand = {
-  data: new SlashCommandBuilder().setName("출석").setDescription("오늘의 출석 캐시를 받습니다."),
-  async execute(interaction, context) {
-    const result = await context.services.shop.awardAttendance(interaction.guildId, interaction.user.id);
-    await interaction.reply({ content: result.awarded ? `출석 보상으로 ${result.amount.toLocaleString()} 캐시를 받았습니다. 현재 잔액: ${result.balance.toLocaleString()} 캐시` : `오늘은 이미 출석했습니다. 현재 잔액: ${result.balance.toLocaleString()} 캐시`, ephemeral: true });
-  }
-};
 
 export const adminGrantCommand = {
   data: new SlashCommandBuilder().setName("캐시지급").setDescription("관리자가 유저에게 캐시를 지급합니다.").addUserOption((option) => option.setName("유저").setDescription("지급 대상").setRequired(true)).addIntegerOption((option) => option.setName("금액").setDescription("지급 캐시").setRequired(true).setMinValue(1)),
