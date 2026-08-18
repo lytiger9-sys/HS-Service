@@ -29,7 +29,7 @@ function text(value, fallback = "", max = 2000) {
 
 function buildChannelName(settings, affiliateName, banner = false) {
   const config = banner ? settings.banner : settings;
-  return text(`${config.nameEmoji || ""}${config.namePrefix || ""}${affiliateName}${config.nameSuffix || ""}`, "파트너", 90)
+  return text(`${config.namePrefix || ""}${affiliateName}${config.nameSuffix || ""}`, "파트너", 90)
     .replace(/[\\/#@:`<>"|*?]/g, "-")
     .replace(/\s+/g, "-")
     .toLowerCase();

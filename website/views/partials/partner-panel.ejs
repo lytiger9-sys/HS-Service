@@ -17,7 +17,6 @@
         <label class="field"><span>파트너 카테고리</span><select name="partnerCategoryId"><option value="">선택 안 함</option><% channels.categories.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.partnerCategoryId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
         <label class="field"><span>채널 접두사</span><input name="partnerNamePrefix" value="<%= settings.partner.namePrefix %>" maxlength="30" /></label>
         <label class="field"><span>채널 접미사</span><input name="partnerNameSuffix" value="<%= settings.partner.nameSuffix %>" maxlength="30" /></label>
-        <label class="field"><span>채널 이모지</span><input name="partnerNameEmoji" value="<%= settings.partner.nameEmoji %>" maxlength="8" /></label>
         <label class="field"><span>임베드 제목</span><input name="partnerEmbedTitle" value="<%= settings.partner.embedTitle %>" data-partner-preview="title" /></label>
         <label class="field full"><span>임베드 내용</span><textarea name="partnerEmbedDescription" rows="4" data-partner-preview="description"><%= settings.partner.embedDescription %></textarea></label>
         <label class="field"><span>임베드 색상</span><input type="color" name="partnerEmbedColor" value="<%= settings.partner.embedColor %>" data-partner-preview="color" /></label>
@@ -34,7 +33,6 @@
       <label class="field"><span>배너 카테고리</span><select name="bannerCategoryId" form="partner-settings-form"><option value="">선택 안 함</option><% channels.categories.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.banner.categoryId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
       <label class="field"><span>배너 접두사</span><input form="partner-settings-form" name="bannerNamePrefix" value="<%= settings.partner.banner.namePrefix %>" /></label>
       <label class="field"><span>배너 접미사</span><input form="partner-settings-form" name="bannerNameSuffix" value="<%= settings.partner.banner.nameSuffix %>" /></label>
-      <label class="field"><span>배너 이모지</span><input form="partner-settings-form" name="bannerNameEmoji" value="<%= settings.partner.banner.nameEmoji %>" /></label>
       <label class="field"><span>배너 제목</span><input form="partner-settings-form" name="bannerEmbedTitle" value="<%= settings.partner.banner.embedTitle %>" /></label>
       <label class="field full"><span>배너 내용</span><textarea form="partner-settings-form" name="bannerEmbedDescription" rows="3"><%= settings.partner.banner.embedDescription %></textarea></label>
       <label class="field"><span>배너 색상</span><input type="color" form="partner-settings-form" name="bannerEmbedColor" value="<%= settings.partner.banner.embedColor %>" /></label>
