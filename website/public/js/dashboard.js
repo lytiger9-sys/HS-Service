@@ -212,27 +212,10 @@ async function submitForm(form, submitter = null) {
   return payload;
 }
 
-function ensureToggleFallbacks(form) {
-  if (!form.id) return;
-  document.querySelectorAll(`input[form="${form.id}"][type="checkbox"][name$="Enabled"]`).forEach((toggle) => {
-    const selector = `input[data-toggle-fallback="${toggle.name}"]`;
-    if (form.querySelector(selector)) return;
-    const fallback = document.createElement("input");
-    fallback.type = "hidden";
-    fallback.name = toggle.name;
-    fallback.value = "off";
-    fallback.dataset.toggleFallback = toggle.name;
-    form.appendChild(fallback);
-    const sync = () => { fallback.value = toggle.checked ? "on" : "off"; };
-    toggle.addEventListener("change", sync);
-    sync();
-  });
-}
 
 function setupForms() {
   // 설정 저장은 비동기 요청으로 처리하고 성공·실패를 viewport 토스트로 표시한다.
   forms.forEach((form) => {
-    ensureToggleFallbacks(form);
     if (form.dataset.confirmReset === "true") {
       form.addEventListener("submit", (event) => {
         if (!window.confirm(form.dataset.confirmMessage || "서버 데이터를 초기화할까요?")) {
