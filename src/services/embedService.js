@@ -37,8 +37,17 @@ const DEFAULTS = {
   updatedAt: null
 };
 
+function normalizeBoolean(value, fallback = false) {
+  if (Array.isArray(value)) return value.some((entry) => normalizeBoolean(entry, false));
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return ["true", "1", "on", "yes"].includes(value.trim().toLowerCase());
+  return fallback;
+}
+
 function normalizeSettings(settings = {}) {
   const embed = { ...DEFAULTS, ...(settings.embed || {}), mode: "components", description: "" };
+  embed.enabled = normalizeBoolean(embed.enabled, DEFAULTS.enabled);
+  embed.scheduleEnabled = normalizeBoolean(embed.scheduleEnabled, DEFAULTS.scheduleEnabled);
   embed.mentionRoleIds = Array.isArray(embed.mentionRoleIds)
     ? embed.mentionRoleIds.filter((id) => /^\d{15,22}$/.test(String(id)))
     : [];
@@ -192,7 +201,7 @@ export function createEmbedService(context) {
     } catch {
       fields = [];
     }
-    const bool = (value) => value === true || value === "true" || value === "on" || value === "1";
+    const bool = (value) => normalizeBoolean(value, false);
     const settings = normalizeSettings({
       embed: {
         ...body,

@@ -34,6 +34,7 @@ function isPlainObject(value) {
 }
 
 function readBoolean(value) {
+  if (Array.isArray(value)) return value.some((entry) => readBoolean(entry));
   return value === true || value === "true" || value === "1" || value === "on";
 }
 
@@ -96,7 +97,7 @@ export function normalizeTicketSettings(settings = {}) {
 
   return {
     ...source,
-    enabled: source.enabled ?? true,
+    enabled: source.enabled === undefined ? true : readBoolean(source.enabled),
     board: {
       ...DEFAULT_TICKET_BOARD,
       ...boardSource,

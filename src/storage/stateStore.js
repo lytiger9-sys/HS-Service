@@ -7,6 +7,13 @@ function clone(value) {
   return structuredClone(value);
 }
 
+function storedBoolean(value, fallback = false) {
+  if (Array.isArray(value)) return value.some((entry) => storedBoolean(entry, false));
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return ["true", "1", "on", "yes"].includes(value.trim().toLowerCase());
+  return fallback;
+}
+
 function normalizeGuildState(doc) {
   if (!doc) {
     return null;
@@ -93,6 +100,27 @@ function normalizeGuildState(doc) {
       ...(data.settings?.partner?.banner || {})
     }
   };
+
+  const booleanDefaults = [
+    ["welcome", "enabled"], ["polls", "enabled"], ["embed", "enabled"], ["notice", "enabled"],
+    ["honeypot", "enabled"], ["security", "enabled"], ["security", "massMentionEnabled"],
+    ["security", "spamEnabled"], ["security", "profanityEnabled"], ["security", "inviteEnabled"],
+    ["assignment", "enabled"], ["nickname", "enabled"], ["voice", "enabled"], ["staff", "enabled"],
+    ["logs", "enabled"], ["partner", "enabled"]
+  ];
+  for (const [section, key] of booleanDefaults) {
+    normalized.settings[section][key] = storedBoolean(normalized.settings[section][key], defaults.settings[section][key]);
+  }
+  normalized.settings.partner.banner.enabled = storedBoolean(
+    normalized.settings.partner.banner.enabled,
+    defaults.settings.partner.banner.enabled
+  );
+  normalized.settings.embed.scheduleEnabled = storedBoolean(
+    normalized.settings.embed.scheduleEnabled,
+    defaults.settings.embed.scheduleEnabled
+  );
+  normalized.shop.enabled = storedBoolean(normalized.shop.enabled, defaults.shop.enabled);
+  normalized.shop.gamblingEnabled = storedBoolean(normalized.shop.gamblingEnabled, defaults.shop.gamblingEnabled);
 
   return normalized;
 }
