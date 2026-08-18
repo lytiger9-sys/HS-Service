@@ -2130,3 +2130,91 @@ body.dashboard-page { background: var(--ink-deep); }
   .dashboard-page .field textarea,
   .dashboard-page .field select { font-size: 16px; }
 }
+
+/* Unified pill switches — replace native square checkboxes */
+.dashboard-page .field:has(> input[type="checkbox"]),
+.dashboard-page .field.check-field,
+.dashboard-page .section-toggle.field.toggle {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+.dashboard-page .field:has(> input[type="checkbox"]) > input[type="checkbox"],
+.dashboard-page .field.check-field > input[type="checkbox"],
+.dashboard-page .section-toggle.field.toggle > input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: block;
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  height: 24px;
+  min-height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(17,19,22,.24);
+  border-radius: 999px;
+  outline: none;
+  background: #c6cbd0;
+  box-shadow: inset 0 1px 2px rgba(17,19,22,.12);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.dashboard-page .field:has(> input[type="checkbox"]) > input[type="checkbox"]::before,
+.dashboard-page .field.check-field > input[type="checkbox"]::before,
+.dashboard-page .section-toggle.field.toggle > input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fffdf8;
+  box-shadow: 0 1px 3px rgba(17,19,22,.28);
+  transform: translateX(0);
+  transition: transform .2s ease, background .2s ease;
+}
+.dashboard-page .field:has(> input[type="checkbox"]) > input[type="checkbox"]:checked,
+.dashboard-page .field.check-field > input[type="checkbox"]:checked,
+.dashboard-page .section-toggle.field.toggle > input[type="checkbox"]:checked {
+  border-color: var(--warm);
+  background: var(--warm);
+  box-shadow: inset 0 1px 2px rgba(17,19,22,.12), 0 0 0 3px rgba(181,138,88,.12);
+}
+.dashboard-page .field:has(> input[type="checkbox"]) > input[type="checkbox"]:checked::before,
+.dashboard-page .field.check-field > input[type="checkbox"]:checked::before,
+.dashboard-page .section-toggle.field.toggle > input[type="checkbox"]:checked::before {
+  transform: translateX(20px);
+  background: #fff;
+}
+.dashboard-page .field:has(> input[type="checkbox"]) > input[type="checkbox"]:focus-visible,
+.dashboard-page .field.check-field > input[type="checkbox"]:focus-visible,
+.dashboard-page .section-toggle.field.toggle > input[type="checkbox"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(181,138,88,.28);
+}
+.dashboard-page .field:has(> input[type="checkbox"]) > span,
+.dashboard-page .field.check-field > span,
+.dashboard-page .section-toggle.field.toggle > span {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: .88rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .dashboard-page .field:has(> input[type="checkbox"]),
+  .dashboard-page .field.check-field,
+  .dashboard-page .section-toggle.field.toggle { grid-template-columns: 44px minmax(0,1fr); }
+}
