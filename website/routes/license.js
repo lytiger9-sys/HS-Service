@@ -9,6 +9,10 @@ import {
 } from "../lib/licenseAuth.js";
 import { PLAN_TAB_LABELS } from "../../src/config/plans.js";
 
+function wantsJson(req) {
+  return req.get("X-Requested-With") === "fetch" || req.accepts(["json", "html"]) === "json";
+}
+
 function regenerateSession(req) {
   return new Promise((resolve, reject) => {
     req.session.regenerate((error) => (error ? reject(error) : resolve()));
@@ -75,9 +79,14 @@ export function createLicenseRouter(context) {
         durationDays: req.body.durationDays,
         count: req.body.count
       });
-      return res.redirect(`/license/dashboard?keys=${encodeURIComponent(issued.map((entry) => entry.key).join("\n"))}`);
+      const keys = issued.map((entry) => entry.key);
+      return wantsJson(req)
+        ? res.json({ ok: true, message: `${keys.length}개의 라이선스가 발급되었습니다.`, keys })
+        : res.redirect(`/license/dashboard?keys=${encodeURIComponent(keys.join("\n"))}`);
     } catch (error) {
-      return res.redirect(`/license/dashboard?error=${encodeURIComponent(error.message)}`);
+      return wantsJson(req)
+        ? res.status(400).json({ ok: false, message: error.message || "라이선스 발급에 실패했습니다." })
+        : res.redirect(`/license/dashboard?error=${encodeURIComponent(error.message)}`);
     }
   });
 
@@ -85,9 +94,11 @@ export function createLicenseRouter(context) {
     try {
       const featureBans = Object.fromEntries(Object.keys(PLAN_TAB_LABELS).filter((id) => id !== "overview").map((id) => [id, String(req.body[`feature_${id}`] || "") !== "on"]));
       await context.services.adminControl.update({ featureBans, otherCommandsEnabled: String(req.body.otherCommandsEnabled || "") === "on" });
-      return res.redirect("/license/dashboard");
+      return wantsJson(req) ? res.json({ ok: true, message: "점검 모드 설정이 저장되었습니다." }) : res.redirect("/license/dashboard");
     } catch (error) {
-      return res.redirect(`/license/dashboard?error=${encodeURIComponent(error.message)}`);
+      return wantsJson(req)
+        ? res.status(400).json({ ok: false, message: error.message || "점검 모드 저장에 실패했습니다." })
+        : res.redirect(`/license/dashboard?error=${encodeURIComponent(error.message)}`);
     }
   });
 
@@ -95,20 +106,26 @@ export function createLicenseRouter(context) {
     try {
       const stopped = String(req.body.stopped || "true") !== "false";
       const updated = await context.services.licenses.setWorkStopped(req.params.id, stopped);
-      if (!updated) return res.redirect("/license/dashboard?error=활성화된 서버 라이센스만 작업중지할 수 있습니다.");
-      return res.redirect("/license/dashboard");
-    } catch (error) { return next(error); }
+      if (!updated) {
+        const message = "활성화된 서버 라이센스만 작업중지할 수 있습니다.";
+        return wantsJson(req) ? res.status(400).json({ ok: false, message }) : res.redirect(`/license/dashboard?error=${encodeURIComponent(message)}`);
+      }
+      return wantsJson(req) ? res.json({ ok: true, message: stopped ? "작업이 중지되었습니다." : "작업이 재개되었습니다." }) : res.redirect("/license/dashboard");
+    } catch (error) {
+      return wantsJson(req) ? res.status(400).json({ ok: false, message: error.message || "작업 상태 변경에 실패했습니다." }) : next(error);
+    }
   });
 
   router.post("/:id/revoke", async (req, res, next) => {
     try {
       const revoked = await context.services.licenses.revoke(req.params.id);
       if (!revoked) {
-        return res.redirect("/license/dashboard?error=이미%20폐기되었거나%20사용할%20수%20없는%20라이선스입니다.");
+        const message = "이미 폐기되었거나 사용할 수 없는 라이선스입니다.";
+        return wantsJson(req) ? res.status(400).json({ ok: false, message }) : res.redirect(`/license/dashboard?error=${encodeURIComponent(message)}`);
       }
-      return res.redirect("/license/dashboard");
+      return wantsJson(req) ? res.json({ ok: true, message: "라이선스가 폐기되었습니다." }) : res.redirect("/license/dashboard");
     } catch (error) {
-      return next(error);
+      return wantsJson(req) ? res.status(400).json({ ok: false, message: error.message || "라이선스 폐기에 실패했습니다." }) : next(error);
     }
   });
 

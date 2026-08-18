@@ -1,0 +1,74 @@
+(() => {
+  const toast = document.createElement("div");
+  toast.className = "save-toast site-toast";
+  toast.hidden = true;
+  toast.setAttribute("aria-live", "polite");
+  document.addEventListener("DOMContentLoaded", () => document.body.appendChild(toast));
+
+  function showSiteToast(message, type = "error") {
+    if (!message) return;
+    toast.textContent = String(message);
+    toast.dataset.type = type;
+    toast.hidden = false;
+    toast.classList.add("is-visible");
+    window.clearTimeout(showSiteToast.timer);
+    showSiteToast.timer = window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+      toast.hidden = true;
+    }, type === "error" ? 4200 : 2600);
+  }
+
+  window.showSiteToast = showSiteToast;
+
+  function shouldHandle(form) {
+    const method = String(form.method || "get").toLowerCase();
+    const action = String(form.action || "");
+    if (method !== "post") return false;
+    if (!/^https?:\/\//i.test(action) && !action.startsWith("/")) return false;
+    if (!action.includes("/guild/") && !action.includes("/license/")) return false;
+    return !/\/license\/(login|logout)(?:[/?#]|$)/.test(action);
+  }
+
+  function csrfToken(form) {
+    return form.querySelector('input[name="_csrf"]')?.value || document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith("csrf-token="))?.slice(11) || "";
+  }
+
+  async function submitWithToast(event) {
+    const form = event.currentTarget;
+    if (!shouldHandle(form) || form.dataset.toastSubmitting === "true") return;
+    event.preventDefault();
+    form.dataset.toastSubmitting = "true";
+    const submitter = event.submitter;
+    const buttons = [...form.querySelectorAll("button, input[type=submit]")];
+    buttons.forEach((button) => { button.disabled = true; });
+    try {
+      const data = new FormData(form);
+      if (submitter?.name && !data.has(submitter.name)) data.append(submitter.name, submitter.value || "");
+      const token = csrfToken(form);
+      if (token && !data.has("_csrf")) data.set("_csrf", decodeURIComponent(token));
+      const response = await fetch(form.action, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "X-Requested-With": "fetch", Accept: "application/json", ...(token ? { "X-CSRF-Token": decodeURIComponent(token) } : {}) },
+        body: data
+      });
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json") ? await response.json().catch(() => null) : null;
+      if (!response.ok || !payload?.ok) {
+        const fallback = payload?.message || (response.status === 403 ? "보안 토큰이 만료되었습니다. 페이지를 새로고침한 뒤 다시 시도하세요." : response.status >= 500 ? "요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요." : "요청을 처리하지 못했습니다.");
+        throw new Error(fallback);
+      }
+      showSiteToast(payload.message || "저장되었습니다.", "success");
+      if (payload.redirect) window.setTimeout(() => { window.location.assign(payload.redirect); }, 350);
+    } catch (error) {
+      showSiteToast(error?.message || "요청을 처리하지 못했습니다.", "error");
+    } finally {
+      form.dataset.toastSubmitting = "false";
+      buttons.forEach((button) => { button.disabled = false; });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("form").forEach((form) => form.addEventListener("submit", submitWithToast));
+  });
+})();

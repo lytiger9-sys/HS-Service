@@ -54,10 +54,20 @@ export async function startWebsite(context) {
       return;
     }
 
+    const status = Number(error.statusCode || error.status || 500);
+    const isFetchRequest = req.get("X-Requested-With") === "fetch" || req.accepts(["json", "html"]) === "json";
     const isDevelopment = process.env.NODE_ENV === "development";
-    res.status(error.statusCode || 500).render("error", {
+    const message = isDevelopment
+      ? (error.message || "알 수 없는 오류가 발생했습니다.")
+      : (status >= 500 ? "요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요." : (error.message || "요청을 처리하지 못했습니다."));
+
+    if (isFetchRequest) {
+      return res.status(status).json({ ok: false, message });
+    }
+
+    return res.status(status).render("error", {
       title: "서버 오류",
-      message: isDevelopment ? (error.message || "알 수 없는 오류가 발생했습니다.") : "요청을 처리하는 중 오류가 발생했습니다."
+      message
     });
   });
 
