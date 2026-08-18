@@ -52,15 +52,6 @@
     </form>
   </article>
 
-  <article class="card section-panel">
-    <div class="section-head"><div><p class="eyebrow">Live Preview</p><h3>파트너 조건 미리보기</h3></div></div>
-    <div class="partner-preview" data-partner-preview-box>
-      <div class="partner-preview-bar" data-partner-preview-color></div>
-      <h4 data-partner-preview-title><%= settings.partner.embedTitle %></h4>
-      <p data-partner-preview-description><%= settings.partner.embedDescription %></p>
-      <button type="button" disabled data-partner-preview-button><%= settings.partner.buttonLabel %></button>
-    </div>
-  </article>
 
   <article class="card section-panel">
     <div class="section-head"><div><p class="eyebrow">Cleanup</p><h3>7일 이상 비활성 파트너</h3></div><span class="muted"><%= stalePartners.length %>개</span></div>
@@ -70,16 +61,3 @@
     </tbody></table></div>
   </article>
 </section>
-<script>
-  (() => {
-    const form = document.querySelector('#partner-settings-form');
-    if (!form) return;
-    const setText = (key, value) => { const node = document.querySelector(`[data-partner-preview-${key}]`); if (node) node.textContent = value; };
-    form.querySelectorAll('[data-partner-preview]').forEach((field) => field.addEventListener('input', () => {
-      const key = field.dataset.partnerPreview;
-      if (key === 'color') document.querySelector('[data-partner-preview-color]').style.background = field.value;
-      else setText(key, field.value);
-    }));
-    document.querySelector('[data-partner-preview-color]').style.background = form.querySelector('[name="partnerEmbedColor"]').value;
-  })();
-</script>

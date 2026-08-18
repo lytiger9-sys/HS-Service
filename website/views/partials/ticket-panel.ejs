@@ -122,32 +122,6 @@
     <form class="settings-form ticket-publish-form" id="ticket-publish-form" method="post" action="/guild/<%= guild.id %>/ticket/publish" aria-hidden="true"></form>
   </article>
 
-  <aside class="preview-column">
-    <div class="card ticket-preview-card">
-      <div class="section-head compact">
-        <div>
-          <p class="eyebrow">Live Preview</p>
-          <h3>티켓 게시물</h3>
-        </div>
-      </div>
-
-      <div class="discord-preview ticket-preview" id="ticket-preview">
-        <div class="preview-bar preview-bar-ticket"></div>
-        <div class="preview-body">
-          <h4 data-preview-ticket-title><%= ticketBoard.title || '티켓 안내' %></h4>
-          <p data-preview-ticket-description><%= ticketBoard.description || '버튼을 눌러 티켓을 열 수 있습니다.' %></p>
-          <div class="ticket-preview-divider"></div>
-          <div class="ticket-preview-actions">
-            <span class="ticket-preview-button" data-preview-ticket-button><%= ticketBoard.buttonLabel || '티켓 열기' %></span>
-          </div>
-          <div class="ticket-preview-footer">
-            <span data-preview-ticket-footer><%= ticketBoard.footerText || '봇 전용 티켓' %></span>
-            <span>방금 전</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </aside>
 </section>
 
 <template id="ticket-category-template">
