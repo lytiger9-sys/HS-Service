@@ -7,6 +7,21 @@ function clone(value) {
   return structuredClone(value);
 }
 
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function mergeDefaults(defaults, source) {
+  if (!isPlainObject(defaults) || !isPlainObject(source)) return source === undefined ? clone(defaults) : clone(source);
+  const result = clone(defaults);
+  for (const [key, value] of Object.entries(source)) {
+    result[key] = isPlainObject(value) && isPlainObject(result[key])
+      ? mergeDefaults(result[key], value)
+      : clone(value);
+  }
+  return result;
+}
+
 function storedBoolean(value, fallback = false) {
   if (Array.isArray(value)) return value.some((entry) => storedBoolean(entry, false));
   if (typeof value === "boolean") return value;
@@ -26,17 +41,11 @@ function normalizeGuildState(doc) {
   const normalized = {
     ...defaults,
     ...data,
-    settings: {
-      ...defaults.settings,
-      ...(data.settings || {})
-    },
+    settings: mergeDefaults(defaults.settings, data.settings || {}),
     notes: Array.isArray(data.notes) ? data.notes : [],
     punishments: Array.isArray(data.punishments) ? data.punishments : [],
     joinOrder: Array.isArray(data.joinOrder) ? data.joinOrder : [],
-    tickets: {
-      ...defaults.tickets,
-      ...(data.tickets || {})
-    },
+    tickets: mergeDefaults(defaults.tickets, data.tickets || {}),
     polls: {
       ...defaults.polls,
       ...(data.polls || {})
@@ -54,8 +63,7 @@ function normalizeGuildState(doc) {
       sounds: Array.isArray(data.expressions?.sounds) ? data.expressions.sounds : []
     },
     shop: {
-      ...defaults.shop,
-      ...(data.shop || {}),
+      ...mergeDefaults(defaults.shop, data.shop || {}),
       birthdayChannelId: data.shop?.birthdayChannelId || "",
       birthdayReward: Number.isFinite(Number(data.shop?.birthdayReward)) ? Math.max(0, Number(data.shop.birthdayReward)) : defaults.shop.birthdayReward,
       birthdays: data.shop?.birthdays && typeof data.shop.birthdays === "object" ? data.shop.birthdays : {},

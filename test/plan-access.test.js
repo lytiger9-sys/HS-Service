@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { interactionFeature, planHasFeature } from "../src/shared/planAccess.js";
+import { canUseFeature, interactionFeature, planHasFeature } from "../src/shared/planAccess.js";
 import { isAllowedGuild } from "../src/shared/guards.js";
 
 test("plan feature gates match the five plan definitions", () => {
@@ -30,6 +30,19 @@ test("licensed guilds are allowed while unlicensed guilds are rejected", async (
   assert.equal(await isAllowedGuild(context, "management"), true);
   assert.equal(await isAllowedGuild(context, "licensed"), true);
   assert.equal(await isAllowedGuild(context, "unknown"), false);
+});
+
+test("management guild bypasses global feature bans", async () => {
+  const context = {
+    config: { allowedGuildId: "management" },
+    services: {
+      licenses: { getActiveByGuild: async () => null },
+      adminControl: { get: async () => ({ featureBans: { shop: true } }) }
+    }
+  };
+  const access = await canUseFeature(context, "management", "shop");
+  assert.equal(access.bypass, true);
+  assert.equal(access.featureAllowed, true);
 });
 
 test("Discord interaction scopes map to server-side features", () => {

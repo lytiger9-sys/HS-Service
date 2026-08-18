@@ -55,7 +55,7 @@ export async function getGuildPlanAccess(context, guildId) {
 export async function canUseFeature(context, guildId, feature) {
   const access = await getGuildPlanAccess(context, guildId);
   const control = await context.services.adminControl?.get().catch(() => null);
-  const featureBanned = Boolean(control?.featureBans?.[normalizeFeatureId(feature)]);
+  const featureBanned = !access.bypass && Boolean(control?.featureBans?.[normalizeFeatureId(feature)]);
   const featureAllowed = !featureBanned && (feature === "banner"
     ? access.allowed
     : access.allowed && (access.bypass || planHasFeature(access.plan, feature)));

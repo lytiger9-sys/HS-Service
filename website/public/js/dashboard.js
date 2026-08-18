@@ -241,19 +241,7 @@ function setupForms() {
       });
       return;
     }
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const buttons = [...form.querySelectorAll("button, input[type=submit]")];
-      buttons.forEach((button) => { button.disabled = true; });
-      try {
-        const payload = await submitForm(form, event.submitter);
-        window.showSiteToast?.(payload.message || "저장되었습니다.", "success");
-      } catch (error) {
-        window.showSiteToast?.(error?.message || "저장에 실패했습니다.", "error");
-      } finally {
-        buttons.forEach((button) => { button.disabled = false; });
-      }
-    });
+    // 저장 제출은 전역 site-toast.js가 한 번만 가로채 비동기로 처리한다.
   });
 }
 
