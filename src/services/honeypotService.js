@@ -67,6 +67,21 @@ export function createHoneypotService(context, guildState) {
     return syncStatusMessage(guildId);
   }
 
+  async function disableChannel(guildId, channelId) {
+    const current = await context.services.settings.getSettings(guildId);
+    if (current.honeypot?.channelId !== channelId) throw new Error("현재 채널은 허니팟으로 지정되어 있지 않습니다.");
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    const channel = guild && await resolveTextChannel(guild, channelId);
+    if (current.honeypot.statusMessageId) await channel?.messages.delete(current.honeypot.statusMessageId).catch(() => null);
+    await guildState.patch(guildId, (state) => {
+      state.settings.honeypot.enabled = false;
+      state.settings.honeypot.channelId = "";
+      state.settings.honeypot.statusMessageId = "";
+      return state.settings.honeypot;
+    });
+    return true;
+  }
+
   async function deleteRecentMessages(channel, limit = 100) {
     const messages = await channel.messages.fetch({ limit }).catch(() => null);
     if (!messages?.size) return 0;
@@ -140,11 +155,11 @@ export function createHoneypotService(context, guildState) {
       ? await member.ban({ reason: "honeypot violation" }).then(() => true).catch(() => false)
       : await member.kick("honeypot violation").then(() => true).catch(() => false);
     if (!punished) {
-      await context.services.logs.sendHoneypotLog(message.guild.id, {
+      await context.services.logs.sendLogByKey(message.guild.id, "moderationAction", {
         embeds: [
           buildBaseEmbed({
-            title: `허니팟 ${action === "ban" ? "차단" : "추방"} 실패`,
-            description: `${member.user.tag} 을(를) ${action === "ban" ? "차단" : "추방"}하지 못했습니다.`,
+            title: "허니팟 제재 실패",
+            description: `${member.user.tag}에 대한 허니팟 제재에 실패했습니다.`,
             color: palette.danger,
             timestamp: Date.now()
           })
@@ -170,11 +185,11 @@ export function createHoneypotService(context, guildState) {
       return guild.settings.honeypot;
     });
 
-    await context.services.logs.sendHoneypotLog(message.guild.id, {
+    await context.services.logs.sendLogByKey(message.guild.id, "moderationAction", {
       embeds: [
         buildBaseEmbed({
-          title: "허니팟 적발",
-          description: `${member.user.tag} 을(를) ${action === "ban" ? "차단" : "추방"}했습니다.`,
+          title: "허니팟 차단",
+          description: `${member.user.tag}을(를) 차단했습니다.`,
           color: parseColor("#8d2d2d"),
           fields: [
             { name: "채널", value: `<#${message.channelId}>`, inline: true },
@@ -192,6 +207,7 @@ export function createHoneypotService(context, guildState) {
   return {
     configureChannel,
     syncStatusMessage,
-    handleMessage
+    handleMessage,
+    disableChannel
   };
 }

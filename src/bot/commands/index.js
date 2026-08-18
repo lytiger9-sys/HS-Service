@@ -8,6 +8,7 @@ import tempvoice from "./tempvoice.js";
 import staff from "./staff.js";
 import honeypotban from "./honeypotban.js";
 import honeypotkick from "./honeypotkick.js";
+import exithoneypot from "./exithoneypot.js";
 import nickapply from "./nickapply.js";
 import nickrandom from "./nickrandom.js";
 import nickinit from "./nickinit.js";
@@ -24,6 +25,7 @@ export const commandList = [
   staff,
   honeypotban,
   honeypotkick,
+  exithoneypot,
   nickapply,
   nickrandom,
   nickinit,
