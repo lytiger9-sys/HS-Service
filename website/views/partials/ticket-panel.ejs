@@ -113,12 +113,13 @@
         <% }) %>
       </div>
 
-      <button class="primary" type="submit">저장</button>
+      <div class="ticket-settings-actions">
+        <button class="primary" type="submit">저장</button>
+        <button class="ghost" type="submit" form="ticket-publish-form">게시</button>
+      </div>
     </form>
 
-    <form class="settings-form ticket-publish-form" method="post" action="/guild/<%= guild.id %>/ticket/publish">
-      <button class="ghost" type="submit">보드 전송</button>
-    </form>
+    <form class="settings-form ticket-publish-form" id="ticket-publish-form" method="post" action="/guild/<%= guild.id %>/ticket/publish" aria-hidden="true"></form>
   </article>
 
   <aside class="preview-column">

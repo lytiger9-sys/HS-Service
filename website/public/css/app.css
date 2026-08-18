@@ -2393,3 +2393,30 @@ body.dashboard-page { background: var(--ink-deep); }
   .dashboard-page .channel-combobox-list { max-height: 210px; }
   .dashboard-page .channel-combobox-input { font-size: 16px; }
 }
+
+/* Ticket actions and banner header alignment */
+.dashboard-page .ticket-settings-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+}
+.dashboard-page .ticket-settings-actions > button { width: 100%; min-height: 50px; margin: 0; }
+.dashboard-page .ticket-publish-form { display: none; }
+.dashboard-page .banner-section-head { align-items: center; }
+.dashboard-page .banner-section-head .banner-toggle { flex: 0 0 auto; min-width: 230px; margin-left: auto; }
+.dashboard-page .banner-license-issue-form h4 {
+  margin: 4px 0 8px;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  line-height: 1.2;
+  letter-spacing: -.035em;
+  color: var(--ink);
+}
+@media (max-width: 760px) {
+  .dashboard-page .ticket-settings-actions { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dashboard-page .banner-section-head { align-items: stretch; }
+  .dashboard-page .banner-section-head .banner-toggle { width: 100%; min-width: 0; margin-left: 0; }
+}

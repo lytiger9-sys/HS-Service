@@ -29,9 +29,8 @@
   </article>
 
   <article class="card section-panel">
-    <div class="section-head"><div><p class="eyebrow">Banner</p><h3>상단배너 설정</h3></div></div>
+    <div class="section-head banner-section-head"><div><p class="eyebrow">Banner</p><h3>상단배너 설정</h3></div><label class="field toggle section-toggle banner-toggle"><input type="checkbox" form="partner-settings-form" name="bannerEnabled" <%= settings.partner.banner.enabled ? 'checked' : '' %> /><span>상단배너 기능 활성화</span></label></div>
     <div class="form-grid">
-      <label class="field toggle"><input type="checkbox" form="partner-settings-form" name="bannerEnabled" <%= settings.partner.banner.enabled ? 'checked' : '' %> /><span>상단배너 기능 활성화</span></label>
       <label class="field"><span>배너 임베드 채널</span><select name="bannerChannelId" form="partner-settings-form"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.banner.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
       <label class="field"><span>배너 카테고리</span><select name="bannerCategoryId" form="partner-settings-form"><option value="">선택 안 함</option><% channels.categories.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.partner.banner.categoryId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
       <label class="field"><span>배너 접두사</span><input form="partner-settings-form" name="bannerNamePrefix" value="<%= settings.partner.banner.namePrefix %>" /></label>
