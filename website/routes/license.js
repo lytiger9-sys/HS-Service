@@ -31,6 +31,12 @@ function regenerateSession(req) {
   });
 }
 
+function saveSession(req) {
+  return new Promise((resolve, reject) => {
+    req.session.save((error) => (error ? reject(error) : resolve()));
+  });
+}
+
 function renderLogin(res, context, message = "") {
   return res.render("license-login", {
     title: "라이선스 관리자 로그인",
@@ -57,6 +63,7 @@ export function createLicenseRouter(context) {
       }
       await regenerateSession(req);
       markLicenseAdmin(req);
+      await saveSession(req);
       return res.redirect("/license/dashboard");
     } catch (error) {
       return next(error);

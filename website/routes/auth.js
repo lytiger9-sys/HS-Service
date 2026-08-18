@@ -2,6 +2,13 @@ import express from "express";
 import passport from "passport";
 import { SESSION_COOKIE_NAME, signOut } from "../lib/auth.js";
 
+function saveSession(req) {
+  return new Promise((resolve, reject) => {
+    if (!req.session || typeof req.session.save !== "function") return resolve();
+    req.session.save((error) => (error ? reject(error) : resolve()));
+  });
+}
+
 function destroySession(req) {
   return new Promise((resolve, reject) => {
     if (!req.session || typeof req.session.destroy !== "function") {
@@ -36,8 +43,13 @@ export function createAuthRouter() {
     passport.authenticate("discord", {
       failureRedirect: "/?auth=failed"
     }),
-    (_req, res) => {
-      res.redirect("/");
+    async (req, res, next) => {
+      try {
+        await saveSession(req);
+        return res.redirect("/");
+      } catch (error) {
+        return next(error);
+      }
     }
   );
 
