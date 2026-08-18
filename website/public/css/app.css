@@ -2938,3 +2938,28 @@ input[type="reset"] {
 .poll-action {
   font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
 }
+
+/* Center the free-text poll toggle between the option and result sections. */
+.dashboard-page .field.poll-free-toggle {
+  grid-column: 1 / -1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 52px;
+  margin: 2px 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+.dashboard-page .field.poll-free-toggle > input[type="checkbox"] {
+  flex: 0 0 44px;
+}
+.dashboard-page .field.poll-free-toggle > span {
+  flex: 0 0 auto;
+}
+@media (max-width: 760px) {
+  .dashboard-page .field.poll-free-toggle {
+    grid-column: 1;
+  }
+}
