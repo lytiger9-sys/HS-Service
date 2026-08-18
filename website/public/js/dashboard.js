@@ -171,8 +171,10 @@ function readCookie(name) {
 }
 
 async function submitForm(form, submitter = null) {
-  const action = submitter?.formAction || form.action;
-  const method = (submitter?.formMethod || form.method || "post").toUpperCase();
+  const hasSubmitterAction = Boolean(submitter?.hasAttribute?.("formaction"));
+  const hasSubmitterMethod = Boolean(submitter?.hasAttribute?.("formmethod"));
+  const action = hasSubmitterAction ? submitter.formAction : form.action;
+  const method = (hasSubmitterMethod ? submitter.formMethod : (form.method || "post")).toUpperCase();
   const csrfToken = readCookie("csrf-token");
   const response = await fetch(action, {
     method,
