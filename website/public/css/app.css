@@ -2745,3 +2745,33 @@ body.dashboard-page { background: var(--ink-deep); }
     grid-template-columns: 1fr;
   }
 }
+
+/* Shop actions: one explicit editorial label system for every related control */
+.dashboard-page .shop-action-button,
+.dashboard-page .shop-action-button.primary,
+.dashboard-page .shop-action-button.ghost,
+.dashboard-page .shop-action-button.danger {
+  font-family: var(--mono);
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  line-height: 1.15;
+  text-align: center;
+  text-rendering: geometricPrecision;
+}
+.dashboard-page .shop-action-row .shop-action-button,
+.dashboard-page .shop-products-card .section-head > .shop-action-button,
+.dashboard-page .shop-products-card .shop-product-row > .shop-action-button {
+  min-height: 42px;
+  padding: 9px 26px;
+}
+@media (max-width: 560px) {
+  .dashboard-page .shop-action-button,
+  .dashboard-page .shop-action-row .shop-action-button,
+  .dashboard-page .shop-products-card .section-head > .shop-action-button,
+  .dashboard-page .shop-products-card .shop-product-row > .shop-action-button {
+    font-size: .72rem;
+    letter-spacing: .06em;
+    padding-inline: 16px;
+  }
+}
