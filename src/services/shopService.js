@@ -4,6 +4,9 @@ import {
   ButtonStyle,
   ContainerBuilder,
   MessageFlags,
+  MediaGalleryBuilder,
+  MediaGalleryItemBuilder,
+  SeparatorBuilder,
   StringSelectMenuBuilder,
   TextDisplayBuilder
 } from "discord.js";
@@ -145,12 +148,37 @@ export function createShopService(context) {
   }
   function shopPayload(guild, shop) {
     const container = new ContainerBuilder();
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${guild.name} 상점\n${shop.embedBody || DEFAULT_SHOP.embedBody}`));
+    const body = String(shop.embedBody || DEFAULT_SHOP.embedBody).replace(/\r/g, "");
+    const lines = body.split("\n");
+    const textLines = [];
+    const flushText = () => {
+      if (!textLines.length) return;
+      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(textLines.join("\n")));
+      textLines.length = 0;
+    };
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${guild.name} 상점`));
+    container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+    for (const line of lines) {
+      const trimmed = line.trim();
+      const imageMatch = trimmed.match(/^\[image\]\s*(?:\((https?:\/\/[^)]+)\)|(https?:\/\/\S+))$/i);
+      if (imageMatch) {
+        flushText();
+        const imageUrl = imageMatch[1] || imageMatch[2];
+        container.addMediaGalleryComponents(new MediaGalleryBuilder().addItems(new MediaGalleryItemBuilder().setURL(imageUrl)));
+      } else {
+        textLines.push(line);
+      }
+    }
+    flushText();
+    container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder().setCustomId("shop:products").setLabel("상품 보기").setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId("shop:info").setLabel("내정보").setStyle(ButtonStyle.Secondary)
     );
-    return { flags: MessageFlags.IsComponentsV2, components: [container, row], allowedMentions: { parse: [] } };
+    container.addActionRowComponents(row);
+    container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent("-# HS-Service"));
+    return { flags: MessageFlags.IsComponentsV2, components: [container], allowedMentions: { parse: [] } };
   }
   async function publish(guild, channelId) {
     await requireEnabled(guild.id);

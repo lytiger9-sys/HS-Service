@@ -2534,6 +2534,9 @@ body.dashboard-page { background: var(--ink-deep); }
 .shop-gambling-toggle { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }
 .shop-field-help { margin: -6px 0 0; font-size: .8rem; }
 .shop-embed-body-block textarea { min-height: 120px; resize: vertical; }
+.shop-embed-guide { display: grid; gap: 6px; padding: 14px 16px; border-left: 3px solid var(--accent-warm); background: rgba(185, 153, 104, .1); color: #52616d; font-size: .82rem; line-height: 1.55; }
+.shop-embed-guide strong { color: var(--ink); }
+.shop-embed-guide code { width: fit-content; padding: 3px 6px; border-radius: 4px; background: rgba(255,255,255,.7); color: #304756; font-family: var(--mono); font-size: .78rem; }
 @media (max-width: 900px) { .shop-top-settings { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .shop-top-settings, .shop-gambling-settings { grid-template-columns: 1fr; } .shop-subsection-head { align-items: flex-start; flex-direction: column; } .shop-gambling-toggle { margin-left: 0; } }
 .shop-product-list { display: grid; gap: 16px; margin-bottom: 20px; }

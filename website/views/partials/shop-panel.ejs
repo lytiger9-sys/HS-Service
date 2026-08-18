@@ -28,7 +28,8 @@
       <div class="shop-setting-block shop-embed-body-block">
         <div class="shop-subsection-head"><div><p class="eyebrow">Shop Embed</p><h4>상점 임베드 본문</h4></div></div>
         <label class="field full"><span>가운데 설명란</span><textarea name="shopEmbedBody" rows="5" maxlength="4000" placeholder="상점 임베드 가운데에 표시할 본문을 입력하세요."><%= shop.embedBody || '상품을 확인하거나 내 캐시 잔액을 확인하세요.' %></textarea></label>
-        <p class="muted shop-field-help">저장 후 상점 임베드 게시를 누르면 상점 제목 아래의 가운데 설명 영역에 표시됩니다.</p>
+        <div class="shop-embed-guide" role="note"><strong>사용 가능한 이미지 입력</strong><code>[Image] (이미지링크)</code><span>예: <code>[Image] (https://example.com/shop-banner.png)</code>를 한 줄에 입력하면 해당 위치에 이미지가 표시됩니다.</span></div>
+        <p class="muted shop-field-help">저장 후 상점 임베드 게시를 누르면 제목과 설명 사이에 실선이 추가되고, 설명·버튼·고정 푸터가 순서대로 표시됩니다.</p>
       </div>
 
       <div class="form-actions"><button class="primary" type="submit">설정 저장</button><button class="ghost" type="submit" formaction="/guild/<%= guild.id %>/shop/publish">상점 임베드 게시</button></div>
