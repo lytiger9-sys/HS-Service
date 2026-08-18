@@ -17,12 +17,26 @@ export default async function handleReady(client, context) {
   const presenceTimer = setInterval(() => void updatePresence().catch((error) => console.error("[bot] presence update failed:", error)), 5 * 60 * 1000);
   presenceTimer.unref?.();
 
+  const commandPayload = commandList.map((command) => command.data.toJSON());
+  const commandNames = commandPayload.map((command) => command.name);
+  const duplicateNames = commandNames.filter((name, index) => commandNames.indexOf(name) !== index);
+  if (duplicateNames.length) {
+    throw new Error(`[commands] duplicate command names: ${[...new Set(duplicateNames)].join(", ")}`);
+  }
+  console.log(`[commands] preparing ${commandPayload.length} slash commands: ${commandNames.join(", ")}`);
+
   for (const guild of client.guilds.cache.values()) {
     if (!(await isAllowedGuild(context, guild.id))) {
+      console.log(`[commands] skipped unlicensed guild ${guild.id}`);
       scheduleGuildValidation(context, guild);
       continue;
     }
-    await guild.commands.set(commandList.map((command) => command.data.toJSON())).catch(() => null);
+    try {
+      const registered = await guild.commands.set(commandPayload);
+      console.log(`[commands] synced guild ${guild.id} (${guild.name}) with ${registered.size} commands`);
+    } catch (error) {
+      console.error(`[commands] failed to sync guild ${guild.id} (${guild.name})`, error);
+    }
     await context.services.honeypot.syncStatusMessage(guild.id).catch(() => null);
     await context.services.overviewChannels.syncGuild(guild).catch((error) => console.error(`[overview] sync failed for ${guild.id}:`, error));
   }
