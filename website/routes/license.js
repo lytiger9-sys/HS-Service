@@ -7,6 +7,7 @@ import {
   requireLicenseAdmin,
   verifyLicenseAdmin
 } from "../lib/licenseAuth.js";
+import { PLAN_TAB_LABELS } from "../../src/config/plans.js";
 
 function regenerateSession(req) {
   return new Promise((resolve, reject) => {
@@ -51,11 +52,15 @@ export function createLicenseRouter(context) {
   router.get("/dashboard", async (req, res, next) => {
     try {
       const licenses = await context.services.licenses.list();
+      const control = await context.services.adminControl.get();
+      const featureControls = Object.entries(PLAN_TAB_LABELS).filter(([id]) => id !== "overview").map(([id, label]) => ({ id, label, banned: Boolean(control.featureBans?.[id]) }));
       return res.render("license-dashboard", {
         title: "라이선스 관리",
         botName: context.config.botName,
         licenses: licenses.filter((license) => license.kind !== "banner"),
         issuedKeys: req.query.keys ? String(req.query.keys).split("\n").filter(Boolean) : [],
+        featureControls,
+        otherCommandsEnabled: control.otherCommandsEnabled,
         errorMessage: req.query.error || ""
       });
     } catch (error) {
@@ -71,6 +76,16 @@ export function createLicenseRouter(context) {
         count: req.body.count
       });
       return res.redirect(`/license/dashboard?keys=${encodeURIComponent(issued.map((entry) => entry.key).join("\n"))}`);
+    } catch (error) {
+      return res.redirect(`/license/dashboard?error=${encodeURIComponent(error.message)}`);
+    }
+  });
+
+  router.post("/feature-control", async (req, res, next) => {
+    try {
+      const featureBans = Object.fromEntries(Object.keys(PLAN_TAB_LABELS).filter((id) => id !== "overview").map((id) => [id, String(req.body[`feature_${id}`] || "") !== "on"]));
+      await context.services.adminControl.update({ featureBans, otherCommandsEnabled: String(req.body.otherCommandsEnabled || "") === "on" });
+      return res.redirect("/license/dashboard");
     } catch (error) {
       return res.redirect(`/license/dashboard?error=${encodeURIComponent(error.message)}`);
     }

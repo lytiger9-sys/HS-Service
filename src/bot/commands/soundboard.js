@@ -1,4 +1,4 @@
-import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export const soundboardSteal = {
   data: new SlashCommandBuilder()
@@ -19,19 +19,26 @@ export const soundboardSteal = {
   }
 };
 
+export function buildSoundboardListPayload(sounds, page, userId) {
+  const pageSize = 15;
+  const pageCount = Math.max(1, Math.ceil(sounds.length / pageSize));
+  const currentPage = Math.min(Math.max(1, Number(page) || 1), pageCount);
+  const items = sounds.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const content = items.length ? items.map((sound) => `**${sound.name}** — ${sound.id}`).join("\n") : "등록된 사운드보드가 없습니다.";
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId(`page:soundboard:${userId}:${currentPage - 1}:${pageCount}`).setLabel("‹").setStyle(ButtonStyle.Secondary).setDisabled(currentPage <= 1),
+    new ButtonBuilder().setCustomId(`page:soundboard:${userId}:${currentPage + 1}:${pageCount}`).setLabel("›").setStyle(ButtonStyle.Secondary).setDisabled(currentPage >= pageCount)
+  );
+  return { content: `${content.slice(0, 1800)}\n\n페이지 ${currentPage}/${pageCount}`, components: [row], ephemeral: true };
+}
+
 export const soundboardList = {
   data: new SlashCommandBuilder().setName("사운드목록").setDescription("현재 서버의 사운드보드 목록을 보여줍니다.").addIntegerOption((option) => option.setName("페이지").setDescription("확인할 페이지").setMinValue(1).setRequired(false)),
   async execute(interaction, context) {
     await interaction.deferReply({ ephemeral: true });
     try {
       const sounds = await context.services.soundboards.list(interaction.guild);
-      const page = interaction.options.getInteger("페이지") || 1;
-      const pageSize = 15;
-      const pageCount = Math.max(1, Math.ceil(sounds.length / pageSize));
-      const currentPage = Math.min(page, pageCount);
-      const items = sounds.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-      const content = items.length ? items.map((sound) => `**${sound.name}** — ${sound.id}`).join("\n") : "등록된 사운드보드가 없습니다.";
-      return interaction.editReply(`${content.slice(0, 1800)}\n\n페이지 ${currentPage}/${pageCount}`);
+      return interaction.editReply(buildSoundboardListPayload(sounds, interaction.options.getInteger("페이지") || 1, interaction.user.id));
     } catch {
       return interaction.editReply("사운드보드 목록을 가져오지 못했습니다.");
     }

@@ -57,6 +57,26 @@
       <section class="license-card">
         <div class="section-head">
           <div>
+            <p class="eyebrow">Maintenance Control</p>
+            <h2>기능별 점검 모드</h2>
+          </div>
+        </div>
+        <form method="post" action="/license/feature-control" class="license-form feature-control-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <p class="muted">토글을 끄면 해당 탭의 기능과 연결된 명령어·버튼이 서버 전체에서 일시 중지됩니다.</p>
+          <div class="license-feature-grid">
+            <% featureControls.forEach((feature) => { %>
+              <label class="field toggle"><input type="checkbox" name="feature_<%= feature.id %>" value="on" <%= feature.banned ? '' : 'checked' %> /><span><%= feature.label %></span></label>
+            <% }) %>
+          </div>
+          <label class="field toggle"><input type="checkbox" name="otherCommandsEnabled" value="on" <%= otherCommandsEnabled ? 'checked' : '' %> /><span>탭에 연결되지 않은 기타 명령어 허용</span></label>
+          <button class="primary" type="submit">점검 모드 설정 저장</button>
+        </form>
+      </section>
+
+      <section class="license-card">
+        <div class="section-head">
+          <div>
             <p class="eyebrow">Inventory</p>
             <h2>라이선스 목록</h2>
           </div>

@@ -225,6 +225,8 @@ function sectionPayload(section, body) {
     return { shop: {
       enabled: readOptionalBoolean(body.shopEnabled),
       messageChannelId: readDiscordId(body.shopMessageChannelId),
+      birthdayChannelId: readDiscordId(body.shopBirthdayChannelId),
+      birthdayReward: readNumber(body.shopBirthdayReward, 100, 0, 1000000),
       dailyReward: readNumber(body.shopDailyReward, 100, 0, 1000000),
       messageReward: readNumber(body.shopMessageReward, 10, 0, 1000000),
       messageThreshold: readNumber(body.shopMessageThreshold, 20, 1, 100000),

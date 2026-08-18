@@ -6,7 +6,7 @@ function commandFeature(commandName) {
   if (commandName === "staff") return "administrators";
   if (["honeypotban", "honeypotkick"].includes(commandName)) return "honeypot";
   if (["nickapply", "nickrandom", "nickinit"].includes(commandName)) return "nickname";
-  if (["도박", "캐시", "캐시지급"].includes(commandName)) return "shop";
+  if (["도박", "캐시", "캐시지급", "생일"].includes(commandName)) return "shop";
   if (["이모지스틸", "이모지목록", "이모지삭제", "사운드스틸", "사운드목록", "사운드삭제"].includes(commandName)) return "voice";
   return null;
 }
@@ -22,10 +22,15 @@ export async function handleSlashCommand(interaction, context) {
   }
 
   const feature = commandFeature(interaction.commandName);
+  const control = await context.services.adminControl?.get().catch(() => null);
+  if (!feature && control?.otherCommandsEnabled === false) {
+    return interaction.reply({ content: "현재 관련 탭 외 명령어가 관리자 점검 모드로 중지되어 있습니다.", ephemeral: true });
+  }
   if (feature) {
     const featureAccess = await canUseFeature(context, interaction.guildId, feature);
     if (!featureAccess.featureAllowed) {
-      return interaction.reply({ content: featureDeniedMessage(feature), ephemeral: true });
+      const message = featureAccess.reason === "feature-ban" ? "이 기능은 현재 관리자 점검 모드로 일시 중지되어 있습니다." : featureDeniedMessage(feature);
+      return interaction.reply({ content: message, ephemeral: true });
     }
   }
 

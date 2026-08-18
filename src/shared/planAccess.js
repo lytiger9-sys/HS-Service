@@ -29,7 +29,8 @@ export function planAllowsFeatureToggle(planId) {
 }
 
 export function interactionFeature(customId = "") {
-  const scope = String(customId).split(":")[0];
+  const parts = String(customId).split(":");
+  const scope = parts[0];
   if (scope === "partner") return "partner";
   if (scope === "banner") return "banner";
   if (scope === "ticket") return "ticket";
@@ -37,6 +38,7 @@ export function interactionFeature(customId = "") {
   if (scope === "staff") return "administrators";
   if (scope === "shop") return "shop";
   if (scope === "save-note") return "ticket";
+  if (scope === "page" && ["emoji", "soundboard"].includes(parts[1])) return "voice";
   return null;
 }
 
@@ -52,10 +54,12 @@ export async function getGuildPlanAccess(context, guildId) {
 
 export async function canUseFeature(context, guildId, feature) {
   const access = await getGuildPlanAccess(context, guildId);
-  const featureAllowed = feature === "banner"
+  const control = await context.services.adminControl?.get().catch(() => null);
+  const featureBanned = Boolean(control?.featureBans?.[normalizeFeatureId(feature)]);
+  const featureAllowed = !featureBanned && (feature === "banner"
     ? access.allowed
-    : access.allowed && (access.bypass || planHasFeature(access.plan, feature));
-  return { ...access, feature, featureAllowed };
+    : access.allowed && (access.bypass || planHasFeature(access.plan, feature)));
+  return { ...access, feature, featureAllowed, reason: featureBanned ? "feature-ban" : access.reason };
 }
 
 export function featureDeniedMessage(feature) {

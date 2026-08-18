@@ -8,7 +8,9 @@
       <div class="shop-setting-block">
         <div class="shop-setting-grid shop-top-settings">
           <label class="field"><span>상점 게시 채널</span><select name="shopMessageChannelId"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= shop.messageChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
+          <label class="field"><span>생일 임베드 게시 채널</span><select name="shopBirthdayChannelId"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= shop.birthdayChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
           <label class="field"><span>출석 보상 캐시</span><input type="number" min="0" name="shopDailyReward" value="<%= shop.dailyReward %>" /></label>
+          <label class="field"><span>생일 축하 캐시</span><input type="number" min="0" name="shopBirthdayReward" value="<%= shop.birthdayReward %>" /></label>
           <label class="field"><span>메시지 보상 캐시</span><input type="number" min="0" name="shopMessageReward" value="<%= shop.messageReward %>" /></label>
           <label class="field"><span>메시지 보상 기준 개수</span><input type="number" min="1" name="shopMessageThreshold" value="<%= shop.messageThreshold %>" /></label>
         </div>

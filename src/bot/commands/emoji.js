@@ -1,4 +1,4 @@
-import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export const emojiSteal = {
   data: new SlashCommandBuilder()
@@ -18,18 +18,26 @@ export const emojiSteal = {
   }
 };
 
+export function buildEmojiListPayload(emojis, page, userId) {
+  const pageSize = 20;
+  const pageCount = Math.max(1, Math.ceil(emojis.length / pageSize));
+  const currentPage = Math.min(Math.max(1, Number(page) || 1), pageCount);
+  const items = emojis.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const content = items.length ? items.map((emoji) => `${emoji} ${emoji.name} — ${emoji.id}`).join("\n") : "등록된 커스텀 이모지가 없습니다.";
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId(`page:emoji:${userId}:${currentPage - 1}:${pageCount}`).setLabel("‹").setStyle(ButtonStyle.Secondary).setDisabled(currentPage <= 1),
+    new ButtonBuilder().setCustomId(`page:emoji:${userId}:${currentPage + 1}:${pageCount}`).setLabel("›").setStyle(ButtonStyle.Secondary).setDisabled(currentPage >= pageCount)
+  );
+  return { content: `${content.slice(0, 1800)}\n\n페이지 ${currentPage}/${pageCount}`, components: [row], ephemeral: true };
+}
+
 export const emojiList = {
   data: new SlashCommandBuilder().setName("이모지목록").setDescription("현재 서버의 커스텀 이모지 목록을 보여줍니다.").addIntegerOption((option) => option.setName("페이지").setDescription("확인할 페이지").setMinValue(1).setRequired(false)),
   async execute(interaction, context) {
     try {
       const emojis = await context.services.emojis.list(interaction.guild);
       const page = interaction.options.getInteger("페이지") || 1;
-      const pageSize = 20;
-      const pageCount = Math.max(1, Math.ceil(emojis.length / pageSize));
-      const currentPage = Math.min(page, pageCount);
-      const items = emojis.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-      const content = items.length ? items.map((emoji) => `${emoji} ${emoji.name} — ${emoji.id}`).join("\n") : "등록된 커스텀 이모지가 없습니다.";
-      return interaction.reply({ content: `${content.slice(0, 1800)}\n\n페이지 ${currentPage}/${pageCount}`, ephemeral: true });
+      return interaction.reply(buildEmojiListPayload(emojis, interaction.options.getInteger("페이지") || 1, interaction.user.id));
     } catch {
       return interaction.reply({ content: "이모지 목록을 가져오지 못했습니다.", ephemeral: true });
     }

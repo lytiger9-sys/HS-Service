@@ -98,12 +98,68 @@ export function createShopService(context) {
     return result;
   }
   async function notifyAward(message, result) {
-    const amount = Number(result?.attendanceAmount || 0) + Number(result?.amount || 0);
+    const amount = Number(result?.attendanceAmount || 0) + Number(result?.amount || 0) + Number(result?.birthdayAmount || 0);
     if (!amount) return;
     const reasons = [];
     if (result?.attendanceAmount) reasons.push("오늘 첫 메시지 보상");
     if (result?.amount) reasons.push("활동 메시지 보상");
+    if (result?.birthdayAmount) reasons.push("생일 축하 보상");
     await message.author.send(`캐시 지급 안내\n+${amount.toLocaleString()} 캐시 (${reasons.join(" + ")})\n현재 잔액: ${Number(result.balance || 0).toLocaleString()} 캐시`).catch(() => null);
+  }
+
+  function isValidBirthday(month, day) {
+    const value = new Date(Date.UTC(2000, month - 1, day));
+    return value.getUTCMonth() === month - 1 && value.getUTCDate() === day;
+  }
+
+  async function setBirthday(guildId, userId, month, day) {
+    await requireEnabled(guildId);
+    const normalizedMonth = Math.floor(Number(month));
+    const normalizedDay = Math.floor(Number(day));
+    if (!isValidBirthday(normalizedMonth, normalizedDay)) throw new Error("올바른 생일 날짜를 입력해 주세요.");
+    await patch(guildId, (guild) => {
+      guild.shop = normalizeShop(guild.shop);
+      guild.shop.birthdays[String(userId)] = { month: normalizedMonth, day: normalizedDay };
+    });
+    return { month: normalizedMonth, day: normalizedDay };
+  }
+
+  function birthdayPayload(guild, user, amount, month, day) {
+    const container = new ContainerBuilder()
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## 생일 축하합니다, ${user.displayName || user.username}님`))
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`${month}월 ${day}일 생일을 맞은 것을 축하합니다.\n\n상점에서 사용할 수 있는 **${amount.toLocaleString()} 캐시**를 선물로 지급했습니다.`))
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${guild.name} 상점 생일 보상`));
+    return { flags: MessageFlags.IsComponentsV2, components: [container], allowedMentions: { parse: [] } };
+  }
+
+  async function processBirthday(message) {
+    if (!message.guild || message.author.bot) return null;
+    const settings = await context.services.settings.getSettings(message.guild.id);
+    if (settings.shop?.enabled === false) return null;
+    const today = new Date();
+    const month = today.getUTCMonth() + 1;
+    const day = today.getUTCDate();
+    let birthdayResult = null;
+    await patch(message.guild.id, (guild) => {
+      guild.shop = normalizeShop(guild.shop);
+      const birthday = guild.shop.birthdays[String(message.author.id)];
+      const channelId = settings.shop?.birthdayChannelId || guild.shop.birthdayChannelId;
+      const amount = Number(settings.shop?.birthdayReward ?? guild.shop.birthdayReward ?? 0);
+      const claimKey = `${message.author.id}:${todayKey()}`;
+      if (!birthday || birthday.month !== month || birthday.day !== day || guild.shop.birthdayClaims[claimKey] || !channelId || amount <= 0) return;
+      const wallet = walletOf(guild.shop, message.author.id);
+      wallet.balance += amount;
+      guild.shop.birthdayClaims[claimKey] = todayKey();
+      const claimKeys = Object.keys(guild.shop.birthdayClaims);
+      if (claimKeys.length > 2000) delete guild.shop.birthdayClaims[claimKeys[0]];
+      birthdayResult = { amount, balance: wallet.balance, channelId, month, day };
+    });
+    if (!birthdayResult) return null;
+    const channel = message.guild.channels.cache.get(birthdayResult.channelId) || await message.guild.channels.fetch(birthdayResult.channelId).catch(() => null);
+    if (channel?.isTextBased?.()) await channel.send(birthdayPayload(message.guild, message.author, birthdayResult.amount, month, day)).catch(() => null);
+    return { birthdayAmount: birthdayResult.amount, balance: birthdayResult.balance };
   }
 
   async function recordMessage(message) {
@@ -130,6 +186,9 @@ export function createShopService(context) {
         result = { ...(result || {}), amount, balance: wallet.balance };
       }
     });
+    const birthdayResult = await processBirthday(message);
+    result = result || birthdayResult;
+    if (birthdayResult && result !== birthdayResult) result = { ...result, ...birthdayResult, balance: birthdayResult.balance };
     await notifyAward(message, result);
     return result;
   }
@@ -244,5 +303,5 @@ export function createShopService(context) {
     }
     return { product, balance };
   }
-  return { getShop, updateSettings, awardAttendance, recordMessage, getBalance, grant, gamble, saveProducts, publish, productMenu, purchase };
+  return { getShop, updateSettings, awardAttendance, recordMessage, setBirthday, processBirthday, getBalance, grant, gamble, saveProducts, publish, productMenu, purchase };
 }

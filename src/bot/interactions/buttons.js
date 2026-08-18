@@ -1,5 +1,7 @@
 import { isAdministrator } from "../../shared/guards.js";
 import { buildJoinOrderPayload } from "../commands/joinorder.js";
+import { buildEmojiListPayload } from "../commands/emoji.js";
+import { buildSoundboardListPayload } from "../commands/soundboard.js";
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
 function buildFreeTextModal(pollId) {
@@ -48,7 +50,7 @@ function buildPartnerApplicationModal() {
 }
 
 export async function handleButtonInteraction(interaction, context) {
-  const [scope, action, id, extra] = interaction.customId.split(":");
+  const [scope, action, id, extra, total] = interaction.customId.split(":");
 
   if (scope === "page" && action === "joinorder-jump") {
     if (String(id) !== String(interaction.user.id)) {
@@ -66,6 +68,18 @@ export async function handleButtonInteraction(interaction, context) {
     }
     const rows = await context.services.serverInfo.getJoinOrder(interaction.guild, 100);
     return interaction.update(buildJoinOrderPayload(rows, Number(extra), interaction.user.id));
+  }
+
+  if (scope === "page" && ["emoji", "soundboard"].includes(action)) {
+    if (String(id) !== String(interaction.user.id)) return interaction.reply({ content: "이 페이지 버튼은 목록을 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });
+    const page = Number(extra) || 1;
+    const pageCount = Number(total) || 1;
+    if (action === "emoji") {
+      const emojis = await context.services.emojis.list(interaction.guild);
+      return interaction.update(buildEmojiListPayload(emojis, Math.min(Math.max(page, 1), pageCount), interaction.user.id));
+    }
+    const sounds = await context.services.soundboards.list(interaction.guild);
+    return interaction.update(buildSoundboardListPayload(sounds, Math.min(Math.max(page, 1), pageCount), interaction.user.id));
   }
 
   if (interaction.customId === "shop:products") {

@@ -56,6 +56,10 @@ function normalizeGuildState(doc) {
     shop: {
       ...defaults.shop,
       ...(data.shop || {}),
+      birthdayChannelId: data.shop?.birthdayChannelId || "",
+      birthdayReward: Number.isFinite(Number(data.shop?.birthdayReward)) ? Math.max(0, Number(data.shop.birthdayReward)) : defaults.shop.birthdayReward,
+      birthdays: data.shop?.birthdays && typeof data.shop.birthdays === "object" ? data.shop.birthdays : {},
+      birthdayClaims: data.shop?.birthdayClaims && typeof data.shop.birthdayClaims === "object" ? data.shop.birthdayClaims : {},
       products: Array.isArray(data.shop?.products) ? data.shop.products : [],
       wallets: data.shop?.wallets && typeof data.shop.wallets === "object" ? data.shop.wallets : {},
       purchases: Array.isArray(data.shop?.purchases) ? data.shop.purchases : []

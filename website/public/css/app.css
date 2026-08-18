@@ -1809,6 +1809,8 @@ a {
   gap: 22px;
 }
 .license-issue-grid { grid-template-columns: minmax(0, 1fr); }
+.license-feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+.feature-control-form > .field.toggle { margin-top: 4px; }
 .license-form { display: grid; gap: 16px; margin-top: 22px; }
 .license-form .field { display: grid; gap: 7px; }
 .license-form .field span { color: #52616d; font-size: 0.84rem; font-weight: 600; }

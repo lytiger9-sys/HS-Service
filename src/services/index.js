@@ -24,6 +24,7 @@ import { createExchangeService } from "./exchangeService.js";
 import { createCloneService } from "./cloneService.js";
 import { createEmojiService } from "./emojiService.js";
 import { createSoundboardService } from "./soundboardService.js";
+import { createAdminControlService } from "./adminControlService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -54,6 +55,7 @@ export function createServices(context) {
     exchange: createExchangeService(),
     cloner: createCloneService(),
     emojis: createEmojiService(context),
-    soundboards: createSoundboardService(context)
+    soundboards: createSoundboardService(context),
+    adminControl: createAdminControlService()
   };
 }
