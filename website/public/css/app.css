@@ -2666,3 +2666,82 @@ body.dashboard-page { background: var(--ink-deep); }
     padding-inline: 20px;
   }
 }
+
+/* License maintenance switches: prevent the generic form-input rule from stretching checkboxes */
+.license-page .feature-control-form .field.toggle,
+.license-auth-page .feature-control-form .field.toggle {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  min-height: 64px;
+  margin: 0;
+  padding: 14px 0;
+  border-top: 1px solid #e3e8ec;
+}
+.license-page .feature-control-form .field.toggle > input[type="checkbox"],
+.license-auth-page .feature-control-form .field.toggle > input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: 0 0 42px;
+  width: 42px;
+  min-width: 42px;
+  height: 24px;
+  min-height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #b8c6d0;
+  border-radius: 999px;
+  background: #dfe6eb;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.license-page .feature-control-form .field.toggle > input[type="checkbox"]::before,
+.license-auth-page .feature-control-form .field.toggle > input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(23, 32, 42, .22);
+  transform: translateX(0);
+  transition: transform .2s ease;
+}
+.license-page .feature-control-form .field.toggle > input[type="checkbox"]:checked,
+.license-auth-page .feature-control-form .field.toggle > input[type="checkbox"]:checked {
+  border-color: #1d3445;
+  background: #1d3445;
+}
+.license-page .feature-control-form .field.toggle > input[type="checkbox"]:checked::before,
+.license-auth-page .feature-control-form .field.toggle > input[type="checkbox"]:checked::before {
+  transform: translateX(18px);
+}
+.license-page .feature-control-form .field.toggle > input[type="checkbox"]:focus-visible,
+.license-auth-page .feature-control-form .field.toggle > input[type="checkbox"]:focus-visible {
+  outline: 3px solid rgba(58, 125, 168, .2);
+  outline-offset: 2px;
+}
+.license-page .feature-control-form .field.toggle > span,
+.license-auth-page .feature-control-form .field.toggle > span {
+  min-width: 0;
+  color: #304756;
+  font-size: .92rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.license-page .feature-control-form > .field.toggle,
+.license-auth-page .feature-control-form > .field.toggle {
+  margin-top: 0;
+  border-bottom: 1px solid #e3e8ec;
+}
+@media (max-width: 720px) {
+  .license-page .license-feature-grid,
+  .license-auth-page .license-feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
