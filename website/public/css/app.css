@@ -2492,3 +2492,15 @@ body.dashboard-page { background: var(--ink-deep); }
 .nickname-role-row { row-gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--hairline-soft); }
 .nickname-role-row:first-child { padding-top: 8px; }
 .nickname-role-row:last-child { border-bottom: 0; padding-bottom: 8px; }
+
+/* Nickname prefix/suffix grouping */
+.nickname-role-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) minmax(160px, 1fr) minmax(160px, 1fr);
+  column-gap: 28px;
+}
+.nickname-role-row .field + .field { margin-left: -12px; }
+@media (max-width: 760px) {
+  .nickname-role-row { grid-template-columns: 1fr; row-gap: 16px; }
+  .nickname-role-row .field + .field { margin-left: 0; }
+}
