@@ -68,11 +68,19 @@
       if (submitter?.name && !data.has(submitter.name)) data.append(submitter.name, submitter.value || "");
       const action = submitter?.hasAttribute?.("formaction") ? submitter.formAction : form.action;
       const method = submitter?.hasAttribute?.("formmethod") ? submitter.formMethod.toUpperCase() : (form.method || "POST").toUpperCase();
+      const encoded = new URLSearchParams();
+      for (const [key, value] of data.entries()) {
+        encoded.append(key, String(value));
+      }
       const response = await fetch(action, {
         method,
         credentials: "same-origin",
-        headers: { "X-Requested-With": "fetch", Accept: "application/json" },
-        body: data
+        headers: {
+          "X-Requested-With": "fetch",
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+        },
+        body: encoded
       });
       const contentType = response.headers.get("content-type") || "";
       let payload = null;
