@@ -5,7 +5,7 @@ const recentMessages = new Map();
 const recentJoins = new Map();
 const RAID_WINDOW_MS = 10 * 1000;
 const RAID_JOIN_THRESHOLD = 5;
-const RAID_TIMEOUT_SECONDS = 10 * 60;
+const RAID_TIMEOUT_SECONDS = 24 * 60 * 60;
 
 function normalizeContent(content) {
   return String(content ?? "")
@@ -130,7 +130,7 @@ export function createModerationService(context, guildState) {
       triggers.push({
         type: "invite-link",
         label: "초대 링크",
-        timeoutSeconds: Number(settings.inviteTimeoutSeconds || 0)
+        timeoutSeconds: Number(settings.inviteTimeoutMinutes || 0) * 60
       });
     }
 
@@ -159,8 +159,8 @@ export function createModerationService(context, guildState) {
     return applyTimeout(context, message, timeoutSeconds, reason, triggers[0].type);
   }
 
-  async function evaluateMemberJoin(member) {
-    if (!member?.guild || member.user?.bot) return null;
+  async function evaluateMemberJoin(member, settings = {}) {
+    if (!member?.guild || member.user?.bot || settings.enabled === false) return null;
     const key = member.guild.id;
     const now = Date.now();
     const joins = (recentJoins.get(key) || []).filter((at) => now - at <= RAID_WINDOW_MS);

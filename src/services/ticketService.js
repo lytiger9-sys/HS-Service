@@ -110,7 +110,8 @@ export function createTicketService(context, guildState) {
     if (settings.enabled === false) {
       throw new Error("현재 티켓 기능이 꺼져 있습니다.");
     }
-    const category = settings.categories.find((entry) => entry.id === categoryId) || null;
+    const category = settings.categories.find((entry) => entry.id === categoryId)
+      || (!settings.categories.length ? { id: "default", label: "일반 문의", serverCategoryId: "", questions: [] } : null);
     if (!category) {
       throw new Error("선택한 티켓 카테고리를 찾을 수 없습니다.");
     }

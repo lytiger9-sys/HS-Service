@@ -29,7 +29,10 @@ export default async function handleMessageCreate(message, context) {
     return;
   }
 
-  await context.services.moderation.evaluateMessage(message).catch(() => null);
+  const securityAccess = await canUseFeature(context, message.guild.id, "security");
+  if (securityAccess.featureAllowed) {
+    await context.services.moderation.evaluateMessage(message).catch(() => null);
+  }
   const assignmentAccess = await canUseFeature(context, message.guild.id, "assignment");
   if (assignmentAccess.featureAllowed) {
     await context.services.assignment.handleMessage(message).catch(() => null);

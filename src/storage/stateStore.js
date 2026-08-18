@@ -89,8 +89,7 @@ function normalizeGuildState(doc) {
     spamEnabled: security.spamEnabled ?? defaults.settings.security.spamEnabled,
     profanityEnabled: security.profanityEnabled ?? defaults.settings.security.profanityEnabled,
     inviteEnabled: security.inviteEnabled ?? defaults.settings.security.inviteEnabled,
-    inviteTimeoutSeconds: security.inviteTimeoutSeconds ?? (Number(security.inviteTimeoutMinutes ?? defaults.settings.security.inviteTimeoutSeconds / 60) * 60),
-    spamWindowSeconds: defaults.settings.security.spamWindowSeconds
+    inviteTimeoutMinutes: security.inviteTimeoutMinutes ?? (Number(security.inviteTimeoutSeconds ?? defaults.settings.security.inviteTimeoutMinutes * 60) / 60)
   };
 
   normalized.settings.ticket = normalizeTicketSettings(data.settings?.ticket || defaults.settings.ticket);

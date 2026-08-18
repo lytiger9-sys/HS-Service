@@ -121,7 +121,7 @@ function sectionPayload(section, body) {
         massMentionTimeoutMinutes: readNumber(body.massMentionTimeoutMinutes, 10, 0, 10080),
         spamTimeoutMinutes: readNumber(body.spamTimeoutMinutes, 10, 0, 10080),
         profanityTimeoutMinutes: readNumber(body.profanityTimeoutMinutes, 10, 0, 10080),
-        inviteTimeoutSeconds: readNumber(body.inviteTimeoutSeconds, 600, 0, 2419200),
+        inviteTimeoutMinutes: readNumber(body.inviteTimeoutMinutes, 10, 0, 10080),
         spamRepeatThreshold: readNumber(body.spamRepeatThreshold, 3, 2, 100),
         profanityWords: splitLines(body.profanityWords, 200, 80),
         securityLogChannelId: readDiscordId(body.securityLogChannelId)

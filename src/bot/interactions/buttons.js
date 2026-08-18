@@ -80,6 +80,18 @@ export async function handleButtonInteraction(interaction, context) {
   }
 
   if (scope === "ticket" && action === "open") {
+    const ticketSettings = await context.services.tickets.getSettings(interaction.guildId);
+    if (!ticketSettings.categories?.length) {
+      await interaction.deferReply({ ephemeral: true });
+      const result = await context.services.tickets.openTicket({
+        guild: interaction.guild,
+        member: interaction.member,
+        categoryId: "",
+        answers: [],
+        requestedBy: interaction.member
+      });
+      return interaction.editReply({ content: result.existing ? "이미 열려 있는 티켓이 있습니다." : "티켓을 열었습니다." });
+    }
     const payload = await context.services.tickets.buildCategoryMenu(interaction.guildId);
     return interaction.reply(payload);
   }

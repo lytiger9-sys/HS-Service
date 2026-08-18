@@ -72,7 +72,7 @@ export function createDefaultGuildSettings() {
       massMentionTimeoutMinutes: 10,
       spamTimeoutMinutes: 10,
       profanityTimeoutMinutes: 10,
-      inviteTimeoutSeconds: 600,
+      inviteTimeoutMinutes: 10,
       spamRepeatThreshold: 3,
       profanityWords: [],
       securityLogChannelId: ""

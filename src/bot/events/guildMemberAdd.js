@@ -10,7 +10,13 @@ export default async function handleGuildMemberAdd(member, context) {
   await context.services.overviewChannels.syncGuild(member.guild).catch((error) => {
     console.error(`[overview] member addition sync failed for ${member.guild.id}:`, error);
   });
-  await context.services.moderation.evaluateMemberJoin(member).catch(() => null);
+  const securityAccess = await canUseFeature(context, member.guild.id, "security");
+  if (securityAccess.featureAllowed) {
+    const securitySettings = (await context.services.settings.getSettings(member.guild.id)).security;
+    if (securitySettings.enabled !== false) {
+      await context.services.moderation.evaluateMemberJoin(member, securitySettings).catch(() => null);
+    }
+  }
   if (member.user.bot) {
     return;
   }
