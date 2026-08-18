@@ -1,5 +1,5 @@
 import { createDefaultState, createDefaultGuildState } from "../config/defaults.js";
-import { connectMongo } from "../database/connect.js";
+import { connectMongo, mongoose } from "../database/connect.js";
 import { GuildStateModel } from "../database/models/guildState.js";
 import { normalizeTicketSettings } from "../shared/ticket.js";
 
@@ -151,6 +151,11 @@ export class StateStore {
     this.ready = (async () => {
       await connectMongo({ uri: this.mongoUri, dbName: this.mongoDbName });
       const docs = await GuildStateModel.find({}).lean();
+      console.info("[storage] loaded guild states", {
+        database: mongoose.connection.name,
+        collection: GuildStateModel.collection.name,
+        count: docs.length
+      });
       this.state = structuredClone(this.initialState);
       this.state.guilds = {};
 
@@ -170,11 +175,25 @@ export class StateStore {
       return null;
     }
 
-    await GuildStateModel.replaceOne(
+    const serialized = serializeGuildState(guildId, guildState);
+    const result = await GuildStateModel.replaceOne(
       { guildId },
-      serializeGuildState(guildId, guildState),
+      serialized,
       { upsert: true }
     );
+    const persisted = await GuildStateModel.findOne({ guildId }, { guildId: 1, settings: 1, shop: 1 }).lean();
+    if (!persisted) {
+      throw new Error(`GuildState persistence verification failed for ${guildId}`);
+    }
+    console.info("[storage] persisted guild state", {
+      guildId,
+      database: mongoose.connection.name,
+      collection: GuildStateModel.collection.name,
+      acknowledged: result.acknowledged,
+      matchedCount: result.matchedCount,
+      modifiedCount: result.modifiedCount,
+      upsertedCount: result.upsertedCount
+    });
 
     return guildState;
   }
