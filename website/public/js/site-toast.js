@@ -81,10 +81,10 @@
       }
       if (form.dataset.toastForm === "true" && payload.featureBans) {
         Object.entries(payload.featureBans).forEach(([featureId, banned]) => {
-          const input = form.querySelector(`input[name="feature_${featureId}"]`);
+          const input = form.querySelector(`input[type="checkbox"][name="feature_${featureId}"]`);
           if (input) input.checked = ![true, 1, "true", "1", "on", "yes", "enabled"].includes(banned);
         });
-        const otherCommands = form.querySelector('input[name="otherCommandsEnabled"]');
+        const otherCommands = form.querySelector('input[type="checkbox"][name="otherCommandsEnabled"]');
         if (otherCommands && payload.otherCommandsEnabled !== undefined) otherCommands.checked = [true, 1, "true", "1", "on", "yes", "enabled"].includes(payload.otherCommandsEnabled);
       }
       if (payload.partialUrl) {
