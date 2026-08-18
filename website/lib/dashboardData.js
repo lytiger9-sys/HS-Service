@@ -90,14 +90,15 @@ function normalizeStaffSettings(settings = {}) {
 }
 
 export async function buildDashboardViewModel(context, guild, planId = "enterprise") {
-  const [overview, settings, notes, polls, tempChannels, stalePartners, shop] = await Promise.all([
+  const [overview, settings, notes, polls, tempChannels, stalePartners, shop, allLicenses] = await Promise.all([
     context.services.serverInfo.getDashboardSnapshot(guild),
     context.services.settings.getSettings(guild.id),
     context.services.notes.listNotes(guild.id),
     context.services.polls.listPolls(guild.id),
     context.services.tempChannels.listTempChannels(guild.id),
     context.services.partners.listStale(guild.id),
-    context.services.shop.getShop(guild.id)
+    context.services.shop.getShop(guild.id),
+    context.services.licenses.list()
   ]);
 
   const administrators = (overview.administrators || []).filter((admin) => !admin.isBot);
@@ -193,6 +194,7 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
     polls,
     tempChannels,
     stalePartners,
+    bannerLicenses: allLicenses.filter((license) => license.kind === "banner" && String(license.issuerGuildId || "") === String(guild.id)),
     shop: normalizedSettings.shop,
     staffMembers,
     staffCounts,
