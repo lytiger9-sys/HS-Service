@@ -8,9 +8,15 @@ function option(commandName, optionName) {
 }
 
 test("일괄 변경·삭제 명령어는 확인 옵션을 요구한다", () => {
-  for (const commandName of ["clear", "복제", "nickrandom", "nickinit", "이모지삭제", "사운드삭제"]) {
+  for (const commandName of ["clear", "복제", "카테고리삭제", "nickrandom", "nickinit", "이모지삭제", "사운드삭제"]) {
     assert.equal(option(commandName, "확인")?.required, true, `${commandName} 확인 옵션 누락`);
   }
+});
+
+test("생일설정 명령어가 등록되어 있다", () => {
+  assert.ok(commandMap.has("생일설정"));
+  assert.equal(option("생일설정", "월")?.required, true);
+  assert.equal(option("생일설정", "일")?.required, true);
 });
 
 test("닉네임 일괄 적용 명령어가 등록되어 있다", () => {

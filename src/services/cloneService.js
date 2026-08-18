@@ -32,5 +32,19 @@ export function createCloneService() {
     }
     return { category: clone, count: children.length };
   }
-  return { cloneCategory };
+  async function deleteCategory(guild, categoryId) {
+    const category = await guild.channels.fetch(categoryId).catch(() => null);
+    if (!category || category.type !== ChannelType.GuildCategory) throw new Error("유효한 카테고리 ID가 아닙니다.");
+    const me = guild.members.me || await guild.members.fetchMe().catch(() => null);
+    if (!me || !category.permissionsFor(me)?.has(PermissionFlagsBits.ManageChannels)) throw new Error("카테고리를 삭제할 권한이 없습니다.");
+    const channels = await guild.channels.fetch().catch(() => guild.channels.cache);
+    const children = [...channels.values()].filter((channel) => channel?.parentId === category.id).sort((a, b) => b.rawPosition - a.rawPosition);
+    for (const channel of children) {
+      await channel.delete("카테고리 삭제 명령어");
+    }
+    await category.delete("카테고리 삭제 명령어");
+    return { categoryName: category.name, count: children.length };
+  }
+
+  return { cloneCategory, deleteCategory };
 }

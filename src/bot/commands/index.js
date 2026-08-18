@@ -16,10 +16,11 @@ import { boostOn, boostOff } from "./boost.js";
 import profile from "./profile.js";
 import exchange from "./exchange.js";
 import clone from "./clone.js";
+import categoryDelete from "./categoryDelete.js";
 import { emojiSteal, emojiList, emojiDelete } from "./emoji.js";
 import { soundboardSteal, soundboardList, soundboardDelete } from "./soundboard.js";
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
-import birthday from "./birthday.js";
+import birthday, { birthdaySetting } from "./birthday.js";
 
 export const commandList = [
   serverinfo,
@@ -41,6 +42,7 @@ export const commandList = [
   profile,
   exchange,
   clone,
+  categoryDelete,
   emojiSteal,
   emojiList,
   emojiDelete,
@@ -50,7 +52,8 @@ export const commandList = [
   shop,
   balanceCommand,
   adminGrantCommand,
-  birthday
+  birthday,
+  birthdaySetting
 ];
 
 export const commandMap = new Map(commandList.map((command) => [command.data.name, command]));
