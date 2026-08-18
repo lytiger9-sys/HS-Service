@@ -36,7 +36,6 @@ export function interactionFeature(customId = "") {
   if (scope === "poll" || scope === "poll-free") return "polls";
   if (scope === "staff") return "administrators";
   if (scope === "shop") return "shop";
-  if (scope === "emoji") return "voice";
   if (scope === "save-note") return "ticket";
   return null;
 }

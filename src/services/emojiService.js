@@ -2,27 +2,31 @@ import { PermissionFlagsBits } from "discord.js";
 
 const MAX_BYTES = 256 * 1024;
 
+function parseEmoji(value) {
+  const match = String(value || "").trim().match(/^<(a?):([\w~+-]{2,32}):(\d+)>$/);
+  if (!match) throw new Error("커스텀 이모지를 명령어 입력란에 그대로 넣어 주세요.");
+  return { animated: Boolean(match[1]), name: match[2], id: match[3] };
+}
+
 export function createEmojiService(context) {
-  async function importFromSource(targetGuild, sourceGuildId, sourceEmojiId, userId) {
-    const me = targetGuild.members.me || await targetGuild.members.fetchMe().catch(() => null);
+  async function importEmoji(guild, value, requestedName, userId) {
+    const source = parseEmoji(value);
+    const me = guild.members.me || await guild.members.fetchMe().catch(() => null);
     if (!me?.permissions.has(PermissionFlagsBits.CreateGuildExpressions)) throw new Error("봇에게 이모지 생성 권한이 없습니다.");
-    const sourceGuild = context.client.guilds.cache.get(sourceGuildId) || await context.client.guilds.fetch(sourceGuildId).catch(() => null);
-    if (!sourceGuild) throw new Error("원본 서버를 찾을 수 없습니다.");
-    const sourceEmoji = await sourceGuild.emojis.fetch(sourceEmojiId).catch(() => null);
-    if (!sourceEmoji) throw new Error("원본 이모지를 찾을 수 없습니다.");
-    await targetGuild.emojis.fetch();
-    if (targetGuild.emojis.cache.some((emoji) => emoji.name === sourceEmoji.name)) throw new Error(`이미 같은 이름의 이모지 '${sourceEmoji.name}'가 있습니다.`);
-    const imageUrl = sourceEmoji.imageURL({ extension: sourceEmoji.animated ? "gif" : "png", size: 256 });
-    if (!imageUrl) throw new Error("원본 이모지 이미지를 찾을 수 없습니다.");
-    const response = await fetch(imageUrl);
+    const name = String(requestedName || source.name).replace(/[^\w~+-]/g, "").slice(0, 32);
+    if (name.length < 2) throw new Error("이모지 이름은 2자 이상이어야 합니다.");
+    await guild.emojis.fetch();
+    if (guild.emojis.cache.some((emoji) => emoji.name === name)) throw new Error(`이미 같은 이름의 이모지 '${name}'가 있습니다.`);
+    const extension = source.animated ? "gif" : "png";
+    const response = await fetch(`https://cdn.discordapp.com/emojis/${source.id}.${extension}?size=256&quality=lossless`);
     if (!response.ok) throw new Error("원본 이모지 이미지를 가져오지 못했습니다.");
     const buffer = Buffer.from(await response.arrayBuffer());
     if (buffer.length > MAX_BYTES) throw new Error("이모지 이미지가 너무 큽니다.");
-    const created = await targetGuild.emojis.create({ attachment: buffer, name: sourceEmoji.name, reason: `이모지 스틸: ${userId}` });
-    await context.services.guildState.patch(targetGuild.id, (state) => {
+    const created = await guild.emojis.create({ attachment: buffer, name, reason: `이모지 스틸: ${userId}` });
+    await context.services.guildState.patch(guild.id, (state) => {
       state.expressions ??= { emojis: [], sounds: [] };
       state.expressions.emojis ??= [];
-      state.expressions.emojis.push({ id: created.id, name: created.name, sourceGuildId, sourceId: sourceEmoji.id, createdBy: userId, createdAt: new Date().toISOString() });
+      state.expressions.emojis.push({ id: created.id, name: created.name, sourceId: source.id, createdBy: userId, createdAt: new Date().toISOString() });
       state.expressions.emojis = state.expressions.emojis.slice(-100);
     });
     return created;
@@ -44,5 +48,5 @@ export function createEmojiService(context) {
     return emoji;
   }
 
-  return { importFromSource, list, remove };
+  return { importEmoji, list, remove };
 }
