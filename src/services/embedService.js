@@ -67,7 +67,7 @@ function normalizeRoleMentions(value, guild) {
   return text;
 }
 
-function mentionPayload(settings, guild) {
+function mentionPayload(settings, guild, includeContent = false) {
   const source = [
     settings.title,
     settings.description,
@@ -82,7 +82,7 @@ function mentionPayload(settings, guild) {
   const uniqueRoles = [...new Set(roles)];
   const mentions = [everyone ? "@everyone" : "", here ? "@here" : "", ...uniqueRoles.map((id) => `<@&${id}>`)].filter(Boolean);
   return {
-    content: mentions.join(" ") || undefined,
+    ...(includeContent && mentions.length ? { content: mentions.join(" ") } : {}),
     allowedMentions: {
       parse: everyone || here ? ["everyone"] : [],
       roles: uniqueRoles
@@ -104,7 +104,7 @@ function legacyPayload(guild, settings) {
     .slice(0, 25)
     .map((field) => ({ name: String(field.name).slice(0, 256), value: String(field.value).slice(0, 1024), inline: Boolean(field.inline) }));
   if (fields.length) embed.addFields(fields);
-  return { embeds: [embed], ...mentionPayload(settings, guild), username: guild?.name };
+  return { embeds: [embed], ...mentionPayload(settings, guild, true), username: guild?.name };
 }
 
 function componentsPayload(settings, guild) {
@@ -149,7 +149,7 @@ function componentsPayload(settings, guild) {
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${normalizeRoleMentions(settings.footer, guild)}`));
   }
   if (!lines.length && !settings.footer) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(" "));
-  return { flags: MessageFlags.IsComponentsV2, components: [container], ...mentionPayload(settings, guild) };
+  return { flags: MessageFlags.IsComponentsV2, components: [container], ...mentionPayload(settings, guild, false) };
 }
 
 export function createEmbedService(context) {
