@@ -1806,6 +1806,7 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
 }
+.license-issue-grid { grid-template-columns: minmax(0, 1fr); }
 .license-form { display: grid; gap: 16px; margin-top: 22px; }
 .license-form .field { display: grid; gap: 7px; }
 .license-form .field span { color: #52616d; font-size: 0.84rem; font-weight: 600; }
@@ -1844,6 +1845,10 @@ a {
 .license-login-button span { position: relative; z-index: 1; color: inherit; }
 .license-plain-key { display: inline-block; margin: 3px 6px 3px 0; padding: 5px 8px; border-radius: 6px; background: #edf3f7; color: #17202a; white-space: nowrap; }
 .license-card td form { display: inline-block; margin: 2px 4px 2px 0; }
+.error-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 24px; }
+.error-actions .primary, .error-actions .ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 10px 16px; border-radius: 8px; font: inherit; cursor: pointer; }
+.error-actions .primary { border: 0; background: #1d3445; color: #fff; }
+.error-actions .ghost { border: 1px solid #b8c6d0; background: #fff; color: #304756; }
 .license-inline-form { margin: 0; }
 .license-inline-form .ghost,
 .license-card .ghost {

@@ -287,14 +287,17 @@ export function createPartnerService(context) {
     return (state(guildId).partners || []).filter((partner) => partner.status === "active" && new Date(partner.lastMessageAt || partner.approvedAt).getTime() < cutoff);
   }
 
-  async function issueBannerLicense(guildId, issuerUserId, durationDays) {
+  async function issueBannerLicense(guildId, issuerUserId, durationDays, issuerPlan = "") {
     const serviceLicense = await context.services.licenses.getActiveByGuild(guildId);
-    if (!serviceLicense) throw new Error("활성 서비스 라이선스가 필요합니다.");
+    const plan = serviceLicense?.plan || issuerPlan;
+    if (!serviceLicense && String(guildId) !== String(context.config.allowedGuildId)) {
+      throw new Error("활성 서비스 라이선스가 필요합니다.");
+    }
     return context.services.licenses.issueBanner({
       durationDays,
       issuerGuildId: guildId,
       issuerUserId,
-      issuerPlan: serviceLicense.plan
+      issuerPlan: plan
     });
   }
 

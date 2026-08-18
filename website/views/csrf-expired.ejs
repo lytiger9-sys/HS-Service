@@ -1,0 +1,14 @@
+<%- include('partials/head', { title: title || '보안 토큰 만료' }) %>
+<body class="error-page csrf-expired-page">
+  <main class="error-card">
+    <p class="error-kicker">HS Service / Security</p>
+    <h1><%= title || '보안 토큰 만료' %></h1>
+    <p><%= message || '보안 토큰이 만료되었습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요.' %></p>
+    <div class="error-actions">
+      <button class="primary" type="button" onclick="window.location.reload()">페이지 새로고침</button>
+      <a class="ghost" href="/">대시보드로 이동</a>
+    </div>
+  </main>
+</body>
+</html>
+

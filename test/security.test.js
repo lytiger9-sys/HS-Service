@@ -12,7 +12,8 @@ function responseMock() {
     set(name, value) { this.headers[name] = value; },
     cookie(name, value, options) { this.cookies[name] = { value, options }; },
     status(code) { this.statusCode = code; return this; },
-    send(value) { this.body = value; return this; }
+    send(value) { this.body = value; return this; },
+    render(view, data) { this.rendered = { view, data }; return this; }
   };
 }
 
@@ -55,11 +56,13 @@ test("CSRF protection rejects missing or invalid tokens", () => {
   csrfProtection(req, res, () => { called = true; });
   assert.equal(called, false);
   assert.equal(res.statusCode, 403);
+  assert.equal(res.rendered.view, "csrf-expired");
 
   req.body._csrf = "b".repeat(64);
   const secondRes = responseMock();
   csrfProtection(req, secondRes, () => { called = true; });
   assert.equal(secondRes.statusCode, 403);
+  assert.equal(secondRes.rendered.view, "csrf-expired");
 });
 
 test("CSRF protection accepts a matching token", () => {

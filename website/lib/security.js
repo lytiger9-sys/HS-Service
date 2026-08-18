@@ -46,7 +46,10 @@ export function csrfProtection(req, res, next) {
     && expectedBuffer.length > 0
     && crypto.timingSafeEqual(expectedBuffer, providedBuffer);
   if (!matches) {
-    return res.status(403).send("보안 토큰이 유효하지 않습니다. 페이지를 새로고침한 뒤 다시 시도하세요.");
+    return res.status(403).render("csrf-expired", {
+      title: "보안 토큰 만료",
+      message: "보안 토큰이 만료되었거나 이미 사용된 페이지에서 요청되었습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요."
+    });
   }
   return next();
 }

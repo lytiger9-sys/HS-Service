@@ -1,7 +1,7 @@
 import express from "express";
 import { getAccessMessage, resolveDashboardAccess, resolveGuildAdministrator } from "../lib/dashboardAccess.js";
 import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
-import { canUseFeature, featureDeniedMessage, planAllowsFeatureToggle } from "../../src/shared/planAccess.js";
+import { canUseFeature, featureDeniedMessage, planAllowsFeatureToggle, planHasFeature } from "../../src/shared/planAccess.js";
 
 function readBoolean(value) {
   if (Array.isArray(value)) return value.some((entry) => readBoolean(entry));
@@ -438,9 +438,12 @@ export function createApiRouter(context) {
       const { guildId } = req.params;
       const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
       if (!access.allowed) return res.status(403).send("발급 서버의 관리자만 배너 라이선스를 발급할 수 있습니다.");
-      const featureAccess = await requireFeature(context, guildId, "partner");
-      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
-      const issued = await context.services.partners.issueBannerLicense(guildId, req.user.id, req.body.bannerDurationDays);
+      const serviceLicense = await context.services.licenses.getActiveByGuild(guildId);
+      const isManagementGuild = String(guildId) === String(context.config.allowedGuildId);
+      const issuerPlan = serviceLicense?.plan || (isManagementGuild ? "enterprise" : "");
+      if (!serviceLicense && !isManagementGuild) return res.redirect(`/?section=partner&bannerError=${encodeURIComponent("상단배너 라이센스 발급에는 해당 서버의 활성 서비스 라이센스가 필요합니다.")}`);
+      if (!planHasFeature(issuerPlan, "partner")) return res.redirect(`/?section=partner&bannerError=${encodeURIComponent("현재 서비스 라이센스 플랜에서는 상단배너 라이센스를 발급할 수 없습니다.")}`);
+      const issued = await context.services.partners.issueBannerLicense(guildId, req.user.id, req.body.bannerDurationDays, issuerPlan);
       return wantsJson(req) ? res.json({ ok: true, key: issued.key, durationDays: issued.durationDays }) : res.redirect(`/?section=partner&bannerKey=${encodeURIComponent(issued.key)}`);
     } catch (error) {
       return res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
