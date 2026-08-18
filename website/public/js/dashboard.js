@@ -176,7 +176,7 @@ async function submitForm(form, submitter = null) {
   const hasSubmitterMethod = Boolean(submitter?.hasAttribute?.("formmethod"));
   const action = hasSubmitterAction ? submitter.formAction : form.action;
   const method = (hasSubmitterMethod ? submitter.formMethod : (form.method || "post")).toUpperCase();
-  const csrfToken = readCookie("csrf-token");
+  const csrfToken = window.dashboardCsrfToken || readCookie("csrf-token");
   const response = await fetch(action, {
     method,
     credentials: "same-origin",
@@ -187,6 +187,7 @@ async function submitForm(form, submitter = null) {
     },
     body: (() => {
       const data = new FormData(form);
+      if (csrfToken) data.set("_csrf", csrfToken);
       const externalControls = form.id
         ? document.querySelectorAll(`input[form="${form.id}"][type="checkbox"]`)
         : [];
