@@ -75,6 +75,14 @@
         const fallback = payload?.message || (response.status === 403 ? "보안 토큰이 만료되었습니다. 페이지를 새로고침한 뒤 다시 시도하세요." : response.status >= 500 ? "요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요." : "요청을 처리하지 못했습니다.");
         throw new Error(fallback);
       }
+      if (form.dataset.toastForm === "true" && payload.featureBans) {
+        Object.entries(payload.featureBans).forEach(([featureId, banned]) => {
+          const input = form.querySelector(`input[name="feature_${featureId}"]`);
+          if (input) input.checked = !Boolean(banned);
+        });
+        const otherCommands = form.querySelector('input[name="otherCommandsEnabled"]');
+        if (otherCommands && typeof payload.otherCommandsEnabled === "boolean") otherCommands.checked = payload.otherCommandsEnabled;
+      }
       if (payload.partialUrl) {
         try {
           await refreshPartial(payload.partialUrl, payload.partialTargets);
@@ -92,6 +100,12 @@
       buttons.forEach((button) => { button.disabled = false; });
     }
   }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('form[data-toast-form="true"]').forEach((form) => {
+      form.addEventListener("submit", submitWithToast);
+    });
+  });
 
   document.addEventListener("submit", (event) => {
     const form = event.target;
