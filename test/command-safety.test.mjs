@@ -13,10 +13,9 @@ test("일괄 변경·삭제 명령어는 확인 옵션을 요구한다", () => {
   }
 });
 
-test("생일설정 명령어가 등록되어 있다", () => {
-  assert.ok(commandMap.has("생일설정"));
-  assert.equal(option("생일설정", "월")?.required, true);
-  assert.equal(option("생일설정", "일")?.required, true);
+test("생일설정 명령어는 등록되지 않는다", () => {
+  assert.equal(commandMap.has("생일설정"), false);
+  assert.ok(commandMap.has("생일"));
 });
 
 test("닉네임 일괄 적용 명령어가 등록되어 있다", () => {

@@ -28,9 +28,5 @@ const birthday = {
   execute: executeBirthday
 };
 
-export const birthdaySetting = {
-  data: birthdayData("생일설정", "상점 생일 보상을 받을 생일을 등록합니다."),
-  execute: executeBirthday
-};
 
 export default birthday;

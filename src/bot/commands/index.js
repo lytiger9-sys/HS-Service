@@ -20,7 +20,7 @@ import categoryDelete from "./categoryDelete.js";
 import { emojiSteal, emojiList, emojiDelete } from "./emoji.js";
 import { soundboardSteal, soundboardList, soundboardDelete } from "./soundboard.js";
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
-import birthday, { birthdaySetting } from "./birthday.js";
+import birthday from "./birthday.js";
 
 export const commandList = [
   serverinfo,
@@ -52,8 +52,7 @@ export const commandList = [
   shop,
   balanceCommand,
   adminGrantCommand,
-  birthday,
-  birthdaySetting
+  birthday
 ];
 
 export const commandMap = new Map(commandList.map((command) => [command.data.name, command]));
