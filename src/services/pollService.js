@@ -2,7 +2,11 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ChannelType
+  ChannelType,
+  ContainerBuilder,
+  MessageFlags,
+  SeparatorBuilder,
+  TextDisplayBuilder
 } from "discord.js";
 import { randomUUID } from "node:crypto";
 import { buildPollEmbed, createBaseEmbed, palette } from "../shared/embeds.js";
@@ -25,34 +29,30 @@ async function resolveTextChannel(guild, channelId) {
 function normalizeOptions(options, freeTextEnabled) {
   const normalized = options
     .map((label) => String(label ?? "").trim())
-    .filter(Boolean)
-    .slice(0, 5);
+    .filter(Boolean);
+  const maxChoices = freeTextEnabled ? 4 : 5;
+  if (normalized.length < 2) throw new Error("투표 항목은 최소 2개 이상이어야 합니다.");
+  if (normalized.length > maxChoices) throw new Error(`투표 항목은 ${maxChoices}개까지 지원합니다.`);
 
-  if (normalized.length < 2) {
-    throw new Error("투표 항목은 최소 2개 이상이어야 합니다.");
-  }
-
-  if (options.filter((label) => String(label ?? "").trim()).length > 5) {
-    throw new Error("투표 항목은 최대 5개까지 지원합니다.");
-  }
-
-  return normalized.map((label) => ({
+  const result = normalized.slice(0, maxChoices).map((label) => ({
     label: clampText(label, 60),
-    count: 0
+    count: 0,
+    isFreeText: false
   }));
+  if (freeTextEnabled) result.push({ label: "자유 입력", count: 0, isFreeText: true });
+  return result;
 }
 
 function buildPollComponents(poll) {
+  const showResults = poll.resultVisibility !== "private" || poll.expired;
   const buttons = poll.options.map((option, index) => {
-    const isFreeText = poll.freeTextEnabled && index === poll.options.length - 1;
-    const label = isFreeText
-      ? `${option.label} (${option.count})`
-      : `${option.label} (${option.count})`;
-
+    const suffix = showResults ? ` (${option.count})` : "";
+    const label = clampText(`${option.label}${suffix}`, 80);
     return new ButtonBuilder()
-      .setCustomId(isFreeText ? `poll:${poll.id}:free` : `poll:${poll.id}:vote:${index}`)
-      .setLabel(clampText(label, 80))
-      .setStyle(isFreeText ? ButtonStyle.Secondary : ButtonStyle.Primary);
+      .setCustomId(option.isFreeText ? `poll:${poll.id}:free` : `poll:${poll.id}:vote:${index}`)
+      .setLabel(label)
+      .setStyle(option.isFreeText ? ButtonStyle.Secondary : ButtonStyle.Primary)
+      .setDisabled(Boolean(poll.expired));
   });
 
   const rows = [];
@@ -60,6 +60,16 @@ function buildPollComponents(poll) {
     rows.push(new ActionRowBuilder().addComponents(buttons.slice(index, index + 5)));
   }
   return rows;
+}
+
+function buildPollPayload(poll) {
+  const container = new ContainerBuilder();
+  const status = poll.expired ? "투표 종료" : (poll.resultVisibility === "private" ? "결과 비공개" : "실시간 결과 공개");
+  const expiry = poll.expiresAt ? `\n상태: ${status} · 만료: <t:${Math.floor(new Date(poll.expiresAt).getTime() / 1000)}:f>` : `\n상태: ${status}`;
+  const heading = `## ${poll.question}${poll.description ? `\n${poll.description}` : ""}${expiry}`;
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(heading));
+  container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+  return { flags: MessageFlags.IsComponentsV2, components: [container, ...buildPollComponents(poll)] };
 }
 
 function applyVote(poll, user, optionIndex, freeText = "") {
@@ -71,7 +81,7 @@ function applyVote(poll, user, optionIndex, freeText = "") {
     poll.options[previousOptionIndex].count = Math.max(0, poll.options[previousOptionIndex].count - 1);
   }
 
-  const isFreeText = poll.freeTextEnabled && optionIndex === poll.options.length - 1;
+  const isFreeText = Boolean(poll.options[optionIndex]?.isFreeText);
   if (previousOptionIndex == null || previousOptionIndex !== optionIndex) {
     poll.options[optionIndex].count += 1;
   }
@@ -124,6 +134,11 @@ export function createPollService(context, guildState) {
       description: clampText(payload.description || "", 1200),
       options: normalizeOptions(payload.options || [], Boolean(payload.freeTextEnabled)),
       freeTextEnabled: Boolean(payload.freeTextEnabled),
+      resultVisibility: payload.resultVisibility === "private" ? "private" : "public",
+      expirationDays: Math.max(1, Math.min(365, Number(payload.expirationDays) || 7)),
+      expiresAt: new Date(Date.now() + Math.max(1, Math.min(365, Number(payload.expirationDays) || 7)) * 86400000).toISOString(),
+      expired: false,
+      logMessageId: "",
       votes: {},
       freeTextAnswers: [],
       createdAt: new Date().toISOString(),
@@ -170,10 +185,7 @@ export function createPollService(context, guildState) {
       throw new Error("투표를 보낼 채널을 찾을 수 없습니다.");
     }
 
-    const message = await channel.send({
-      embeds: [buildPollEmbed(poll)],
-      components: buildPollComponents(poll)
-    });
+    const message = await channel.send(buildPollPayload(poll));
 
     await guildState.patch(guildId, (guildStateValue) => {
       guildStateValue.polls[pollId].channelId = channel.id;
@@ -181,16 +193,15 @@ export function createPollService(context, guildState) {
       return guildStateValue.polls[pollId];
     });
 
-    await context.services.logs.sendLogByKey(guildId, "voteChannelId", {
-      embeds: [
-        createBaseEmbed({
-          title: "투표 게시",
-          description: `${poll.question} 을(를) ${channel.id ? `<#${channel.id}>` : "채널"} 에 게시했습니다.`,
-          color: palette.success,
-          timestamp: Date.now()
-        })
-      ]
+    const logMessage = await context.services.logs.sendLogByKey(guildId, "voteChannelId", {
+      embeds: [buildPollLogEmbed(poll, "투표 진행 중")]
     });
+    if (logMessage) {
+      await guildState.patch(guildId, (guildStateValue) => {
+        guildStateValue.polls[pollId].logMessageId = logMessage.id;
+        return guildStateValue.polls[pollId];
+      });
+    }
 
     return message;
   }
@@ -216,10 +227,46 @@ export function createPollService(context, guildState) {
       return null;
     }
 
-    return message.edit({
-      embeds: [buildPollEmbed(poll)],
-      components: buildPollComponents(poll)
+    const messageResult = await message.edit(buildPollPayload(poll));
+    await syncPollLog(guildId, pollId, poll);
+    return messageResult;
+  }
+
+  function buildPollLogEmbed(poll, status) {
+    const total = poll.options.reduce((sum, option) => sum + Number(option.count || 0), 0);
+    const lines = poll.options.map((option) => `**${option.label}**: ${option.count}표`).join("\n");
+    return createBaseEmbed({
+      title: `투표 결과 · ${status}`,
+      description: `**${poll.question}**\n${poll.description || ""}\n\n${lines}\n\n총 투표 수: ${total}명`,
+      color: status === "투표 종료" ? palette.info : palette.success,
+      timestamp: Date.now()
     });
+  }
+
+  async function syncPollLog(guildId, pollId, poll = null) {
+    const current = poll || await getPoll(guildId, pollId);
+    if (!current) return null;
+    if (current.logMessageId) {
+      const edited = await context.services.logs.editLogByKey(guildId, "voteChannelId", current.logMessageId, { embeds: [buildPollLogEmbed(current, current.expired ? "투표 종료" : "투표 진행 중")] });
+      if (edited) return edited;
+    }
+    return context.services.logs.sendLogByKey(guildId, "voteChannelId", { embeds: [buildPollLogEmbed(current, current.expired ? "투표 종료" : "투표 진행 중")] });
+  }
+
+  async function expirePoll(guildId, pollId) {
+    const poll = await getPoll(guildId, pollId);
+    if (!poll || poll.expired || !poll.expiresAt || Date.parse(poll.expiresAt) > Date.now()) return false;
+    await guildState.patch(guildId, (guild) => { guild.polls[pollId].expired = true; return guild.polls[pollId]; });
+    await syncPollMessage(guildId, pollId);
+    await syncPollLog(guildId, pollId);
+    return true;
+  }
+
+  async function processExpirations() {
+    for (const guild of context.client?.guilds.cache.values() || []) {
+      const polls = await listPolls(guild.id);
+      for (const poll of polls) await expirePoll(guild.id, poll.id).catch(() => null);
+    }
   }
 
   async function vote(guildId, pollId, user, optionIndex, freeText = "") {
@@ -232,6 +279,10 @@ export function createPollService(context, guildState) {
       const poll = guild.polls[pollId];
       if (!poll) {
         throw new Error("투표를 찾을 수 없습니다.");
+      }
+      if (poll.expired || (poll.expiresAt && Date.parse(poll.expiresAt) <= Date.now())) {
+        poll.expired = true;
+        throw new Error("이미 만료된 투표입니다.");
       }
 
       applyVote(poll, user, optionIndex, freeText);
@@ -247,7 +298,8 @@ export function createPollService(context, guildState) {
       throw new Error("투표를 찾을 수 없습니다.");
     }
 
-    const optionIndex = poll.options.length - 1;
+    const optionIndex = poll.options.findIndex((option) => option.isFreeText);
+    if (optionIndex < 0) throw new Error("이 투표에는 자유 입력 항목이 없습니다.");
     await vote(interaction.guildId, pollId, interaction.user, optionIndex, value);
   }
 
@@ -264,6 +316,7 @@ export function createPollService(context, guildState) {
     vote,
     handleFreeTextVote,
     handleChoiceVote,
-    buildPollComponents
+    buildPollComponents,
+    processExpirations
   };
 }

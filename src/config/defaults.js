@@ -21,7 +21,9 @@ export function createDefaultGuildSettings() {
     },
     ticket: createDefaultTicketSettings(),
     polls: {
-      enabled: true
+      enabled: true,
+      resultVisibility: "public",
+      expirationDays: 7
     },
     embed: {
       enabled: true,

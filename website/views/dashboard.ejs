@@ -307,14 +307,12 @@
               <h3>투표 생성</h3>
             </div>
             <label class="field toggle section-toggle">
-              <input type="checkbox" form="polls-settings-form" name="pollsEnabled" <%= settings.polls.enabled !== false ? 'checked' : '' %> />
+              <input type="checkbox" form="poll-publish-form" name="pollsEnabled" <%= settings.polls.enabled !== false ? 'checked' : '' %> />
               <span>투표 기능 활성화</span>
             </label>
           </div>
 
-          <form class="settings-form" id="polls-settings-form" method="post" action="/guild/<%= guild.id %>/settings/polls"></form>
-
-          <form class="settings-form" id="poll-publish-form" method="post" action="/guild/<%= guild.id %>/polls">
+          <form class="settings-form" id="poll-publish-form" method="post" action="/guild/<%= guild.id %>/settings/polls">
             <div class="form-grid">
               <label class="field">
                 <span>게시 채널</span>
@@ -334,18 +332,29 @@
                 <textarea name="pollDescription" rows="4" data-poll-preview="description"></textarea>
               </label>
               <label class="field full">
-                <span>항목(한 줄에 하나, 마지막 줄은 자유 입력 항목으로 사용 가능)</span>
+                <span>항목(한 줄에 하나, 자유 입력을 켜면 별도 항목이 추가됩니다)</span>
                 <textarea name="pollOptions" rows="5" data-poll-preview="options"></textarea>
               </label>
               <label class="field toggle">
                 <input type="checkbox" name="pollFreeText" checked data-poll-preview="freeText" />
-                <span>마지막 항목 자유 입력</span>
+                <span>자유 입력 항목 추가</span>
+              </label>
+              <label class="field">
+                <span>결과 표시</span>
+                <select name="pollResultVisibility">
+                  <option value="public" <%= (settings.polls.resultVisibility || 'public') !== 'private' ? 'selected' : '' %>>공개 결과</option>
+                  <option value="private" <%= settings.polls.resultVisibility === 'private' ? 'selected' : '' %>>비공개 결과</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>투표 만료 일수</span>
+                <input type="number" name="pollExpirationDays" min="1" max="365" value="<%= settings.polls.expirationDays || 7 %>" />
               </label>
             </div>
           </form>
           <div class="poll-settings-actions">
-            <button class="primary" type="submit" form="polls-settings-form">저장</button>
-            <button class="ghost" type="submit" form="poll-publish-form">게시</button>
+            <button class="primary" type="submit" formaction="/guild/<%= guild.id %>/settings/polls">저장</button>
+            <button class="ghost" type="submit" formaction="/guild/<%= guild.id %>/polls">게시</button>
           </div>
         </article>
 

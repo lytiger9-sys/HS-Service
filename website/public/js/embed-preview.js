@@ -65,12 +65,18 @@ function setupPollPreview() {
       return;
     }
 
-    options.forEach((option, index) => {
+    options.forEach((option) => {
       const pill = document.createElement("span");
       pill.className = "poll-pill";
-      pill.textContent = freeTextInput?.checked && index === options.length - 1 ? `${option} (자유 입력)` : option;
+      pill.textContent = option;
       optionsBox.appendChild(pill);
     });
+    if (freeTextInput?.checked) {
+      const pill = document.createElement("span");
+      pill.className = "poll-pill is-free-text";
+      pill.textContent = "자유 입력";
+      optionsBox.appendChild(pill);
+    }
   };
 
   [questionInput, descriptionInput, optionsInput, freeTextInput].forEach((input) => {

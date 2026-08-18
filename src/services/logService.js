@@ -50,6 +50,18 @@ export function createLogService(context, guildState) {
     return sendConfigured(guildId, channelId, payload);
   }
 
+  async function editLogByKey(guildId, key, messageId, payload) {
+    if (!messageId) return null;
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    if (!guild) return null;
+    const settings = await getSettings(guildId);
+    if (settings.logs?.enabled === false) return null;
+    const channel = await resolveTextChannel(guild, settings.logs?.[key]);
+    if (!channel) return null;
+    const message = await channel.messages.fetch(messageId).catch(() => null);
+    return message?.edit(payload).catch(() => null) || null;
+  }
+
   async function sendWelcomeError(guildId, payload) {
     const settings = await getSettings(guildId);
     if (settings.logs?.enabled === false) {
@@ -69,6 +81,7 @@ export function createLogService(context, guildState) {
   return {
     sendConfigured,
     sendLogByKey,
+    editLogByKey,
     sendWelcomeError,
     sendHoneypotLog
   };

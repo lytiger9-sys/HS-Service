@@ -187,7 +187,9 @@ function sectionPayload(section, body) {
   if (section === "polls") {
     return {
       polls: {
-        enabled: readOptionalBoolean(body.pollsEnabled)
+        enabled: readOptionalBoolean(body.pollsEnabled),
+        resultVisibility: body.pollResultVisibility === "private" ? "private" : "public",
+        expirationDays: readNumber(body.pollExpirationDays, 7, 1, 365)
       }
     };
   }
@@ -494,6 +496,8 @@ export function createApiRouter(context) {
         description: req.body.pollDescription || "",
         options: splitLines(req.body.pollOptions),
         freeTextEnabled: readBoolean(req.body.pollFreeText),
+        resultVisibility: req.body.pollResultVisibility === "private" ? "private" : "public",
+        expirationDays: readNumber(req.body.pollExpirationDays, 7, 1, 365),
         createdBy: req.body.createdBy || "",
         createdByTag: req.body.createdByTag || ""
       });

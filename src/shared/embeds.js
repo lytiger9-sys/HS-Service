@@ -149,10 +149,11 @@ export function buildServerInfoEmbed(guild, stats) {
   return embed;
 }
 
-export function buildPollEmbed(poll) {
+export function buildPollEmbed(poll, forceResults = true) {
+  const showResults = forceResults || poll.resultVisibility !== "private" || poll.expired;
   const lines = poll.options.map((option, index) => {
-    const label = index === poll.options.length - 1 && poll.freeTextEnabled ? `${option.label} (자유 입력)` : option.label;
-    return `${index + 1}. ${label} - ${option.count}표`;
+    const label = option.isFreeText ? `${option.label} (자유 입력)` : option.label;
+    return `${index + 1}. ${label}${showResults ? ` - ${option.count}표` : ""}`;
   });
 
   const footerText = poll.freeTextAnswers?.length
@@ -161,7 +162,7 @@ export function buildPollEmbed(poll) {
 
   return createBaseEmbed({
     title: poll.question,
-    description: [poll.description || "설명 없음", "", ...lines].join("\n"),
+    description: [poll.description || "설명 없음", "", ...lines, poll.expiresAt ? `만료: ${new Date(poll.expiresAt).toLocaleString("ko-KR")}` : ""].filter(Boolean).join("\n"),
     color: palette.slate,
     footer: footerText,
     timestamp: poll.createdAt

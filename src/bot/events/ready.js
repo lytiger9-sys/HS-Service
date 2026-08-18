@@ -25,4 +25,7 @@ export default async function handleReady(client, context) {
   await context.services.embeds.processSchedules().catch(() => null);
   const embedScheduleTimer = setInterval(() => void context.services.embeds.processSchedules().catch(() => null), 60 * 1000);
   embedScheduleTimer.unref?.();
+  await context.services.polls.processExpirations().catch(() => null);
+  const pollExpirationTimer = setInterval(() => void context.services.polls.processExpirations().catch(() => null), 60 * 1000);
+  pollExpirationTimer.unref?.();
 }
