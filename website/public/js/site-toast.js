@@ -33,8 +33,20 @@
     return form.querySelector('input[name="_csrf"]')?.value || document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith("csrf-token="))?.slice(11) || "";
   }
 
+  async function refreshPartial(url) {
+    const response = await fetch(url, { credentials: "same-origin", headers: { Accept: "text/html", "X-Requested-With": "fetch" } });
+    if (!response.ok) throw new Error("최신 목록을 불러오지 못했습니다.");
+    const html = await response.text();
+    const parsed = new DOMParser().parseFromString(html, "text/html");
+    const incoming = parsed.querySelector('[data-panel="partner"]');
+    const current = document.querySelector('[data-panel="partner"]');
+    if (!incoming || !current) throw new Error("목록 화면을 갱신하지 못했습니다.");
+    incoming.className = current.className;
+    current.replaceWith(incoming);
+  }
+
   async function submitWithToast(event) {
-    const form = event.currentTarget;
+    const form = event.target;
     if (!shouldHandle(form) || form.dataset.toastSubmitting === "true") return;
     event.preventDefault();
     form.dataset.toastSubmitting = "true";
@@ -58,6 +70,14 @@
         const fallback = payload?.message || (response.status === 403 ? "보안 토큰이 만료되었습니다. 페이지를 새로고침한 뒤 다시 시도하세요." : response.status >= 500 ? "요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요." : "요청을 처리하지 못했습니다.");
         throw new Error(fallback);
       }
+      if (payload.partialUrl) {
+        try {
+          await refreshPartial(payload.partialUrl);
+        } catch (refreshError) {
+          showSiteToast(refreshError?.message || "목록 갱신에 실패했습니다.", "error");
+          return;
+        }
+      }
       showSiteToast(payload.message || "저장되었습니다.", "success");
       if (payload.redirect) window.setTimeout(() => { window.location.assign(payload.redirect); }, 350);
     } catch (error) {
@@ -68,7 +88,8 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("form").forEach((form) => form.addEventListener("submit", submitWithToast));
+  document.addEventListener("submit", (event) => {
+    const form = event.target;
+    if (form instanceof HTMLFormElement) submitWithToast(event);
   });
 })();

@@ -69,7 +69,7 @@ async function requireFeature(context, guildId, feature) {
 function saveResponse(res, req, { section, message = "저장되었습니다." }) {
   const nextSection = section === "staff" ? "administrators" : section;
   if (wantsJson(req)) {
-    return res.json({ ok: true, section: nextSection, message });
+    return res.json({ ok: true, section: nextSection, message, ...(section === "partner" ? { partialUrl: "/?partial=partner" } : {}) });
   }
 
   return res.redirect(nextSection === "administrators" ? "/?section=administrators" : `/?section=${nextSection}`);
@@ -429,7 +429,7 @@ export function createApiRouter(context) {
       const featureAccess = await requireFeature(context, guildId, "partner");
       if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
       await context.services.partners.deletePartner(guildId, partnerId);
-      return wantsJson(req) ? res.json({ ok: true }) : res.redirect("/?section=partner");
+      return wantsJson(req) ? res.json({ ok: true, message: "비활성 파트너 채널을 삭제했습니다.", partialUrl: "/?partial=partner" }) : res.redirect("/?section=partner");
     } catch (error) {
       next(error);
     }
@@ -443,12 +443,20 @@ export function createApiRouter(context) {
       const serviceLicense = await context.services.licenses.getActiveByGuild(guildId);
       const isManagementGuild = String(guildId) === String(context.config.allowedGuildId);
       const issuerPlan = serviceLicense?.plan || (isManagementGuild ? "enterprise" : "");
-      if (!serviceLicense && !isManagementGuild) return res.redirect(`/?section=partner&bannerError=${encodeURIComponent("상단배너 라이센스 발급에는 해당 서버의 활성 서비스 라이센스가 필요합니다.")}`);
-      if (!planHasFeature(issuerPlan, "partner")) return res.redirect(`/?section=partner&bannerError=${encodeURIComponent("현재 서비스 라이센스 플랜에서는 상단배너 라이센스를 발급할 수 없습니다.")}`);
+      if (!serviceLicense && !isManagementGuild) {
+        const message = "상단배너 라이센스 발급에는 해당 서버의 활성 서비스 라이센스가 필요합니다.";
+        return wantsJson(req) ? res.status(400).json({ ok: false, message }) : res.redirect(`/?section=partner&bannerError=${encodeURIComponent(message)}`);
+      }
+      if (!planHasFeature(issuerPlan, "partner")) {
+        const message = "현재 서비스 라이센스 플랜에서는 상단배너 라이센스를 발급할 수 없습니다.";
+        return wantsJson(req) ? res.status(400).json({ ok: false, message }) : res.redirect(`/?section=partner&bannerError=${encodeURIComponent(message)}`);
+      }
       const issued = await context.services.partners.issueBannerLicense(guildId, req.user.id, req.body.bannerDurationDays, issuerPlan);
-      return wantsJson(req) ? res.json({ ok: true, key: issued.key, durationDays: issued.durationDays }) : res.redirect(`/?section=partner&bannerKey=${encodeURIComponent(issued.key)}`);
+      return wantsJson(req)
+        ? res.json({ ok: true, key: issued.key, durationDays: issued.durationDays, message: "상단배너 라이센스를 발급했습니다.", partialUrl: "/?partial=partner" })
+        : res.redirect(`/?section=partner&bannerKey=${encodeURIComponent(issued.key)}`);
     } catch (error) {
-      return res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
+      return wantsJson(req) ? res.status(400).json({ ok: false, message: error.message || "상단배너 라이센스 발급에 실패했습니다." }) : res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
     }
   });
 
@@ -464,9 +472,9 @@ export function createApiRouter(context) {
         promoWebhook: String(req.body.bannerPromoWebhook || "").trim(),
         recipientUserId: req.user?.id || ""
       });
-      return wantsJson(req) ? res.json({ ok: true }) : res.redirect("/?section=partner");
+      return wantsJson(req) ? res.json({ ok: true, message: "상단배너가 생성되었습니다.", partialUrl: "/?partial=partner" }) : res.redirect("/?section=partner");
     } catch (error) {
-      return res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
+      return wantsJson(req) ? res.status(400).json({ ok: false, message: error.message || "상단배너 생성에 실패했습니다." }) : res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
     }
   });
 

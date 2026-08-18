@@ -32,14 +32,22 @@ export function createIndexRouter(context) {
           const activeSection = viewModel.sections.some((section) => section.id === requestedSection)
             ? requestedSection
             : "overview";
-          return res.render("dashboard", {
+          const dashboardLocals = {
             ...viewModel,
             currentUser: req.user,
             activeSection,
             saved: req.query.saved || "",
             issuedBannerKey: req.query.bannerKey || "",
             bannerError: req.query.bannerError || ""
-          });
+          };
+          if (req.query.partial === "partner") {
+            return res.render("partials/partner-panel", {
+              ...dashboardLocals,
+              panelClass: () => "panel-stack",
+              csrfToken: res.locals.csrfToken
+            });
+          }
+          return res.render("dashboard", dashboardLocals);
         }
         if (access.status === 503 || access.status === 404) {
           return res.status(access.status).render("error", {
