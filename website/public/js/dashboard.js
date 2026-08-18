@@ -165,14 +165,22 @@ function injectFeatureToggles() {
   });
 }
 
+function readCookie(name) {
+  const entry = document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
+  return entry ? decodeURIComponent(entry.slice(name.length + 1)) : "";
+}
+
 async function submitForm(form, submitter = null) {
   const action = submitter?.formAction || form.action;
   const method = (submitter?.formMethod || form.method || "post").toUpperCase();
+  const csrfToken = readCookie("csrf-token");
   const response = await fetch(action, {
     method,
+    credentials: "same-origin",
     headers: {
       "X-Requested-With": "fetch",
-      Accept: "application/json"
+      Accept: "application/json",
+      ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {})
     },
     body: (() => {
       const data = new FormData(form);
@@ -183,9 +191,13 @@ async function submitForm(form, submitter = null) {
     })()
   });
 
-  const payload = await response.json().catch(() => null);
+  const contentType = response.headers.get("content-type") || "";
+  const payload = contentType.includes("application/json")
+    ? await response.json().catch(() => null)
+    : null;
   if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || "저장에 실패했습니다.");
+    const serverMessage = payload?.message || (!contentType.includes("application/json") ? (await response.text().catch(() => "")) : "");
+    throw new Error(serverMessage || "저장에 실패했습니다.");
   }
 
   return payload;
