@@ -47,6 +47,11 @@ function normalizeGuildState(doc) {
     },
     partners: Array.isArray(data.partners) ? data.partners : [],
     bannerSlots: Array.isArray(data.bannerSlots) ? data.bannerSlots : [],
+    expressions: {
+      ...defaults.expressions,
+      ...(data.expressions || {}),
+      emojis: Array.isArray(data.expressions?.emojis) ? data.expressions.emojis : []
+    },
     shop: {
       ...defaults.shop,
       ...(data.shop || {}),

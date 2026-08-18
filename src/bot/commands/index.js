@@ -16,6 +16,8 @@ import { boostOn, boostOff } from "./boost.js";
 import profile from "./profile.js";
 import exchange from "./exchange.js";
 import clone from "./clone.js";
+import { emojiSteal } from "./emoji.js";
+import emojiList from "./emoji.js";
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 
 export const commandList = [
@@ -38,6 +40,8 @@ export const commandList = [
   profile,
   exchange,
   clone,
+  emojiSteal,
+  emojiList,
   shop,
   balanceCommand,
   adminGrantCommand

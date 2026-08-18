@@ -22,6 +22,7 @@ import { createServerAuditLogService } from "./serverAuditLogService.js";
 import { createBoostService } from "./boostService.js";
 import { createExchangeService } from "./exchangeService.js";
 import { createCloneService } from "./cloneService.js";
+import { createEmojiService } from "./emojiService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -50,6 +51,7 @@ export function createServices(context) {
     serverAuditLogs: createServerAuditLogService(context),
     boost: createBoostService(context, guildState),
     exchange: createExchangeService(),
-    cloner: createCloneService()
+    cloner: createCloneService(),
+    emojis: createEmojiService(context)
   };
 }
