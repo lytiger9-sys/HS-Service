@@ -230,8 +230,7 @@ function ensureToggleFallbacks(form) {
 }
 
 function setupForms() {
-  // 설정 저장은 브라우저 native POST를 사용한다. fetch로 가로채지 않아
-  // DOM의 모든 form-associated control이 Express body parser에 전달된다.
+  // 설정 저장은 비동기 요청으로 처리하고 성공·실패를 viewport 토스트로 표시한다.
   forms.forEach((form) => {
     ensureToggleFallbacks(form);
     if (form.dataset.confirmReset === "true") {
@@ -240,7 +239,21 @@ function setupForms() {
           event.preventDefault();
         }
       });
+      return;
     }
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const buttons = [...form.querySelectorAll("button, input[type=submit]")];
+      buttons.forEach((button) => { button.disabled = true; });
+      try {
+        const payload = await submitForm(form, event.submitter);
+        window.showSiteToast?.(payload.message || "저장되었습니다.", "success");
+      } catch (error) {
+        window.showSiteToast?.(error?.message || "저장에 실패했습니다.", "error");
+      } finally {
+        buttons.forEach((button) => { button.disabled = false; });
+      }
+    });
   });
 }
 
