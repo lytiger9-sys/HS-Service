@@ -66,9 +66,16 @@
         body: data
       });
       const contentType = response.headers.get("content-type") || "";
-      const payload = contentType.includes("application/json") ? await response.json().catch(() => null) : null;
+      let payload = null;
+      let responseText = "";
+      if (contentType.includes("application/json")) {
+        payload = await response.json().catch(() => null);
+      } else {
+        responseText = await response.text().catch(() => "");
+      }
       if (!response.ok || !payload?.ok) {
         const fallback = payload?.message
+          || responseText.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
           || (response.status === 401 ? "관리자 세션이 만료되었습니다. 다시 로그인해 주세요." : "저장 요청이 거부되었습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요.");
         throw new Error(`${fallback} (${response.status})`);
       }

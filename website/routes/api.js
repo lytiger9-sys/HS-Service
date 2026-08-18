@@ -283,10 +283,11 @@ export function createApiRouter(context) {
       if (guildId !== access.guild.id) {
         return res.status(403).send("접근할 수 없는 서버입니다.");
       }
-      const featureAccess = await requireFeature(context, guildId, featureForSection(section));
-      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
-
+            const featureAccess = await requireFeature(context, guildId, featureForSection(section));
+      // 점검 모드로 기능이 꺼져 있어도 관리자는 설정을 저장해 다시 켤 수 있어야 한다.
+      if (!featureAccess.allowed && featureAccess.reason !== "feature-ban") return res.status(403).send(featureAccess.message);
       const payload = sectionPayload(section, req.body);
+
       if (!payload) {
         return res.status(400).send("지원하지 않는 섹션입니다.");
       }
