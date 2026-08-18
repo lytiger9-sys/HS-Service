@@ -68,8 +68,9 @@
       const contentType = response.headers.get("content-type") || "";
       const payload = contentType.includes("application/json") ? await response.json().catch(() => null) : null;
       if (!response.ok || !payload?.ok) {
-        const fallback = payload?.message || (response.status >= 500 ? "요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요." : "요청을 처리하지 못했습니다.");
-        throw new Error(fallback);
+        const fallback = payload?.message
+          || (response.status === 401 ? "관리자 세션이 만료되었습니다. 다시 로그인해 주세요." : "저장 요청이 거부되었습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요.");
+        throw new Error(`${fallback} (${response.status})`);
       }
       if (form.dataset.toastForm === "true" && payload.featureBans) {
         Object.entries(payload.featureBans).forEach(([featureId, banned]) => {

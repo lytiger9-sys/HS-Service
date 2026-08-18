@@ -20,6 +20,9 @@ export function isLicenseAdmin(req) {
 
 export function requireLicenseAdmin(req, res, next) {
   if (isLicenseAdmin(req)) return next();
+  const isFetchRequest = String(req.get("X-Requested-With") || "").toLowerCase() === "fetch"
+    || String(req.get("Accept") || "").toLowerCase().includes("application/json");
+  if (isFetchRequest) return res.status(401).json({ ok: false, message: "라이선스 관리자 세션이 만료되었습니다. 다시 로그인해 주세요." });
   return res.redirect("/license/login");
 }
 
