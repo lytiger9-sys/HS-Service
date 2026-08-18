@@ -4,7 +4,8 @@ import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
 import { canUseFeature, featureDeniedMessage, planAllowsFeatureToggle } from "../../src/shared/planAccess.js";
 
 function readBoolean(value) {
-  return value === "on" || value === "true" || value === "1";
+  if (Array.isArray(value)) return value.some((entry) => readBoolean(entry));
+  return value === "on" || value === "true" || value === "1" || value === true;
 }
 
 function readNumber(value, fallback = 0, min = -Infinity, max = Infinity) {
