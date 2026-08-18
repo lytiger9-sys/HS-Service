@@ -8,12 +8,27 @@ export function createServerAuditLogService(context) {
   }
 
   async function handleGuildUpdate(oldGuild, newGuild) {
-    const brandingChanges = [];
-    if (oldGuild.icon !== newGuild.icon) brandingChanges.push("아이콘이 변경되었습니다.");
-    if (oldGuild.banner !== newGuild.banner) brandingChanges.push("배너가 변경되었습니다.");
-    if (oldGuild.name !== newGuild.name) await send(newGuild.id, "serverNameChange", "서버 이름 변경", `이름: ${oldGuild.name} → ${newGuild.name}`);
-    if (brandingChanges.length) await send(newGuild.id, "guildBrandingChange", "서버 브랜딩 변경", brandingChanges.join("\n"));
-    return Boolean(brandingChanges.length || oldGuild.name !== newGuild.name);
+    const changes = [];
+    if (oldGuild.name !== newGuild.name) changes.push(`이름: ${oldGuild.name} → ${newGuild.name}`);
+    if (oldGuild.icon !== newGuild.icon) changes.push("아이콘이 변경되었습니다.");
+    if (oldGuild.banner !== newGuild.banner) changes.push("배너가 변경되었습니다.");
+    if (!changes.length) return false;
+    await send(newGuild.id, "serverIdentityChange", "서버 정보 변경", changes.join("\n"));
+    return true;
+  }
+
+  async function handleMemberUpdate(oldMember, newMember) {
+    if (!newMember?.guild || !oldMember?.roles?.cache || !newMember?.roles?.cache) return false;
+    const added = [...newMember.roles.cache.values()].filter((role) => !oldMember.roles.cache.has(role.id) && role.id !== newMember.guild.id);
+    const removed = [...oldMember.roles.cache.values()].filter((role) => !newMember.roles.cache.has(role.id) && role.id !== newMember.guild.id);
+    if (!added.length && !removed.length) return false;
+    const lines = [];
+    if (added.length) lines.push(`지급: ${added.map((role) => `<@&${role.id}>`).join(", ")}`);
+    if (removed.length) lines.push(`회수: ${removed.map((role) => `<@&${role.id}>`).join(", ")}`);
+    await send(newMember.guild.id, "roleChange", "역할 변경", `${newMember} (${newMember.user.tag})\n${lines.join("\n")}`, [
+      { name: "사용자", value: `${newMember.user.tag} (${newMember.id})`, inline: false }
+    ]);
+    return true;
   }
 
   async function handleChannelCreate(channel) {
@@ -36,5 +51,5 @@ export function createServerAuditLogService(context) {
     return send(newChannel.guild.id, eventKey, newChannel.type === 4 ? "카테고리 수정" : "채널 수정", `${oldChannel.name} → ${newChannel.name}`);
   }
 
-  return { handleGuildUpdate, handleChannelCreate, handleChannelDelete, handleChannelUpdate };
+  return { handleGuildUpdate, handleMemberUpdate, handleChannelCreate, handleChannelDelete, handleChannelUpdate };
 }

@@ -46,9 +46,9 @@ export function createLogService(context, guildState) {
     const eventKey = key === "messageChange" ? "messageChangeEnabled"
       : key === "categoryChange" ? "categoryChangeEnabled"
       : key === "channelChange" ? "channelChangeEnabled"
-      : key === "guildBrandingChange" ? "guildBrandingChangeEnabled"
-      : key === "moderationAction" ? "moderationActionEnabled"
-      : key === "serverNameChange" ? "serverNameChangeEnabled" : null;
+      : ["guildBrandingChange", "serverNameChange", "serverIdentityChange"].includes(key) ? "serverIdentityChangeEnabled"
+      : key === "roleChange" ? "roleChangeEnabled"
+      : key === "moderationAction" ? "moderationActionEnabled" : null;
     if (eventKey && settings.logs?.[eventKey] === false) return null;
     return sendConfigured(guildId, settings.logs?.serverChannelId, payload);
   }

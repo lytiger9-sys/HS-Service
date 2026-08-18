@@ -13,11 +13,11 @@
     <form class="settings-form" id="logs-settings-form" method="post" action="/guild/<%= guild.id %>/settings/logs">
       <div class="form-grid">
         <label class="field full"><span>서버 로그 채널</span><select name="logServerChannelId"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.logs.serverChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
-        <label class="field toggle"><input type="checkbox" name="logServerNameChangeEnabled" <%= settings.logs.serverNameChangeEnabled !== false ? 'checked' : '' %> /><span>서버 이름 변경</span></label>
+        <label class="field toggle"><input type="checkbox" name="logServerIdentityChangeEnabled" <%= settings.logs.serverIdentityChangeEnabled !== false ? 'checked' : '' %> /><span>서버 이름·아이콘·배너 변경</span></label>
         <label class="field toggle"><input type="checkbox" name="logMessageChangeEnabled" <%= settings.logs.messageChangeEnabled !== false ? 'checked' : '' %> /><span>메시지 수정·삭제</span></label>
         <label class="field toggle"><input type="checkbox" name="logCategoryChangeEnabled" <%= settings.logs.categoryChangeEnabled !== false ? 'checked' : '' %> /><span>카테고리 추가·수정·삭제</span></label>
         <label class="field toggle"><input type="checkbox" name="logChannelChangeEnabled" <%= settings.logs.channelChangeEnabled !== false ? 'checked' : '' %> /><span>채널 추가·수정·삭제</span></label>
-        <label class="field toggle"><input type="checkbox" name="logGuildBrandingChangeEnabled" <%= settings.logs.guildBrandingChangeEnabled !== false ? 'checked' : '' %> /><span>서버 아이콘·배너 변경</span></label>
+        <label class="field toggle"><input type="checkbox" name="logRoleChangeEnabled" <%= settings.logs.roleChangeEnabled !== false ? 'checked' : '' %> /><span>역할 지급·회수</span></label>
         <label class="field toggle"><input type="checkbox" name="logModerationActionEnabled" <%= settings.logs.moderationActionEnabled !== false ? 'checked' : '' %> /><span>유저 타임아웃·서버 차단·제재 이유</span></label>
       </div>
       <button class="primary" type="submit">저장</button>

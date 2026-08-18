@@ -200,11 +200,11 @@ function sectionPayload(section, body) {
       logs: {
         enabled: readOptionalBoolean(body.logsEnabled),
         serverChannelId: readDiscordId(body.logServerChannelId),
-        serverNameChangeEnabled: readBoolean(body.logServerNameChangeEnabled),
+        serverIdentityChangeEnabled: readBoolean(body.logServerIdentityChangeEnabled),
         messageChangeEnabled: readBoolean(body.logMessageChangeEnabled),
         categoryChangeEnabled: readBoolean(body.logCategoryChangeEnabled),
         channelChangeEnabled: readBoolean(body.logChannelChangeEnabled),
-        guildBrandingChangeEnabled: readBoolean(body.logGuildBrandingChangeEnabled),
+        roleChangeEnabled: readBoolean(body.logRoleChangeEnabled),
         moderationActionEnabled: readBoolean(body.logModerationActionEnabled)
       }
     };

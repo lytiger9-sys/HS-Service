@@ -118,6 +118,15 @@ function normalizeGuildState(doc) {
   for (const [section, key] of booleanDefaults) {
     normalized.settings[section][key] = storedBoolean(normalized.settings[section][key], defaults.settings[section][key]);
   }
+  const storedLogs = data.settings?.logs || {};
+  normalized.settings.logs.serverIdentityChangeEnabled = storedBoolean(
+    storedLogs.serverIdentityChangeEnabled ?? (storedLogs.serverNameChangeEnabled !== false && storedLogs.guildBrandingChangeEnabled !== false),
+    defaults.settings.logs.serverIdentityChangeEnabled
+  );
+  normalized.settings.logs.roleChangeEnabled = storedBoolean(
+    storedLogs.roleChangeEnabled,
+    defaults.settings.logs.roleChangeEnabled
+  );
   normalized.settings.partner.banner.enabled = storedBoolean(
     normalized.settings.partner.banner.enabled,
     defaults.settings.partner.banner.enabled

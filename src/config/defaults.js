@@ -113,6 +113,8 @@ export function createDefaultGuildSettings() {
       categoryChangeEnabled: true,
       channelChangeEnabled: true,
       guildBrandingChangeEnabled: true,
+      serverIdentityChangeEnabled: true,
+      roleChangeEnabled: true,
       moderationActionEnabled: true
     },
     partner: {
