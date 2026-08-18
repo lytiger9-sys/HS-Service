@@ -2,13 +2,13 @@ import { ChannelType, PermissionFlagsBits } from "discord.js";
 
 const CATEGORY_NAME = "개요";
 const CHANNEL_DEFINITIONS = [
-  { key: "members", prefix: "인원수" },
-  { key: "bots", prefix: "봇 수" },
-  { key: "total", prefix: "전체 인원 수" }
+  { key: "members", prefix: "인원수", unit: "명" },
+  { key: "bots", prefix: "봇 수", unit: "개" },
+  { key: "total", prefix: "전체 인원 수", unit: "명" }
 ];
 
-function channelName(prefix, value) {
-  return `${prefix}: ${value}명`;
+function channelName(prefix, value, unit = "명") {
+  return `${prefix}: ${value}${unit}`;
 }
 
 function findManagedChannel(category, prefix) {
@@ -62,7 +62,7 @@ export function createOverviewChannelService(context) {
       let channel = findManagedChannel(category, definition.prefix);
       if (!channel) {
         channel = await guild.channels.create({
-          name: channelName(definition.prefix, counts[definition.key]),
+          name: channelName(definition.prefix, counts[definition.key], definition.unit),
           type: ChannelType.GuildVoice,
           parent: category.id,
           permissionOverwrites,
@@ -73,7 +73,7 @@ export function createOverviewChannelService(context) {
           await channel.setParent(category.id, { lockPermissions: false }).catch(() => null);
         }
         await channel.permissionOverwrites.set(permissionOverwrites, "개요 음성 채널 권한 동기화").catch(() => null);
-        const nextName = channelName(definition.prefix, counts[definition.key]);
+        const nextName = channelName(definition.prefix, counts[definition.key], definition.unit);
         if (channel.name !== nextName) {
           await channel.setName(nextName, "개요 실시간 통계 갱신").catch(() => null);
         }
