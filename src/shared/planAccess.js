@@ -33,9 +33,10 @@ export function interactionFeature(customId = "") {
   if (scope === "partner") return "partner";
   if (scope === "banner") return "banner";
   if (scope === "ticket") return "ticket";
-  if (scope === "poll") return "polls";
+  if (scope === "poll" || scope === "poll-free") return "polls";
   if (scope === "staff") return "administrators";
   if (scope === "shop") return "shop";
+  if (scope === "save-note") return "ticket";
   return null;
 }
 

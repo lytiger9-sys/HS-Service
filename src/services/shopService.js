@@ -170,7 +170,18 @@ export function createShopService(context) {
       state.shop.purchases = state.shop.purchases.slice(0, 500);
     });
     try { await user.send(`구매가 완료되었습니다.\n상품: ${product.name}\n\n${delivery || "상품 지급 내용이 없습니다."}`); }
-    catch { await grant(guild.id, user.id, product.price, "DM 전송 실패 환불"); throw new Error("DM을 보낼 수 없어 구매 금액을 환불했습니다."); }
+    catch {
+      await patch(guild.id, (state) => {
+        state.shop = normalizeShop(state.shop);
+        const current = state.shop.products.find((entry) => entry.id === productId);
+        if (current) {
+          current.stock = [delivery, ...stockLines(current)];
+          current.delivery = current.stock.join("\n");
+        }
+      });
+      await grant(guild.id, user.id, product.price, "DM 전송 실패 환불");
+      throw new Error("DM을 보낼 수 없어 구매 금액과 재고를 환불했습니다.");
+    }
     return { product, balance };
   }
   return { getShop, updateSettings, awardAttendance, recordMessage, getBalance, grant, gamble, saveProducts, publish, productMenu, purchase };

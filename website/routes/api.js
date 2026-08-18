@@ -488,6 +488,7 @@ export function createApiRouter(context) {
         await context.services.polls.publishPoll(guildId, poll.id, poll.channelId);
       }
 
+      if (wantsJson(req)) return res.json({ ok: true, section: "polls", message: "투표를 게시했습니다." });
       return res.redirect("/?section=polls&saved=1");
     } catch (error) {
       next(error);

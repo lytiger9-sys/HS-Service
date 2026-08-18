@@ -235,7 +235,7 @@ export function createPartnerService(context) {
     });
     if (rejected) {
       const guild = await context.client.guilds.fetch(guildId).catch(() => null);
-      const approvalChannel = await guild?.channels.fetch(current.settings.partner.approvalChannelId).catch(() => null);
+      const approvalChannel = await guild?.channels.fetch(state(guildId).settings?.partner?.approvalChannelId).catch(() => null);
       const approvalMessage = rejected.approvalMessageId ? await approvalChannel?.messages.fetch(rejected.approvalMessageId).catch(() => null) : null;
       await approvalMessage?.edit({ embeds: [applicationEmbed(rejected).setTitle("파트너 신청 거절")], components: [] }).catch(() => null);
       const user = await context.client.users.fetch(rejected.requesterId).catch(() => null);

@@ -165,9 +165,11 @@ function injectFeatureToggles() {
   });
 }
 
-async function submitForm(form) {
-  const response = await fetch(form.action, {
-    method: (form.method || "post").toUpperCase(),
+async function submitForm(form, submitter = null) {
+  const action = submitter?.formAction || form.action;
+  const method = (submitter?.formMethod || form.method || "post").toUpperCase();
+  const response = await fetch(action, {
+    method,
     headers: {
       "X-Requested-With": "fetch",
       Accept: "application/json"
@@ -194,7 +196,7 @@ function setupForms() {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const submitButton = form.querySelector("button[type='submit']");
+      const submitButton = event.submitter || form.querySelector("button[type='submit']");
       const initialLabel = submitButton?.textContent || "";
 
       try {
@@ -207,7 +209,7 @@ function setupForms() {
           return;
         }
 
-        const payload = await submitForm(form);
+        const payload = await submitForm(form, event.submitter);
         showToast(payload.message || "저장되었습니다.");
         if (payload.section) {
           activateTab(payload.section, { scroll: false });
