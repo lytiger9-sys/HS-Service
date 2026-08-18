@@ -156,7 +156,7 @@ export function createDefaultGuildState() {
     tempChannels: {},
     partners: [],
     bannerSlots: [],
-    expressions: { emojis: [] },
+    expressions: { emojis: [], sounds: [] },
     shop: {
       enabled: true,
       messageChannelId: "",

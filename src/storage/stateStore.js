@@ -50,7 +50,8 @@ function normalizeGuildState(doc) {
     expressions: {
       ...defaults.expressions,
       ...(data.expressions || {}),
-      emojis: Array.isArray(data.expressions?.emojis) ? data.expressions.emojis : []
+      emojis: Array.isArray(data.expressions?.emojis) ? data.expressions.emojis : [],
+      sounds: Array.isArray(data.expressions?.sounds) ? data.expressions.sounds : []
     },
     shop: {
       ...defaults.shop,
