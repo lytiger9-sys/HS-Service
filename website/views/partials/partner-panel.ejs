@@ -41,6 +41,9 @@
       <label class="field"><span>배너 색상</span><input type="color" form="partner-settings-form" name="bannerEmbedColor" value="<%= settings.partner.banner.embedColor %>" /></label>
       <label class="field"><span>배너 버튼 이름</span><input form="partner-settings-form" name="bannerButtonLabel" value="<%= settings.partner.banner.buttonLabel %>" /></label>
     </div>
+    <div class="form-actions">
+      <button class="primary" type="submit" form="partner-settings-form">상단배너 설정 저장</button>
+    </div>
     <% if (bannerError) { %><p class="notice danger"><%= bannerError %></p><% } %>
     <% if (issuedBannerKey) { %><p class="notice success"><strong>배너 라이선스가 발급되었습니다.</strong><br /><code><%= issuedBannerKey %></code><br /><span class="muted">이 키를 배너를 받을 서버 관리자에게 전달하세요. 키는 지금만 확인할 수 있습니다.</span></p><% } %>
     <form class="settings-form banner-license-issue-form" method="post" action="/guild/<%= guild.id %>/partner/banner-license">
