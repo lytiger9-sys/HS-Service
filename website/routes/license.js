@@ -9,6 +9,16 @@ import {
 } from "../lib/licenseAuth.js";
 import { PLAN_TAB_LABELS } from "../../src/config/plans.js";
 
+function toBoolean(value, fallback = false) {
+  if (Array.isArray(value)) return value.some((entry) => toBoolean(entry, false));
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (["true", "1", "on", "yes", "enabled"].includes(normalized)) return true;
+  if (["false", "0", "off", "no", "disabled", ""].includes(normalized)) return false;
+  return fallback;
+}
+
 function wantsJson(req) {
   const requestedWith = String(req.get("X-Requested-With") || "").toLowerCase();
   const accept = String(req.get("Accept") || "").toLowerCase();
@@ -59,7 +69,7 @@ export function createLicenseRouter(context) {
     try {
       const licenses = await context.services.licenses.list();
       const control = await context.services.adminControl.get();
-      const featureControls = Object.entries(PLAN_TAB_LABELS).filter(([id]) => id !== "overview").map(([id, label]) => ({ id, label, banned: Boolean(control.featureBans?.[id]) }));
+      const featureControls = Object.entries(PLAN_TAB_LABELS).filter(([id]) => id !== "overview").map(([id, label]) => ({ id, label, banned: toBoolean(control.featureBans?.[id]) }));
       return res.render("license-dashboard", {
         title: "라이선스 관리",
         botName: context.config.botName,
@@ -94,8 +104,8 @@ export function createLicenseRouter(context) {
 
   router.post("/feature-control", async (req, res, next) => {
     try {
-      const featureBans = Object.fromEntries(Object.keys(PLAN_TAB_LABELS).filter((id) => id !== "overview").map((id) => [id, String(req.body[`feature_${id}`] || "") !== "on"]));
-      const saved = await context.services.adminControl.update({ featureBans, otherCommandsEnabled: String(req.body.otherCommandsEnabled || "") === "on" });
+      const featureBans = Object.fromEntries(Object.keys(PLAN_TAB_LABELS).filter((id) => id !== "overview").map((id) => [id, !toBoolean(req.body[`feature_${id}`])]));
+      const saved = await context.services.adminControl.update({ featureBans, otherCommandsEnabled: toBoolean(req.body.otherCommandsEnabled) });
       const message = "점검 모드 설정이 저장되었습니다.";
       return wantsJson(req) ? res.json({ ok: true, message, featureBans: saved.featureBans, otherCommandsEnabled: saved.otherCommandsEnabled }) : res.redirect("/license/dashboard");
     } catch (error) {

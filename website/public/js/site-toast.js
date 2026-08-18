@@ -30,6 +30,15 @@
     return !/\/license\/(login|logout)(?:[/?#]|$)/.test(action);
   }
 
+  function booleanValue(value, fallback = false) {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value !== 0;
+    const normalized = String(value ?? "").trim().toLowerCase();
+    if (["true", "1", "on", "yes", "enabled"].includes(normalized)) return true;
+    if (["false", "0", "off", "no", "disabled", ""].includes(normalized)) return false;
+    return fallback;
+  }
+
   function csrfToken(form) {
     return form.querySelector('input[name="_csrf"]')?.value || document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith("csrf-token="))?.slice(11) || "";
   }
@@ -90,10 +99,10 @@
       if (form.dataset.toastForm === "true" && payload.featureBans) {
         Object.entries(payload.featureBans).forEach(([featureId, banned]) => {
           const input = form.querySelector(`input[name="feature_${featureId}"]`);
-          if (input) input.checked = !Boolean(banned);
+          if (input) input.checked = !booleanValue(banned);
         });
         const otherCommands = form.querySelector('input[name="otherCommandsEnabled"]');
-        if (otherCommands && typeof payload.otherCommandsEnabled === "boolean") otherCommands.checked = payload.otherCommandsEnabled;
+        if (otherCommands && payload.otherCommandsEnabled !== undefined) otherCommands.checked = booleanValue(payload.otherCommandsEnabled);
       }
       if (payload.partialUrl) {
         try {
