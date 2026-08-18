@@ -66,8 +66,10 @@
         data.set(input.name, input.checked ? "on" : "off");
       });
       if (submitter?.name && !data.has(submitter.name)) data.append(submitter.name, submitter.value || "");
-      const response = await fetch(form.action, {
-        method: "POST",
+      const action = submitter?.hasAttribute?.("formaction") ? submitter.formAction : form.action;
+      const method = submitter?.hasAttribute?.("formmethod") ? submitter.formMethod.toUpperCase() : (form.method || "POST").toUpperCase();
+      const response = await fetch(action, {
+        method,
         credentials: "same-origin",
         headers: { "X-Requested-With": "fetch", Accept: "application/json" },
         body: data
