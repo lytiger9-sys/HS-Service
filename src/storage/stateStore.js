@@ -39,7 +39,14 @@ function normalizeGuildState(doc) {
       ...(data.tempChannels || {})
     },
     partners: Array.isArray(data.partners) ? data.partners : [],
-    bannerSlots: Array.isArray(data.bannerSlots) ? data.bannerSlots : []
+    bannerSlots: Array.isArray(data.bannerSlots) ? data.bannerSlots : [],
+    shop: {
+      ...defaults.shop,
+      ...(data.shop || {}),
+      products: Array.isArray(data.shop?.products) ? data.shop.products : [],
+      wallets: data.shop?.wallets && typeof data.shop.wallets === "object" ? data.shop.wallets : {},
+      purchases: Array.isArray(data.shop?.purchases) ? data.shop.purchases : []
+    }
   };
 
   const logs = data.settings?.logs || {};

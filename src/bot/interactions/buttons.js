@@ -49,6 +49,15 @@ function buildPartnerApplicationModal() {
 export async function handleButtonInteraction(interaction, context) {
   const [scope, action, id, extra] = interaction.customId.split(":");
 
+  if (interaction.customId === "shop:products") {
+    return interaction.reply(await context.services.shop.productMenu(interaction.guildId));
+  }
+
+  if (interaction.customId === "shop:info") {
+    const balance = await context.services.shop.getBalance(interaction.guildId, interaction.user.id);
+    return interaction.reply({ content: `현재 보유 캐시: ${balance.toLocaleString()} 캐시`, ephemeral: true });
+  }
+
   if (interaction.customId === "partner:apply") {
     return interaction.showModal(buildPartnerApplicationModal());
   }

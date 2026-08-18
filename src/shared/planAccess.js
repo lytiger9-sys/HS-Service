@@ -35,6 +35,7 @@ export function interactionFeature(customId = "") {
   if (scope === "ticket") return "ticket";
   if (scope === "poll") return "polls";
   if (scope === "staff") return "administrators";
+  if (scope === "shop") return "shop";
   return null;
 }
 

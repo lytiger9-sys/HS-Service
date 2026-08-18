@@ -68,7 +68,8 @@ function buildSections() {
     { id: "polls", label: "투표", description: "버튼 투표" },
     { id: "logs", label: "로그", description: "채널 연결" },
     { id: "partner", label: "파트너", description: "제휴 신청 및 채널" },
-    { id: "nickname", label: "닉네임", description: "역할별 이름 규칙" }
+    { id: "nickname", label: "닉네임", description: "역할별 이름 규칙" },
+    { id: "shop", label: "상점", description: "캐시 및 상품" }
   ];
 }
 
@@ -89,13 +90,14 @@ function normalizeStaffSettings(settings = {}) {
 }
 
 export async function buildDashboardViewModel(context, guild, planId = "enterprise") {
-  const [overview, settings, notes, polls, tempChannels, stalePartners] = await Promise.all([
+  const [overview, settings, notes, polls, tempChannels, stalePartners, shop] = await Promise.all([
     context.services.serverInfo.getDashboardSnapshot(guild),
     context.services.settings.getSettings(guild.id),
     context.services.notes.listNotes(guild.id),
     context.services.polls.listPolls(guild.id),
     context.services.tempChannels.listTempChannels(guild.id),
-    context.services.partners.listStale(guild.id)
+    context.services.partners.listStale(guild.id),
+    context.services.shop.getShop(guild.id)
   ]);
 
   const administrators = (overview.administrators || []).filter((admin) => !admin.isBot);
@@ -131,6 +133,20 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
       enabled: true,
       rules: {},
       ...(settings.nickname || {})
+    },
+    shop: {
+      enabled: true,
+      messageChannelId: "",
+      messageId: "",
+      dailyReward: 100,
+      messageReward: 10,
+      messageThreshold: 20,
+      gamblingEnabled: true,
+      gamblingWinRate: 45,
+      gamblingMaxBet: 100000,
+      products: [],
+      ...(shop || {}),
+      products: Array.isArray(shop?.products) ? shop.products : []
     },
     embed: {
       enabled: true,
@@ -177,6 +193,7 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
     polls,
     tempChannels,
     stalePartners,
+    shop: normalizedSettings.shop,
     staffMembers,
     staffCounts,
     channels: groupedChannels,

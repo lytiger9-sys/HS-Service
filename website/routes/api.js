@@ -49,7 +49,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", nickname: "nickname", partner: "partner" };
+  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", nickname: "nickname", shop: "shop", partner: "partner" };
   return map[section] || null;
 }
 
@@ -209,6 +209,18 @@ function sectionPayload(section, body) {
     }
     return { nickname: { enabled: readBoolean(body.nicknameEnabled), rules } };
   }
+  if (section === "shop") {
+    return { shop: {
+      enabled: readBoolean(body.shopEnabled),
+      messageChannelId: readDiscordId(body.shopMessageChannelId),
+      dailyReward: readNumber(body.shopDailyReward, 100, 0, 1000000),
+      messageReward: readNumber(body.shopMessageReward, 10, 0, 1000000),
+      messageThreshold: readNumber(body.shopMessageThreshold, 20, 1, 100000),
+      gamblingEnabled: readBoolean(body.shopGamblingEnabled),
+      gamblingWinRate: readNumber(body.shopGamblingWinRate, 45, 1, 99),
+      gamblingMaxBet: readNumber(body.shopGamblingMaxBet, 100000, 1, 100000000)
+    } };
+  }
   if (section === "partner") {
     return {
       partner: {
@@ -312,6 +324,38 @@ export function createApiRouter(context) {
     } catch (error) {
       return res.status(400).json({ ok: false, message: error.message || "임베드 전송에 실패했습니다." });
     }
+  });
+
+  router.post("/:guildId/shop/products", async (req, res, next) => {
+    try {
+      const { guildId } = req.params;
+      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      if (!access.allowed) return res.status(403).send("서버 관리자만 상품을 관리할 수 있습니다.");
+      const featureAccess = await requireFeature(context, guildId, "shop");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
+      const ids = Array.isArray(req.body.productId) ? req.body.productId : [req.body.productId].filter(Boolean);
+      const names = Array.isArray(req.body.productName) ? req.body.productName : [req.body.productName].filter(Boolean);
+      const prices = Array.isArray(req.body.productPrice) ? req.body.productPrice : [req.body.productPrice].filter(Boolean);
+      const descriptions = Array.isArray(req.body.productDescription) ? req.body.productDescription : [req.body.productDescription].filter(Boolean);
+      const deliveries = Array.isArray(req.body.productDelivery) ? req.body.productDelivery : [req.body.productDelivery].filter(Boolean);
+      const enabledIds = new Set(Array.isArray(req.body.productEnabled) ? req.body.productEnabled : [req.body.productEnabled].filter(Boolean));
+      const products = names.map((name, index) => ({ id: ids[index] || "", name, price: prices[index], description: descriptions[index] || "", delivery: deliveries[index] || "", enabled: enabledIds.has(ids[index]) || !ids[index] }));
+      await context.services.shop.saveProducts(guildId, products);
+      return wantsJson(req) ? res.json({ ok: true }) : res.redirect("/?section=shop");
+    } catch (error) { next(error); }
+  });
+
+  router.post("/:guildId/shop/publish", async (req, res, next) => {
+    try {
+      const { guildId } = req.params;
+      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      if (!access.allowed) return res.status(403).send("서버 관리자만 상점을 게시할 수 있습니다.");
+      const featureAccess = await requireFeature(context, guildId, "shop");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
+      const settings = await context.services.settings.getSettings(guildId);
+      const sent = await context.services.shop.publish(access.guild, settings.shop?.messageChannelId);
+      return wantsJson(req) ? res.json({ ok: true, messageId: sent.id }) : res.redirect("/?section=shop");
+    } catch (error) { return res.status(400).send(error.message); }
   });
 
   router.post("/:guildId/reset", async (req, res, next) => {

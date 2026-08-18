@@ -6,6 +6,9 @@ export default async function handleMessageCreate(message, context) {
     return;
   }
 
+  const shopAccess = await canUseFeature(context, message.guild.id, "shop");
+  if (shopAccess.featureAllowed) await context.services.shop.recordMessage(message).catch(() => null);
+
   const partnerAccess = await canUseFeature(context, message.guild.id, "partner");
   if (!(await isAllowedGuild(context, message.guild.id))) {
     if (partnerAccess.featureAllowed && await context.services.partners.handleMessage(message)) return;

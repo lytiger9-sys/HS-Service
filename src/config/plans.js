@@ -44,7 +44,7 @@ export const PLAN_DEFINITIONS = [
     description: "전체 기능 및 확장 운영",
     order: 5,
     allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "events", "shop"],
+    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "shop", "events"],
     includesFutureFeatures: true
   }
 ];

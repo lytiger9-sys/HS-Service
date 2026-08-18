@@ -11,6 +11,7 @@ import honeypotkick from "./honeypotkick.js";
 import nickapply from "./nickapply.js";
 import nickrandom from "./nickrandom.js";
 import nickinit from "./nickinit.js";
+import shop, { attendanceCommand, balanceCommand, adminGrantCommand } from "./shop.js";
 
 export const commandList = [
   serverinfo,
@@ -25,7 +26,11 @@ export const commandList = [
   honeypotkick,
   nickapply,
   nickrandom,
-  nickinit
+  nickinit,
+  shop,
+  attendanceCommand,
+  balanceCommand,
+  adminGrantCommand
 ];
 
 export const commandMap = new Map(commandList.map((command) => [command.data.name, command]));

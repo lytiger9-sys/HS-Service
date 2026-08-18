@@ -14,7 +14,8 @@ const guildStateSchema = new Schema(
     polls: { type: Schema.Types.Mixed, default: () => ({}) },
     tempChannels: { type: Schema.Types.Mixed, default: () => ({}) },
     partners: { type: [Schema.Types.Mixed], default: () => [] },
-    bannerSlots: { type: [Schema.Types.Mixed], default: () => [] }
+    bannerSlots: { type: [Schema.Types.Mixed], default: () => [] },
+    shop: { type: Schema.Types.Mixed, default: () => createDefaultGuildState().shop }
   },
   {
     versionKey: false,

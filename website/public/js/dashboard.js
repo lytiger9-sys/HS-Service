@@ -482,6 +482,21 @@ function setupChannelComboboxes() {
     document.querySelectorAll(".channel-combobox-input").forEach((input) => input.setAttribute("aria-expanded", "false"));
   }, { passive: true });
 }
+function setupShopPanel() {
+  const list = document.querySelector("[data-shop-product-list]");
+  const add = document.querySelector("[data-shop-add-product]");
+  if (!list || !add) return;
+  const bindRemove = (row) => row.querySelector("[data-shop-remove-product]")?.addEventListener("click", () => row.remove());
+  list.querySelectorAll("[data-shop-product]").forEach(bindRemove);
+  add.addEventListener("click", () => {
+    const row = document.createElement("div");
+    row.className = "shop-product-row";
+    row.dataset.shopProduct = "";
+    row.innerHTML = `<input type="hidden" name="productId" value="" /><label class="field"><span>상품명</span><input name="productName" required /></label><label class="field"><span>가격</span><input type="number" min="0" name="productPrice" value="0" required /></label><label class="field full"><span>상품 설명</span><input name="productDescription" /></label><label class="field full"><span>구매 후 DM 내용</span><textarea name="productDelivery" rows="3" required></textarea></label><label class="field toggle"><input type="checkbox" name="productEnabled" value="" checked /><span>판매 중</span></label><button class="ghost danger" type="button" data-shop-remove-product>삭제</button>`;
+    list.append(row); bindRemove(row);
+  });
+}
+
 function setupTabs() {
   const activeFromDom = normalizeTab(document.querySelector(".sidebar-tab.is-active")?.dataset.tab || defaultTab);
   activateTab(activeFromDom);
@@ -522,6 +537,7 @@ function setupSearch() {
 }
 
 setupChannelComboboxes();
+setupShopPanel();
 setupTabs();
 setupSearch();
 setupEmbedPanel();

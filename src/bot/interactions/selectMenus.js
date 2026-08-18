@@ -1,6 +1,14 @@
 export async function handleSelectMenuInteraction(interaction, context) {
   const [scope, action] = interaction.customId.split(":");
 
+  if (scope === "shop" && action === "purchase") {
+    const productId = interaction.values?.[0];
+    if (!productId) return interaction.reply({ content: "상품을 선택해 주세요.", ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
+    const result = await context.services.shop.purchase(interaction.guild, interaction.user, productId);
+    return interaction.editReply({ content: `${result.product.name} 구매가 완료되었습니다. 남은 캐시: ${result.balance.toLocaleString()} 캐시` });
+  }
+
   if (scope !== "ticket" || action !== "select-category") {
     return false;
   }

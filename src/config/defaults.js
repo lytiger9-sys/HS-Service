@@ -146,6 +146,20 @@ export function createDefaultGuildState() {
     polls: {},
     tempChannels: {},
     partners: [],
-    bannerSlots: []
+    bannerSlots: [],
+    shop: {
+      enabled: true,
+      messageChannelId: "",
+      messageId: "",
+      dailyReward: 100,
+      messageReward: 10,
+      messageThreshold: 20,
+      gamblingEnabled: true,
+      gamblingWinRate: 45,
+      gamblingMaxBet: 100000,
+      products: [],
+      wallets: {},
+      purchases: []
+    }
   };
 }
