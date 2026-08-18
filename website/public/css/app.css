@@ -2627,3 +2627,42 @@ body.dashboard-page { background: var(--ink-deep); }
     padding-inline: 14px;
   }
 }
+
+/* Unified wide, slim action controls across dashboard and license pages */
+.dashboard-page .primary,
+.dashboard-page .ghost,
+.license-page .primary,
+.license-page .ghost,
+.license-auth-page .primary,
+.license-auth-page .ghost {
+  min-width: 148px;
+  min-height: 42px;
+  padding: 9px 28px;
+  border-radius: 9px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.dashboard-page .component-tool-list .ghost {
+  min-width: 148px;
+}
+.license-issue-grid .license-card > .eyebrow {
+  margin-bottom: 6px;
+}
+.license-issue-grid .license-card > h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+.license-issue-grid .license-form > .primary {
+  margin-top: 4px;
+}
+@media (max-width: 560px) {
+  .dashboard-page .primary,
+  .dashboard-page .ghost,
+  .license-page .primary,
+  .license-page .ghost,
+  .license-auth-page .primary,
+  .license-auth-page .ghost {
+    min-width: 132px;
+    padding-inline: 20px;
+  }
+}
