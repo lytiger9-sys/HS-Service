@@ -11,7 +11,8 @@ export function createCloneService() {
     const clone = await guild.channels.create({
       name: `${source.name} 복제`,
       type: ChannelType.GuildCategory,
-      position: source.rawPosition + 1,
+      // Discord의 create position은 삽입 과정에서 한 칸 밀리므로 기준 위치를 그대로 사용해야 바로 아래에 놓입니다.
+      position: source.rawPosition,
       permissionOverwrites: overwrite(source)
     });
     const children = [...source.children.cache.values()].sort((a, b) => a.rawPosition - b.rawPosition);
