@@ -1928,6 +1928,8 @@ a {
 .activation-heading h1 { margin-bottom: 0; }
 .activation-mark { display: grid; place-items: center; width: 52px; height: 52px; flex: 0 0 52px; overflow: hidden; border-radius: 14px; background: #1d3445; box-shadow: 0 8px 18px rgba(29, 52, 69, .18); }
 .activation-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.welcome-variable-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.welcome-variable-buttons .variable-button { padding: 5px 9px; font-family: var(--mono); font-size: .68rem; line-height: 1; }
 .activation-submit { width: 100%; display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 12px 16px 12px 20px; font-weight: 700; }
 .activation-submit span:last-child { font-size: 1.35rem; transition: transform .3s var(--ease); }
 .activation-submit:hover span:last-child { transform: translateX(4px); }

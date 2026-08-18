@@ -113,10 +113,12 @@
               <label class="field">
                 <span>채널 임베드 제목</span>
                 <input type="text" name="welcomeEmbedTitle" value="<%= settings.welcome.embedTitle %>" data-welcome-preview="title" />
+                <div class="welcome-variable-buttons" data-variable-target="welcomeEmbedTitle"><button type="button" class="ghost variable-button" data-variable="{user}">유저</button><button type="button" class="ghost variable-button" data-variable="{guild}">길드</button><button type="button" class="ghost variable-button" data-variable="{totalmember}">총멤버</button></div>
               </label>
               <label class="field full">
                 <span>채널 임베드 내용</span>
                 <textarea name="welcomeEmbedDescription" rows="4" data-welcome-preview="description"><%= settings.welcome.embedDescription %></textarea>
+                <div class="welcome-variable-buttons" data-variable-target="welcomeEmbedDescription"><button type="button" class="ghost variable-button" data-variable="{user}">유저</button><button type="button" class="ghost variable-button" data-variable="{guild}">길드</button><button type="button" class="ghost variable-button" data-variable="{totalmember}">총멤버</button></div>
               </label>
               <label class="field">
                 <span>채널 임베드 색상</span>
@@ -125,10 +127,12 @@
               <label class="field">
                 <span>DM 제목</span>
                 <input type="text" name="welcomeDmTitle" value="<%= settings.welcome.dmTitle %>" data-welcome-preview="dmTitle" />
+                <div class="welcome-variable-buttons" data-variable-target="welcomeDmTitle"><button type="button" class="ghost variable-button" data-variable="{user}">유저</button><button type="button" class="ghost variable-button" data-variable="{guild}">길드</button><button type="button" class="ghost variable-button" data-variable="{totalmember}">총멤버</button></div>
               </label>
               <label class="field full">
                 <span>DM 내용</span>
                 <textarea name="welcomeDmMessage" rows="4" data-welcome-preview="dmMessage"><%= settings.welcome.dmMessage %></textarea>
+                <div class="welcome-variable-buttons" data-variable-target="welcomeDmMessage"><button type="button" class="ghost variable-button" data-variable="{user}">유저</button><button type="button" class="ghost variable-button" data-variable="{guild}">길드</button><button type="button" class="ghost variable-button" data-variable="{totalmember}">총멤버</button></div>
               </label>
               <label class="field">
                 <span>DM 색상</span>

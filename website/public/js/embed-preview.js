@@ -2,6 +2,25 @@ function text(value, fallback = "") {
   return value == null || value === "" ? fallback : String(value);
 }
 
+function setupWelcomeVariables() {
+  document.querySelectorAll("[data-variable-target]").forEach((group) => {
+    const target = document.querySelector(`[name="${group.dataset.variableTarget}"]`);
+    if (!target) return;
+    group.querySelectorAll("[data-variable]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.dataset.variable || "";
+        const start = typeof target.selectionStart === "number" ? target.selectionStart : target.value.length;
+        const end = typeof target.selectionEnd === "number" ? target.selectionEnd : start;
+        target.value = `${target.value.slice(0, start)}${value}${target.value.slice(end)}`;
+        target.focus();
+        const cursor = start + value.length;
+        target.setSelectionRange?.(cursor, cursor);
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+    });
+  });
+}
+
 function setupWelcomePreview() {
   const titleInput = document.querySelector('[data-welcome-preview="title"]');
   const descriptionInput = document.querySelector('[data-welcome-preview="description"]');
@@ -114,6 +133,7 @@ function setupStaffPreview() {
   render();
 }
 
+setupWelcomeVariables();
 setupWelcomePreview();
 setupPollPreview();
 setupStaffPreview();
