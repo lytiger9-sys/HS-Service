@@ -2900,3 +2900,14 @@ body.dashboard-page { background: var(--ink-deep); }
   background: #ffffff;
   box-shadow: 0 5px 16px rgba(17, 19, 22, .045);
 }
+
+/* Remove the legacy connected grid outline from overview metrics */
+.dashboard-page section.hero.card .hero-grid {
+  border: 0;
+  gap: 10px;
+}
+.dashboard-page section.hero.card .hero-grid .metric {
+  border: 0;
+  background: #ffffff;
+  box-shadow: 0 5px 16px rgba(17, 19, 22, .045);
+}
