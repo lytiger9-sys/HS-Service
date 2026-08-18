@@ -39,6 +39,17 @@ function refreshExpiredStatus(license) {
 
 export function createLicenseService() {
   return {
+    async countSupportedGuilds(guildIds = []) {
+      const ids = [...new Set(guildIds.map((id) => String(id)).filter(Boolean))];
+      if (!ids.length) return 0;
+      const assignedGuildIds = await LicenseModel.distinct("assignedGuildId", {
+        kind: "service",
+        status: "active",
+        assignedGuildId: { $in: ids }
+      });
+      return assignedGuildIds.length;
+    },
+
     async list() {
       const licenses = await LicenseModel.find({}).sort({ createdAt: -1 }).lean();
       const expiredIds = licenses
@@ -141,8 +152,9 @@ export function createLicenseService() {
       const now = new Date();
       license.status = "active";
       license.assignedGuildId = String(guildId);
-      license.activatedAt = now;
-      license.expiresAt = new Date(now.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
+      // 최초 웹 등록 시점에만 타이머를 시작하며, 재조회·재로그인으로 연장하지 않습니다.
+      license.activatedAt = license.activatedAt || now;
+      license.expiresAt = license.expiresAt || new Date(license.activatedAt.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
       await license.save();
       return license.toObject();
     },

@@ -96,6 +96,7 @@ export function createIndexRouter(context) {
       }
       req.session.activeLicenseId = String(license._id);
       req.session.activeGuildId = guildId;
+      await Promise.resolve(context.updatePresence?.()).catch(() => null);
       return res.redirect("/");
     } catch (error) {
       return next(error);

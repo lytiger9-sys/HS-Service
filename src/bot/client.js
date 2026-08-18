@@ -36,21 +36,26 @@ export async function createBot(context) {
   context.commands = commandMap;
   context.client = client;
 
+  const runAllowedGuildEvent = async (guildId, handler) => {
+    if (!(await isAllowedGuild(context, guildId))) return;
+    await handler();
+  };
+
   client.once("ready", () => void handleReady(client, context).catch((error) => console.error("[bot] ready error:", error)));
   client.on("guildCreate", (guild) => void handleGuildCreate(guild, context).catch((error) => console.error("[bot] guildCreate error:", error)));
-  client.on("guildMemberAdd", (member) => void handleGuildMemberAdd(member, context).catch((error) => console.error("[bot] guildMemberAdd error:", error)));
-  client.on("guildMemberRemove", (member) => void handleGuildMemberRemove(member, context).catch((error) => console.error("[bot] guildMemberRemove error:", error)));
-  client.on("guildMemberUpdate", (oldMember, newMember) => void handleGuildMemberUpdate(oldMember, newMember, context).catch((error) => console.error("[bot] guildMemberUpdate error:", error)));
-  client.on("channelDelete", (channel) => void handleChannelDelete(channel, context).catch((error) => console.error("[bot] channelDelete error:", error)));
-  client.on("guildUpdate", (oldGuild, newGuild) => void context.services.serverAuditLogs.handleGuildUpdate(oldGuild, newGuild).catch((error) => console.error("[audit] guildUpdate error:", error)));
-  client.on("channelCreate", (channel) => void context.services.serverAuditLogs.handleChannelCreate(channel).catch((error) => console.error("[audit] channelCreate error:", error)));
-  client.on("channelUpdate", (oldChannel, newChannel) => void context.services.serverAuditLogs.handleChannelUpdate(oldChannel, newChannel).catch((error) => console.error("[audit] channelUpdate error:", error)));
-  client.on("messageCreate", (message) => void handleMessageCreate(message, context).catch((error) => console.error("[bot] messageCreate error:", error)));
-  client.on("messageUpdate", (oldMessage, newMessage) => void handleMessageUpdate(oldMessage, newMessage, context).catch((error) => console.error("[bot] messageUpdate error:", error)));
-  client.on("messageDelete", (message) => void handleMessageDelete(message, context).catch((error) => console.error("[bot] messageDelete error:", error)));
-  client.on("messageDeleteBulk", (messages, channel) => void handleMessageDeleteBulk(messages, channel, context).catch((error) => console.error("[bot] messageDeleteBulk error:", error)));
+  client.on("guildMemberAdd", (member) => void runAllowedGuildEvent(member.guild?.id, () => handleGuildMemberAdd(member, context)).catch((error) => console.error("[bot] guildMemberAdd error:", error)));
+  client.on("guildMemberRemove", (member) => void runAllowedGuildEvent(member.guild?.id, () => handleGuildMemberRemove(member, context)).catch((error) => console.error("[bot] guildMemberRemove error:", error)));
+  client.on("guildMemberUpdate", (oldMember, newMember) => void runAllowedGuildEvent(newMember.guild?.id || oldMember.guild?.id, () => handleGuildMemberUpdate(oldMember, newMember, context)).catch((error) => console.error("[bot] guildMemberUpdate error:", error)));
+  client.on("channelDelete", (channel) => void runAllowedGuildEvent(channel.guild?.id, () => handleChannelDelete(channel, context)).catch((error) => console.error("[bot] channelDelete error:", error)));
+  client.on("guildUpdate", (oldGuild, newGuild) => void runAllowedGuildEvent(newGuild.id, () => context.services.serverAuditLogs.handleGuildUpdate(oldGuild, newGuild)).catch((error) => console.error("[audit] guildUpdate error:", error)));
+  client.on("channelCreate", (channel) => void runAllowedGuildEvent(channel.guild?.id, () => context.services.serverAuditLogs.handleChannelCreate(channel)).catch((error) => console.error("[audit] channelCreate error:", error)));
+  client.on("channelUpdate", (oldChannel, newChannel) => void runAllowedGuildEvent(newChannel.guild?.id || oldChannel.guild?.id, () => context.services.serverAuditLogs.handleChannelUpdate(oldChannel, newChannel)).catch((error) => console.error("[audit] channelUpdate error:", error)));
+  client.on("messageCreate", (message) => void runAllowedGuildEvent(message.guild?.id, () => handleMessageCreate(message, context)).catch((error) => console.error("[bot] messageCreate error:", error)));
+  client.on("messageUpdate", (oldMessage, newMessage) => void runAllowedGuildEvent(newMessage.guild?.id || oldMessage.guild?.id, () => handleMessageUpdate(oldMessage, newMessage, context)).catch((error) => console.error("[bot] messageUpdate error:", error)));
+  client.on("messageDelete", (message) => void runAllowedGuildEvent(message.guild?.id, () => handleMessageDelete(message, context)).catch((error) => console.error("[bot] messageDelete error:", error)));
+  client.on("messageDeleteBulk", (messages, channel) => void runAllowedGuildEvent(channel.guild?.id, () => handleMessageDeleteBulk(messages, channel, context)).catch((error) => console.error("[bot] messageDeleteBulk error:", error)));
   client.on("interactionCreate", (interaction) => void handleInteractionCreate(interaction, context).catch((error) => console.error("[bot] interactionCreate error:", error)));
-  client.on("voiceStateUpdate", (oldState, newState) => void handleVoiceStateUpdate(oldState, newState, context).catch((error) => console.error("[bot] voiceStateUpdate error:", error)));
+  client.on("voiceStateUpdate", (oldState, newState) => void runAllowedGuildEvent(newState.guild?.id || oldState.guild?.id, () => handleVoiceStateUpdate(oldState, newState, context)).catch((error) => console.error("[bot] voiceStateUpdate error:", error)));
 
   client.on("guildDelete", async (guild) => {
     if (!(await isAllowedGuild(context, guild.id))) {

@@ -1,8 +1,21 @@
+import { ActivityType } from "discord.js";
 import { commandList } from "../commands/index.js";
 import { isAllowedGuild, scheduleGuildValidation } from "../../shared/guards.js";
 
 export default async function handleReady(client, context) {
   console.log(`[bot] logged in as ${client.user.tag}`);
+
+  const updatePresence = async () => {
+    const supportedGuilds = await context.services.licenses.countSupportedGuilds(client.guilds.cache.keys());
+    client.user.setPresence({
+      activities: [{ name: `Supporting ${supportedGuilds} servers`, type: ActivityType.Watching }],
+      status: "online"
+    });
+  };
+  context.updatePresence = updatePresence;
+  await updatePresence().catch((error) => console.error("[bot] presence update failed:", error));
+  const presenceTimer = setInterval(() => void updatePresence().catch((error) => console.error("[bot] presence update failed:", error)), 5 * 60 * 1000);
+  presenceTimer.unref?.();
 
   for (const guild of client.guilds.cache.values()) {
     if (!(await isAllowedGuild(context, guild.id))) {
