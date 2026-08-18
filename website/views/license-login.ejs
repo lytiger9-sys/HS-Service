@@ -12,7 +12,6 @@
         <p class="notice danger"><%= message %></p>
       <% } %>
       <form method="post" action="/license/login" class="license-form">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <label class="field">
           <span>관리자 아이디</span>
           <input type="text" name="licenseAdminId" autocomplete="username" required />

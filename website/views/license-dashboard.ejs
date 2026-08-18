@@ -8,7 +8,6 @@
             <h1>라이선스 관리</h1>
           </div>
           <form method="post" action="/license/logout" class="license-inline-form">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <button class="ghost license-login-button" type="submit"><span>로그아웃</span></button>
           </form>
         </div>
@@ -30,7 +29,6 @@
           <p class="eyebrow">New License</p>
           <h2>라이선스 발급</h2>
           <form method="post" action="/license/issue" class="license-form">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <label class="field">
               <span>플랜</span>
               <select name="plan">
@@ -62,7 +60,6 @@
           </div>
         </div>
         <form method="post" action="/license/feature-control" class="license-form feature-control-form" data-toast-form="true">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <p class="muted">토글을 끄면 해당 탭의 기능과 연결된 명령어·버튼이 서버 전체에서 일시 중지됩니다.</p>
           <div class="license-feature-grid">
             <% featureControls.forEach((feature) => { %>
@@ -99,11 +96,9 @@
                   <td><%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-' %></td>
                   <td>
                     <% if (license.status === 'active') { %>
-                      <form method="post" action="/license/<%= license._id %>/work-stop"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><input type="hidden" name="stopped" value="<%= license.workStopped ? 'false' : 'true' %>" /><button class="ghost <%= license.workStopped ? '' : 'danger' %>" type="submit"><%= license.workStopped ? '작업재개' : '작업중지' %></button></form>
                     <% } %>
                     <% if (license.status === 'available' || license.status === 'active') { %>
                       <form method="post" action="/license/<%= license._id %>/revoke">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                         <button class="ghost danger" type="submit">폐기</button>
                       </form>
                     <% } else { %>-<% } %>

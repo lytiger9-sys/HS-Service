@@ -6,7 +6,7 @@ import { createAuthRouter } from "./routes/auth.js";
 import { createIndexRouter } from "./routes/index.js";
 import { createApiRouter } from "./routes/api.js";
 import { createLicenseRouter } from "./routes/license.js";
-import { applySecurityHeaders, csrfProtection, ensureCsrfToken, requestRateLimit } from "./lib/security.js";
+import { applySecurityHeaders, requestRateLimit } from "./lib/security.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,7 +39,6 @@ export async function startWebsite(context) {
   });
 
   configureWebAuth(app, context);
-  app.use(ensureCsrfToken);
   app.use(requestRateLimit);
 
   app.use((req, res, next) => {
@@ -52,9 +51,9 @@ export async function startWebsite(context) {
   app.locals.botName = context.config.botName;
 
   app.use("/auth", createAuthRouter(context));
-  app.use("/", csrfProtection, createIndexRouter(context));
-  app.use("/guild", csrfProtection, createApiRouter(context));
-  app.use("/license", csrfProtection, createLicenseRouter(context));
+  app.use("/", createIndexRouter(context));
+  app.use("/guild", createApiRouter(context));
+  app.use("/license", createLicenseRouter(context));
 
   app.use((error, req, res, _next) => {
     console.error("[web] error:", error);

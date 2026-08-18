@@ -166,24 +166,17 @@ function injectFeatureToggles() {
   });
 }
 
-function readCookie(name) {
-  const entry = document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
-  return entry ? decodeURIComponent(entry.slice(name.length + 1)) : "";
-}
-
 async function submitForm(form, submitter = null) {
   const hasSubmitterAction = Boolean(submitter?.hasAttribute?.("formaction"));
   const hasSubmitterMethod = Boolean(submitter?.hasAttribute?.("formmethod"));
   const action = hasSubmitterAction ? submitter.formAction : form.action;
   const method = (hasSubmitterMethod ? submitter.formMethod : (form.method || "post")).toUpperCase();
-  const csrfToken = window.dashboardCsrfToken || readCookie("csrf-token");
   const response = await fetch(action, {
     method,
     credentials: "same-origin",
     headers: {
       "X-Requested-With": "fetch",
       Accept: "application/json",
-      ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {})
     },
     body: (() => {
       const data = new FormData();
@@ -196,7 +189,6 @@ async function submitForm(form, submitter = null) {
         if ((input.type === "checkbox" || input.type === "radio") && !input.checked) return;
         data.append(input.name, input.value ?? "");
       });
-      if (csrfToken) data.set("_csrf", csrfToken);
       const toggleInputs = new Set([
         ...Array.from(form.querySelectorAll('input[type="checkbox"][name$="Enabled"]')),
         ...(form.id ? Array.from(document.querySelectorAll(`input[form="${form.id}"][type="checkbox"][name$="Enabled"]`)) : [])

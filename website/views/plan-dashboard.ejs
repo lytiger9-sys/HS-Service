@@ -24,7 +24,6 @@
           <% }) %>
         </nav>
         <form method="post" action="/license/switch" class="license-form">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button class="ghost" type="submit">다른 라이선스 연결</button>
         </form>
         <a class="license-admin-login" href="/auth/discord">관리자 로그인</a>

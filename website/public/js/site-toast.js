@@ -30,19 +30,6 @@
     return !/\/license\/(login|logout)(?:[/?#]|$)/.test(action);
   }
 
-  function booleanValue(value, fallback = false) {
-    if (typeof value === "boolean") return value;
-    if (typeof value === "number") return value !== 0;
-    const normalized = String(value ?? "").trim().toLowerCase();
-    if (["true", "1", "on", "yes", "enabled"].includes(normalized)) return true;
-    if (["false", "0", "off", "no", "disabled", ""].includes(normalized)) return false;
-    return fallback;
-  }
-
-  function csrfToken(form) {
-    return form.querySelector('input[name="_csrf"]')?.value || document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith("csrf-token="))?.slice(11) || "";
-  }
-
   async function refreshPartial(url, targets = []) {
     const response = await fetch(url, { credentials: "same-origin", headers: { Accept: "text/html", "X-Requested-With": "fetch" } });
     if (!response.ok) throw new Error("최신 목록을 불러오지 못했습니다.");
@@ -70,39 +57,25 @@
     try {
       const data = new FormData(form);
       if (submitter?.name && !data.has(submitter.name)) data.append(submitter.name, submitter.value || "");
-      let token = csrfToken(form);
-      if (token && !data.has("_csrf")) data.set("_csrf", decodeURIComponent(token));
-      async function sendRequest() {
-        const response = await fetch(form.action, {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "X-Requested-With": "fetch", Accept: "application/json", ...(token ? { "X-CSRF-Token": decodeURIComponent(token) } : {}) },
-          body: data
-        });
-        const contentType = response.headers.get("content-type") || "";
-        const payload = contentType.includes("application/json") ? await response.json().catch(() => null) : null;
-        return { response, payload };
-      }
-
-      let { response, payload } = await sendRequest();
-      if (response.status === 403 && payload?.code === "csrf-expired" && payload.csrfToken) {
-        token = payload.csrfToken;
-        data.set("_csrf", token);
-        const hiddenToken = form.querySelector('input[name="_csrf"]');
-        if (hiddenToken) hiddenToken.value = token;
-        ({ response, payload } = await sendRequest());
-      }
+      const response = await fetch(form.action, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "X-Requested-With": "fetch", Accept: "application/json" },
+        body: data
+      });
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json") ? await response.json().catch(() => null) : null;
       if (!response.ok || !payload?.ok) {
-        const fallback = payload?.message || (response.status === 403 ? "보안 토큰이 만료되었습니다. 페이지를 새로고침한 뒤 다시 시도하세요." : response.status >= 500 ? "요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요." : "요청을 처리하지 못했습니다.");
+        const fallback = payload?.message || (response.status >= 500 ? "요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요." : "요청을 처리하지 못했습니다.");
         throw new Error(fallback);
       }
       if (form.dataset.toastForm === "true" && payload.featureBans) {
         Object.entries(payload.featureBans).forEach(([featureId, banned]) => {
           const input = form.querySelector(`input[name="feature_${featureId}"]`);
-          if (input) input.checked = !booleanValue(banned);
+          if (input) input.checked = ![true, 1, "true", "1", "on", "yes", "enabled"].includes(banned);
         });
         const otherCommands = form.querySelector('input[name="otherCommandsEnabled"]');
-        if (otherCommands && payload.otherCommandsEnabled !== undefined) otherCommands.checked = booleanValue(payload.otherCommandsEnabled);
+        if (otherCommands && payload.otherCommandsEnabled !== undefined) otherCommands.checked = [true, 1, "true", "1", "on", "yes", "enabled"].includes(payload.otherCommandsEnabled);
       }
       if (payload.partialUrl) {
         try {

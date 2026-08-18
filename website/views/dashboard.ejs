@@ -391,6 +391,5 @@
   <script>
     window.dashboardSettings = <%- JSON.stringify(settings) %>;
     window.dashboardPlan = <%- JSON.stringify({ id: planId, allowFeatureToggle }) %>;
-    window.dashboardCsrfToken = <%- JSON.stringify(csrfToken || '') %>;
   </script>
   <%- include('partials/footer') %>

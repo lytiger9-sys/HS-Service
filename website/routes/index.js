@@ -43,8 +43,7 @@ export function createIndexRouter(context) {
           if (req.query.partial === "partner") {
             return res.render("partials/partner-panel", {
               ...dashboardLocals,
-              panelClass: () => "panel-stack",
-              csrfToken: res.locals.csrfToken
+              panelClass: () => "panel-stack"
             });
           }
           return res.render("dashboard", dashboardLocals);

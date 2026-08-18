@@ -14,7 +14,6 @@
         <p class="license-notice license-notice-danger"><%= message %></p>
       <% } %>
       <form method="post" action="/activate" class="license-form">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <label>
           <span>Discord 서버 ID</span>
           <input type="text" name="guildId" inputmode="numeric" pattern="[0-9]{15,22}" placeholder="서버 설정 → 고급 → 개발자 모드에서 복사" required />
