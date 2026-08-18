@@ -42,6 +42,9 @@ export async function createBot(context) {
   client.on("guildMemberRemove", (member) => void handleGuildMemberRemove(member, context).catch((error) => console.error("[bot] guildMemberRemove error:", error)));
   client.on("guildMemberUpdate", (oldMember, newMember) => void handleGuildMemberUpdate(oldMember, newMember, context).catch((error) => console.error("[bot] guildMemberUpdate error:", error)));
   client.on("channelDelete", (channel) => void handleChannelDelete(channel, context).catch((error) => console.error("[bot] channelDelete error:", error)));
+  client.on("guildUpdate", (oldGuild, newGuild) => void context.services.serverAuditLogs.handleGuildUpdate(oldGuild, newGuild).catch((error) => console.error("[audit] guildUpdate error:", error)));
+  client.on("channelCreate", (channel) => void context.services.serverAuditLogs.handleChannelCreate(channel).catch((error) => console.error("[audit] channelCreate error:", error)));
+  client.on("channelUpdate", (oldChannel, newChannel) => void context.services.serverAuditLogs.handleChannelUpdate(oldChannel, newChannel).catch((error) => console.error("[audit] channelUpdate error:", error)));
   client.on("messageCreate", (message) => void handleMessageCreate(message, context).catch((error) => console.error("[bot] messageCreate error:", error)));
   client.on("messageUpdate", (oldMessage, newMessage) => void handleMessageUpdate(oldMessage, newMessage, context).catch((error) => console.error("[bot] messageUpdate error:", error)));
   client.on("messageDelete", (message) => void handleMessageDelete(message, context).catch((error) => console.error("[bot] messageDelete error:", error)));

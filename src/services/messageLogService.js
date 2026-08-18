@@ -77,8 +77,8 @@ async function resolveMessageSnapshot(message) {
 }
 
 export function createMessageLogService(context) {
-  async function sendServerLog(guildId, payload) {
-    return context.services.logs.sendLogByKey(guildId, "serverChannelId", payload);
+  async function sendServerLog(guildId, eventKey, payload) {
+    return context.services.logs.sendLogByKey(guildId, eventKey, payload);
   }
 
   async function handleMessageUpdate(oldMessage, newMessage) {
@@ -98,7 +98,7 @@ export function createMessageLogService(context) {
       return false;
     }
 
-    await sendServerLog(guildId, {
+    await sendServerLog(guildId, "messageChange", {
       embeds: [
         buildBaseEmbed({
           title: "메시지 수정",
@@ -131,7 +131,7 @@ export function createMessageLogService(context) {
       return false;
     }
 
-    await sendServerLog(guildId, {
+    await sendServerLog(guildId, "messageChange", {
       embeds: [
         buildBaseEmbed({
           title: "메시지 삭제",
@@ -168,7 +168,7 @@ export function createMessageLogService(context) {
       return `- ${author}: ${content}`;
     });
 
-    await sendServerLog(guildId, {
+    await sendServerLog(guildId, "messageChange", {
       embeds: [
         buildBaseEmbed({
           title: "메시지 일괄 삭제",

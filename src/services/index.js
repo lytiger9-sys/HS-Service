@@ -18,6 +18,7 @@ import { createOverviewChannelService } from "./overviewChannelService.js";
 import { createEmbedService } from "./embedService.js";
 import { applyAllNicknames, randomizeNicknames, applyNickname, getBotManagedRoles } from "./nicknameService.js";
 import { createShopService } from "./shopService.js";
+import { createServerAuditLogService } from "./serverAuditLogService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -42,6 +43,7 @@ export function createServices(context) {
     overviewChannels: createOverviewChannelService(context),
     embeds: createEmbedService(context),
     nicknames: { applyAllNicknames, randomizeNicknames, applyNickname, getBotManagedRoles },
-    shop: createShopService(context)
+    shop: createShopService(context),
+    serverAuditLogs: createServerAuditLogService(context)
   };
 }

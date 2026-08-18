@@ -23,7 +23,8 @@ export function createDefaultGuildSettings() {
     polls: {
       enabled: true,
       resultVisibility: "public",
-      expirationDays: 7
+      expirationDays: 7,
+      voteLogChannelId: ""
     },
     embed: {
       enabled: true,
@@ -74,7 +75,8 @@ export function createDefaultGuildSettings() {
       inviteTimeoutMinutes: 10,
       spamWindowSeconds: 12,
       spamRepeatThreshold: 3,
-      profanityWords: []
+      profanityWords: [],
+      securityLogChannelId: ""
     },
     assignment: {
       enabled: true,
@@ -102,11 +104,13 @@ export function createDefaultGuildSettings() {
     },
     logs: {
       enabled: true,
-      moderationChannelId: "",
-      securityChannelId: "",
       serverChannelId: "",
-      voteChannelId: "",
-      systemChannelId: ""
+      serverNameChangeEnabled: true,
+      messageChangeEnabled: true,
+      categoryChangeEnabled: true,
+      channelChangeEnabled: true,
+      guildBrandingChangeEnabled: true,
+      moderationActionEnabled: true
     },
     partner: {
       enabled: false,

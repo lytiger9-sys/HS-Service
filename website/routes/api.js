@@ -124,7 +124,8 @@ function sectionPayload(section, body) {
         inviteTimeoutMinutes: readNumber(body.inviteTimeoutMinutes, 10, 0, 10080),
         spamWindowSeconds: readNumber(body.spamWindowSeconds, 12, 1, 3600),
         spamRepeatThreshold: readNumber(body.spamRepeatThreshold, 3, 2, 100),
-        profanityWords: splitLines(body.profanityWords, 200, 80)
+        profanityWords: splitLines(body.profanityWords, 200, 80),
+        securityLogChannelId: readDiscordId(body.securityLogChannelId)
       }
     };
   }
@@ -189,20 +190,23 @@ function sectionPayload(section, body) {
       polls: {
         enabled: readOptionalBoolean(body.pollsEnabled),
         resultVisibility: body.pollResultVisibility === "private" ? "private" : "public",
-        expirationDays: readNumber(body.pollExpirationDays, 7, 1, 365)
+        expirationDays: readNumber(body.pollExpirationDays, 7, 1, 365),
+        voteLogChannelId: readDiscordId(body.pollVoteLogChannelId)
       }
     };
   }
 
-    if (section === "logs") {
+  if (section === "logs") {
     return {
       logs: {
         enabled: readOptionalBoolean(body.logsEnabled),
-        moderationChannelId: readDiscordId(body.logModerationChannelId),
-        securityChannelId: readDiscordId(body.logSecurityChannelId),
         serverChannelId: readDiscordId(body.logServerChannelId),
-        voteChannelId: readDiscordId(body.logVoteChannelId),
-        systemChannelId: readDiscordId(body.logSystemChannelId)
+        serverNameChangeEnabled: readBoolean(body.logServerNameChangeEnabled),
+        messageChangeEnabled: readBoolean(body.logMessageChangeEnabled),
+        categoryChangeEnabled: readBoolean(body.logCategoryChangeEnabled),
+        channelChangeEnabled: readBoolean(body.logChannelChangeEnabled),
+        guildBrandingChangeEnabled: readBoolean(body.logGuildBrandingChangeEnabled),
+        moderationActionEnabled: readBoolean(body.logModerationActionEnabled)
       }
     };
   }

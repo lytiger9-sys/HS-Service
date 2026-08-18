@@ -28,26 +28,29 @@ export function createLogService(context, guildState) {
 
   async function sendConfigured(guildId, channelId, payload) {
     const guild = await context.client.guilds.fetch(guildId).catch(() => null);
-    if (!guild) {
-      return null;
-    }
-
+    if (!guild) return null;
     const settings = await getSettings(guildId);
-    if (settings.logs?.enabled === false) {
-      return null;
-    }
-
+    if (settings.logs?.enabled === false) return null;
     const channel = await resolveTextChannel(guild, channelId);
     return send(channel, payload);
   }
 
   async function sendLogByKey(guildId, key, payload) {
     const settings = await getSettings(guildId);
-    if (settings.logs?.enabled === false) {
-      return null;
+    if (key === "voteChannelId") {
+      return sendConfigured(guildId, settings.polls?.voteLogChannelId, payload);
     }
-    const channelId = settings.logs?.[key];
-    return sendConfigured(guildId, channelId, payload);
+    if (key === "securityChannelId") {
+      return sendConfigured(guildId, settings.security?.securityLogChannelId, payload);
+    }
+    const eventKey = key === "messageChange" ? "messageChangeEnabled"
+      : key === "categoryChange" ? "categoryChangeEnabled"
+      : key === "channelChange" ? "channelChangeEnabled"
+      : key === "guildBrandingChange" ? "guildBrandingChangeEnabled"
+      : key === "moderationAction" ? "moderationActionEnabled"
+      : key === "serverNameChange" ? "serverNameChangeEnabled" : null;
+    if (eventKey && settings.logs?.[eventKey] === false) return null;
+    return sendConfigured(guildId, settings.logs?.serverChannelId, payload);
   }
 
   async function editLogByKey(guildId, key, messageId, payload) {
@@ -56,7 +59,10 @@ export function createLogService(context, guildState) {
     if (!guild) return null;
     const settings = await getSettings(guildId);
     if (settings.logs?.enabled === false) return null;
-    const channel = await resolveTextChannel(guild, settings.logs?.[key]);
+    const channelId = key === "voteChannelId" ? settings.polls?.voteLogChannelId
+      : key === "securityChannelId" ? settings.security?.securityLogChannelId
+      : settings.logs?.serverChannelId;
+    const channel = await resolveTextChannel(guild, channelId);
     if (!channel) return null;
     const message = await channel.messages.fetch(messageId).catch(() => null);
     return message?.edit(payload).catch(() => null) || null;
@@ -64,18 +70,14 @@ export function createLogService(context, guildState) {
 
   async function sendWelcomeError(guildId, payload) {
     const settings = await getSettings(guildId);
-    if (settings.logs?.enabled === false) {
-      return null;
-    }
-    return sendConfigured(guildId, settings.welcome.errorChannelId, payload);
+    if (settings.logs?.enabled === false) return null;
+    return sendConfigured(guildId, settings.logs?.serverChannelId, payload);
   }
 
   async function sendHoneypotLog(guildId, payload) {
     const settings = await getSettings(guildId);
-    if (settings.logs?.enabled === false) {
-      return null;
-    }
-    return sendConfigured(guildId, settings.honeypot.logChannelId, payload);
+    if (settings.logs?.enabled === false) return null;
+    return sendConfigured(guildId, settings.security?.securityLogChannelId, payload);
   }
 
   return {

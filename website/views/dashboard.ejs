@@ -185,6 +185,13 @@
 
           <form class="settings-form" id="security-settings-form" method="post" action="/guild/<%= guild.id %>/settings/security">
             <div class="form-grid">
+              <label class="field full">
+                <span>보안 로그 채널</span>
+                <select name="securityLogChannelId">
+                  <option value="">선택 안 함</option>
+                  <% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.security.securityLogChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %>
+                </select>
+              </label>
               <label class="field">
                 <span>전체 멘션 타임아웃(분)</span>
                 <input type="number" min="0" name="massMentionTimeoutMinutes" value="<%= settings.security.massMentionTimeoutMinutes %>" />
@@ -321,6 +328,13 @@
                   <% channels.text.forEach((channel) => { %>
                     <option value="<%= channel.id %>"><%= channel.label %></option>
                   <% }) %>
+                </select>
+              </label>
+              <label class="field">
+                <span>투표 로그 채널</span>
+                <select name="pollVoteLogChannelId">
+                  <option value="">선택 안 함</option>
+                  <% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.polls.voteLogChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %>
                 </select>
               </label>
               <label class="field">
