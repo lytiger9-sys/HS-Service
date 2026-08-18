@@ -2939,15 +2939,15 @@ input[type="reset"] {
   font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
 }
 
-/* Center the free-text poll toggle between the option and result sections. */
+/* Center the free-text poll toggle inside its existing left-column divider. */
 .dashboard-page .field.poll-free-toggle {
-  grid-column: 1 / -1;
+  grid-column: auto;
   display: flex !important;
   align-items: center;
   justify-content: center;
   gap: 12px;
   min-height: 52px;
-  margin: 2px 0;
+  margin: 0;
   padding: 14px 0;
   border-top: 1px solid var(--line-soft);
   border-bottom: 1px solid var(--line-soft);
@@ -2957,9 +2957,4 @@ input[type="reset"] {
 }
 .dashboard-page .field.poll-free-toggle > span {
   flex: 0 0 auto;
-}
-@media (max-width: 760px) {
-  .dashboard-page .field.poll-free-toggle {
-    grid-column: 1;
-  }
 }
