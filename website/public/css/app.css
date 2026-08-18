@@ -2922,3 +2922,19 @@ body.dashboard-page { background: var(--ink-deep); }
 .dashboard-page section.hero.card .hero-grid .metric {
   border: 0;
 }
+
+/* Unified UI typography: every actionable control and status indicator uses Pretendard. */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
+}
+
+.status-badge,
+.auth-badge,
+.poll-pill,
+.chip,
+.poll-action {
+  font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
+}
