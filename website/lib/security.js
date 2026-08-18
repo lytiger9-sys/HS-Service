@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 
 const CSRF_SESSION_KEY = "csrfToken";
+const CSRF_COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 7;
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS_PER_WINDOW = 120;
 const rateBuckets = new Map();
@@ -27,7 +28,7 @@ export function ensureCsrfToken(req, res, next) {
       httpOnly: false,
       sameSite: "lax",
       secure: req.secure,
-      maxAge: 1000 * 60 * 60 * 24
+      maxAge: CSRF_COOKIE_MAX_AGE
     });
   }
   next();

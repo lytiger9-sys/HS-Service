@@ -55,6 +55,44 @@
         </article>
       </section>
 
+      <% if (bannerLicenses && bannerLicenses.length > 0) { %>
+        <section class="license-card banner-license-analytics">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Banner License Analytics</p>
+              <h2>상단배너 라이센스 현황</h2>
+            </div>
+            <span class="muted"><%= bannerLicenses.length %>개</span>
+          </div>
+          <div class="banner-chart" role="img" aria-label="상단배너 라이센스 상태별 현황">
+            <% bannerChart.forEach((item) => { %>
+              <div class="banner-chart-row">
+                <span class="banner-chart-label"><%= item.status %></span>
+                <div class="banner-chart-track"><span class="banner-chart-bar status-<%= item.status %>" style="width: <%= item.percent %>%"></span></div>
+                <strong><%= item.count %></strong>
+              </div>
+            <% }) %>
+          </div>
+          <div class="table-wrap banner-license-table">
+            <table>
+              <thead><tr><th>키</th><th>플랜</th><th>상태</th><th>발급 서버</th><th>수령 서버</th><th>만료일</th></tr></thead>
+              <tbody>
+                <% bannerLicenses.forEach((license) => { %>
+                  <tr>
+                    <td><code class="license-plain-key"><%= license.key || `HS-••••-••••-${license.keyLast4}` %></code></td>
+                    <td><%= license.plan %></td>
+                    <td><span class="status-badge status-<%= license.status %>"><%= license.status %></span></td>
+                    <td><%= license.issuerGuildId || '-' %></td>
+                    <td><%= license.assignedGuildId || '-' %></td>
+                    <td><%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR') : '-' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      <% } %>
+
       <section class="license-card">
         <div class="section-head">
           <div>

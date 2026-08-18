@@ -51,10 +51,19 @@ export function createLicenseRouter(context) {
   router.get("/dashboard", async (req, res, next) => {
     try {
       const licenses = await context.services.licenses.list();
+      const bannerLicenses = licenses.filter((license) => license.kind === "banner");
+      const bannerStatuses = ["available", "active", "expired", "revoked"];
+      const bannerChart = bannerStatuses.map((status) => ({
+        status,
+        count: bannerLicenses.filter((license) => license.status === status).length
+      }));
+      const bannerMax = Math.max(1, ...bannerChart.map((item) => item.count));
       return res.render("license-dashboard", {
         title: "라이선스 관리",
         botName: context.config.botName,
         licenses,
+        bannerLicenses,
+        bannerChart: bannerChart.map((item) => ({ ...item, percent: Math.round((item.count / bannerMax) * 100) })),
         issuedKeys: req.query.keys ? String(req.query.keys).split("\n").filter(Boolean) : [],
         errorMessage: req.query.error || ""
       });

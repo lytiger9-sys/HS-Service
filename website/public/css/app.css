@@ -1849,6 +1849,14 @@ a {
 .error-actions .primary, .error-actions .ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 10px 16px; border-radius: 8px; font: inherit; cursor: pointer; }
 .error-actions .primary { border: 0; background: #1d3445; color: #fff; }
 .error-actions .ghost { border: 1px solid #b8c6d0; background: #fff; color: #304756; }
+.csrf-card { max-width: 560px; text-align: left; }
+.csrf-card-icon { display: grid; place-items: center; width: 58px; height: 58px; margin-bottom: 22px; border: 1px solid #c8d3dc; border-radius: 16px; background: #f2f7fa; color: #3a7da8; font-size: 1.9rem; }
+.csrf-card .error-kicker { margin-bottom: 14px; }
+.csrf-lead { margin: 0; color: #52616d; font-size: 1rem; line-height: 1.7; }
+.csrf-help-box { display: grid; gap: 6px; margin-top: 24px; padding: 16px 18px; border-left: 3px solid #b89968; background: #f8f7f2; color: #52616d; font-size: .88rem; }
+.csrf-help-box strong { color: #17202a; }
+.csrf-card .error-actions { justify-content: flex-start; }
+.csrf-card .error-actions .primary span { margin-left: 8px; font-size: 1.1rem; }
 .license-inline-form { margin: 0; }
 .license-inline-form .ghost,
 .license-card .ghost {
@@ -1881,6 +1889,17 @@ a {
 .license-card .section-head h2 { margin-bottom: 0; }
 .license-card .table-wrap { overflow-x: auto; }
 .license-card table { width: 100%; min-width: 760px; border-collapse: collapse; }
+.banner-chart { display: grid; gap: 12px; margin: 6px 0 24px; padding: 18px; background: #f5f8fa; border: 1px solid #e0e7eb; border-radius: 12px; }
+.banner-chart-row { display: grid; grid-template-columns: 86px minmax(120px, 1fr) 32px; gap: 12px; align-items: center; }
+.banner-chart-label { color: #52616d; font-family: var(--mono); font-size: .72rem; text-transform: uppercase; }
+.banner-chart-track { height: 10px; overflow: hidden; border-radius: 999px; background: #dfe7eb; }
+.banner-chart-bar { display: block; height: 100%; min-width: 3px; border-radius: inherit; background: #3a7da8; transition: width .45s var(--ease); }
+.banner-chart-bar.status-available { background: #5b9d72; }
+.banner-chart-bar.status-active { background: #3a7da8; }
+.banner-chart-bar.status-expired { background: #b89968; }
+.banner-chart-bar.status-revoked { background: #a03d32; }
+.banner-chart-row strong { color: #17202a; text-align: right; }
+.banner-license-table table { min-width: 920px; }
 .license-card th, .license-card td { padding: 13px 12px; border-bottom: 1px solid #e2e8ed; text-align: left; white-space: nowrap; }
 .license-card th { color: #60717d; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
 .license-auth-shell { width: min(520px, calc(100% - 40px)); min-height: 100vh; margin: 0 auto; display: grid; place-items: center; padding: 40px 0; }
@@ -1902,6 +1921,17 @@ a {
 /* Activation and plan dashboard */
 .activation-shell { align-items: center; }
 .activation-shell .license-auth-card { max-width: 560px; }
+.activation-card { position: relative; overflow: hidden; }
+.activation-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, #1d3445, #b89968, #3a7da8); }
+.activation-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.activation-heading .eyebrow { margin-bottom: 8px; }
+.activation-heading h1 { margin-bottom: 0; }
+.activation-mark { display: grid; place-items: center; width: 52px; height: 52px; flex: 0 0 52px; border-radius: 14px; background: #1d3445; color: #fff; font-family: var(--mono); font-size: .78rem; font-weight: 700; letter-spacing: .12em; box-shadow: 0 8px 18px rgba(29, 52, 69, .18); }
+.activation-submit { width: 100%; display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 12px 16px 12px 20px; font-weight: 700; }
+.activation-submit span:last-child { font-size: 1.35rem; transition: transform .3s var(--ease); }
+.activation-submit:hover span:last-child { transform: translateX(4px); }
+.activation-trust { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; color: #81909b; font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; }
+.activation-trust span { padding: 6px 8px; border: 1px solid #dce4e9; border-radius: 999px; background: #f7fafb; }
 .license-auth-card .license-form label { display: grid; gap: 7px; color: #52616d; font-size: 0.84rem; font-weight: 600; }
 .activation-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 16px; color: #80909b; font-size: 0.78rem; }
 .activation-divider::before, .activation-divider::after { content: ""; height: 1px; flex: 1; background: #dce4e9; }
