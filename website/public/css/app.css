@@ -2486,3 +2486,9 @@ body.dashboard-page { background: var(--ink-deep); }
 .shop-product-row .full { grid-column: 1 / -1; }
 .shop-product-row .danger { align-self: end; }
 @media (max-width: 760px) { .shop-product-row { grid-template-columns: 1fr; } .shop-product-row .full { grid-column: auto; } }
+
+/* Nickname role settings spacing */
+.nickname-role-list { display: grid; gap: 28px; }
+.nickname-role-row { row-gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--hairline-soft); }
+.nickname-role-row:first-child { padding-top: 8px; }
+.nickname-role-row:last-child { border-bottom: 0; padding-bottom: 8px; }
