@@ -6,18 +6,18 @@ function buildTicketPreview() {
   const form = document.querySelector("[data-ticket-form]");
   const preview = document.querySelector("#ticket-preview");
 
-  if (!form || !preview) {
+  if (!form) {
     return;
   }
 
-  const title = preview.querySelector("[data-preview-ticket-title]");
-  const description = preview.querySelector("[data-preview-ticket-description]");
-  const button = preview.querySelector("[data-preview-ticket-button]");
-  const footer = preview.querySelector("[data-preview-ticket-footer]");
-  const count = preview.querySelector("[data-preview-ticket-count]");
-  const board = preview.querySelector("[data-preview-ticket-board]");
-  const categoriesBox = preview.querySelector("[data-preview-ticket-categories]");
-  const bar = preview.querySelector(".preview-bar-ticket");
+  const title = preview?.querySelector("[data-preview-ticket-title]");
+  const description = preview?.querySelector("[data-preview-ticket-description]");
+  const button = preview?.querySelector("[data-preview-ticket-button]");
+  const footer = preview?.querySelector("[data-preview-ticket-footer]");
+  const count = preview?.querySelector("[data-preview-ticket-count]");
+  const board = preview?.querySelector("[data-preview-ticket-board]");
+  const categoriesBox = preview?.querySelector("[data-preview-ticket-categories]");
+  const bar = preview?.querySelector(".preview-bar-ticket");
 
   const titleInput = form.querySelector('[data-ticket-preview="title"]');
   const descriptionInput = form.querySelector('[data-ticket-preview="description"]');
