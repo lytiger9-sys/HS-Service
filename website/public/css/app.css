@@ -2911,3 +2911,20 @@ body.dashboard-page { background: var(--ink-deep); }
   background: #ffffff;
   box-shadow: 0 5px 16px rgba(17, 19, 22, .045);
 }
+
+/* Restore the overview background card without restoring the connected metric grid lines */
+.dashboard-page section.hero.card {
+  border: 1px solid rgba(17, 19, 22, .10);
+  border-radius: 16px;
+  background: rgba(248, 245, 238, .92);
+  box-shadow: 0 10px 32px rgba(17, 19, 22, .045);
+}
+.dashboard-page section.hero.card:hover {
+  border-color: rgba(181, 138, 88, .52);
+}
+.dashboard-page section.hero.card .hero-grid {
+  border: 0;
+}
+.dashboard-page section.hero.card .hero-grid .metric {
+  border: 0;
+}
