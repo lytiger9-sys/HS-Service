@@ -145,7 +145,8 @@ function injectFeatureToggles() {
 
     const section = getSectionFromAction(form);
     const inputName = `${section}Enabled`;
-    if (!featureLabels[section] || form.elements.namedItem(inputName)) {
+    const externalToggle = form.id && document.querySelector(`input[form="${form.id}"][name="${inputName}"]`);
+    if (!featureLabels[section] || form.elements.namedItem(inputName) || externalToggle) {
       return;
     }
 
