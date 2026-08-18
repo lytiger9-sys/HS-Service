@@ -364,6 +364,105 @@ function setupEmbedPanel() {
   });
 }
 
+function setupChannelComboboxes() {
+  const selectors = 'select[name*="ChannelId"], select[name*="CategoryId"], select[data-embed-channel]';
+  const selects = [...document.querySelectorAll(selectors)].filter((select) => !select.dataset.comboReady);
+  const closeAll = (except) => {
+    document.querySelectorAll(".channel-combobox.is-open").forEach((combo) => {
+      if (combo !== except) combo.classList.remove("is-open");
+    });
+  };
+  selects.forEach((select) => {
+    select.dataset.comboReady = "true";
+    const combo = document.createElement("div");
+    combo.className = "channel-combobox";
+    combo.dataset.channelCombobox = "true";
+    const input = document.createElement("input");
+    input.type = "search";
+    input.className = "channel-combobox-input";
+    input.autocomplete = "off";
+    input.setAttribute("aria-label", select.previousElementSibling?.textContent?.trim() || "채널 선택");
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("role", "combobox");
+    const list = document.createElement("div");
+    list.className = "channel-combobox-list";
+    list.setAttribute("role", "listbox");
+    combo.append(input, list);
+    select.parentNode.insertBefore(combo, select);
+    select.style.display = "none";
+    const getOptions = () => [...select.options].filter((option) => option.value);
+    const updateLabel = () => {
+      const selected = select.options[select.selectedIndex];
+      input.value = selected?.value ? selected.textContent.trim() : "";
+      input.placeholder = selected?.value ? "채널 변경" : "채널 이름 검색 또는 선택";
+    };
+    const render = (query = "") => {
+      const normalized = query.trim().toLowerCase();
+      list.replaceChildren();
+      const empty = document.createElement("button");
+      empty.type = "button";
+      empty.className = "channel-combobox-option is-empty";
+      empty.textContent = "선택 안 함";
+      empty.addEventListener("click", () => {
+        select.value = "";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        updateLabel();
+        combo.classList.remove("is-open");
+        input.setAttribute("aria-expanded", "false");
+      });
+      list.append(empty);
+      const matches = getOptions().filter((option) => option.textContent.toLowerCase().includes(normalized));
+      matches.forEach((option) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "channel-combobox-option";
+        item.textContent = option.textContent.trim();
+        item.setAttribute("role", "option");
+        item.setAttribute("aria-selected", String(option.value === select.value));
+        item.addEventListener("click", () => {
+          select.value = option.value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          updateLabel();
+          combo.classList.remove("is-open");
+          input.setAttribute("aria-expanded", "false");
+        });
+        list.append(item);
+      });
+      if (!matches.length) {
+        const noMatch = document.createElement("span");
+        noMatch.className = "channel-combobox-empty";
+        noMatch.textContent = "검색 결과가 없습니다.";
+        list.append(noMatch);
+      }
+    };
+    input.addEventListener("focus", () => {
+      closeAll(combo);
+      combo.classList.add("is-open");
+      input.setAttribute("aria-expanded", "true");
+      render(input.value === select.options[select.selectedIndex]?.textContent?.trim() ? "" : input.value);
+    });
+    input.addEventListener("input", () => {
+      closeAll(combo);
+      combo.classList.add("is-open");
+      input.setAttribute("aria-expanded", "true");
+      render(input.value);
+    });
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        updateLabel();
+        combo.classList.remove("is-open");
+        input.setAttribute("aria-expanded", "false");
+      }
+    });
+    updateLabel();
+    render();
+  });
+  document.addEventListener("click", (event) => {
+    if (event.target.closest(".channel-combobox")) return;
+    closeAll(null);
+    document.querySelectorAll(".channel-combobox-input").forEach((input) => input.setAttribute("aria-expanded", "false"));
+  }, { passive: true });
+}
 function setupTabs() {
   const activeFromDom = normalizeTab(document.querySelector(".sidebar-tab.is-active")?.dataset.tab || defaultTab);
   activateTab(activeFromDom);
@@ -403,6 +502,7 @@ function setupSearch() {
   });
 }
 
+setupChannelComboboxes();
 setupTabs();
 setupSearch();
 setupEmbedPanel();
