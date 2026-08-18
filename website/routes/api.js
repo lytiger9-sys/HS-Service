@@ -69,7 +69,7 @@ async function requireFeature(context, guildId, feature) {
 function saveResponse(res, req, { section, message = "저장되었습니다." }) {
   const nextSection = section === "staff" ? "administrators" : section;
   if (wantsJson(req)) {
-    return res.json({ ok: true, section: nextSection, message, ...(section === "partner" ? { partialUrl: "/?partial=partner" } : {}) });
+    return res.json({ ok: true, section: nextSection, message });
   }
 
   return res.redirect(nextSection === "administrators" ? "/?section=administrators" : `/?section=${nextSection}`);
@@ -429,7 +429,7 @@ export function createApiRouter(context) {
       const featureAccess = await requireFeature(context, guildId, "partner");
       if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
       await context.services.partners.deletePartner(guildId, partnerId);
-      return wantsJson(req) ? res.json({ ok: true, message: "비활성 파트너 채널을 삭제했습니다.", partialUrl: "/?partial=partner" }) : res.redirect("/?section=partner");
+      return wantsJson(req) ? res.json({ ok: true, message: "비활성 파트너 채널을 삭제했습니다.", partialUrl: "/?partial=partner", partialTargets: ["partner-cleanup"] }) : res.redirect("/?section=partner");
     } catch (error) {
       next(error);
     }
@@ -453,7 +453,7 @@ export function createApiRouter(context) {
       }
       const issued = await context.services.partners.issueBannerLicense(guildId, req.user.id, req.body.bannerDurationDays, issuerPlan);
       return wantsJson(req)
-        ? res.json({ ok: true, key: issued.key, durationDays: issued.durationDays, message: "상단배너 라이센스를 발급했습니다.", partialUrl: "/?partial=partner" })
+        ? res.json({ ok: true, key: issued.key, durationDays: issued.durationDays, message: "상단배너 라이센스를 발급했습니다.", partialUrl: "/?partial=partner", partialTargets: ["banner-license-result", "banner-license-list"] })
         : res.redirect(`/?section=partner&bannerKey=${encodeURIComponent(issued.key)}`);
     } catch (error) {
       return wantsJson(req) ? res.status(400).json({ ok: false, message: error.message || "상단배너 라이센스 발급에 실패했습니다." }) : res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
@@ -472,7 +472,7 @@ export function createApiRouter(context) {
         promoWebhook: String(req.body.bannerPromoWebhook || "").trim(),
         recipientUserId: req.user?.id || ""
       });
-      return wantsJson(req) ? res.json({ ok: true, message: "상단배너가 생성되었습니다.", partialUrl: "/?partial=partner" }) : res.redirect("/?section=partner");
+      return wantsJson(req) ? res.json({ ok: true, message: "상단배너가 생성되었습니다." }) : res.redirect("/?section=partner");
     } catch (error) {
       return wantsJson(req) ? res.status(400).json({ ok: false, message: error.message || "상단배너 생성에 실패했습니다." }) : res.redirect(`/?section=partner&bannerError=${encodeURIComponent(error.message)}`);
     }

@@ -45,7 +45,7 @@
     </div>
   </article>
 
-  <article class="card section-panel">
+  <article class="card section-panel" data-partial-target="partner-cleanup">
     <div class="section-head"><div><p class="eyebrow">Cleanup</p><h3>7일 이상 비활성 파트너</h3></div><span class="muted"><%= stalePartners.length %>개</span></div>
     <div class="table-wrap"><table><thead><tr><th>제휴명</th><th>채널</th><th>마지막 활동</th><th>신청자</th><th>관리</th></tr></thead><tbody>
       <% if (!stalePartners.length) { %><tr><td colspan="5" class="muted">정리할 비활성 파트너가 없습니다.</td></tr><% } %>
@@ -55,8 +55,10 @@
 
   <article class="card section-panel banner-license-card">
     <div class="section-head"><div><p class="eyebrow">License</p><h3>배너 라이선스 발급</h3></div></div>
-    <% if (bannerError) { %><p class="notice danger"><%= bannerError %></p><% } %>
-    <% if (issuedBannerKey) { %><p class="notice success"><strong>배너 라이선스가 발급되었습니다.</strong><br /><code><%= issuedBannerKey %></code><br /><span class="muted">이 키를 배너를 받을 서버 관리자에게 전달하세요. 발급된 키는 아래 ‘발급한 상단배너 라이센스’ 목록에서 계속 확인할 수 있습니다.</span></p><% } %>
+    <div data-partial-target="banner-license-result">
+      <% if (bannerError) { %><p class="notice danger"><%= bannerError %></p><% } %>
+      <% if (issuedBannerKey) { %><p class="notice success"><strong>배너 라이선스가 발급되었습니다.</strong><br /><code><%= issuedBannerKey %></code><br /><span class="muted">이 키를 배너를 받을 서버 관리자에게 전달하세요. 발급된 키는 아래 ‘발급한 상단배너 라이센스’ 목록에서 계속 확인할 수 있습니다.</span></p><% } %>
+    </div>
     <form class="settings-form banner-license-issue-form" method="post" action="/guild/<%= guild.id %>/partner/banner-license">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <div class="form-grid"><label class="field"><span>사용 기간(일)</span><input type="number" name="bannerDurationDays" min="1" max="3650" value="30" required /></label></div>
@@ -64,12 +66,11 @@
     </form>
   </article>
 
-  <% if (bannerLicenses && bannerLicenses.length) { %>
-    <article class="card section-panel banner-license-list-card">
+  <article class="card section-panel banner-license-list-card<%= bannerLicenses && bannerLicenses.length ? '' : ' is-hidden' %>" data-partial-target="banner-license-list">
       <div class="section-head"><div><p class="eyebrow">Issued Banner Licenses</p><h3>발급한 상단배너 라이센스</h3><p class="muted">상단배너 라이센스는 이 파트너 탭에서만 확인합니다.</p></div><span class="muted"><%= bannerLicenses.length %>개</span></div>
       <div class="table-wrap"><table><thead><tr><th>라이센스 키</th><th>상태</th><th>수령 서버</th><th>만료일</th></tr></thead><tbody>
-        <% bannerLicenses.forEach((license) => { %><tr><td><code><%= license.key || `HS-••••-••••-${license.keyLast4}` %></code></td><td><span class="status-badge status-<%= license.status %>"><%= license.status %></span></td><td><%= license.assignedGuildId || '-' %></td><td><%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR') : '-' %></td></tr><% }) %>
+        <% if (!bannerLicenses || !bannerLicenses.length) { %><tr><td colspan="4" class="muted">발급한 상단배너 라이선스가 없습니다.</td></tr><% } %>
+        <% (bannerLicenses || []).forEach((license) => { %><tr><td><code><%= license.key || `HS-••••-••••-${license.keyLast4}` %></code></td><td><span class="status-badge status-<%= license.status %>"><%= license.status %></span></td><td><%= license.assignedGuildId || '-' %></td><td><%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR') : '-' %></td></tr><% }) %>
       </tbody></table></div>
     </article>
-  <% } %>
 </section>

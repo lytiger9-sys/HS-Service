@@ -33,16 +33,20 @@
     return form.querySelector('input[name="_csrf"]')?.value || document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith("csrf-token="))?.slice(11) || "";
   }
 
-  async function refreshPartial(url) {
+  async function refreshPartial(url, targets = []) {
     const response = await fetch(url, { credentials: "same-origin", headers: { Accept: "text/html", "X-Requested-With": "fetch" } });
     if (!response.ok) throw new Error("최신 목록을 불러오지 못했습니다.");
     const html = await response.text();
     const parsed = new DOMParser().parseFromString(html, "text/html");
-    const incoming = parsed.querySelector('[data-panel="partner"]');
-    const current = document.querySelector('[data-panel="partner"]');
-    if (!incoming || !current) throw new Error("목록 화면을 갱신하지 못했습니다.");
-    incoming.className = current.className;
-    current.replaceWith(incoming);
+    const names = Array.isArray(targets) && targets.length ? targets : ["partner"];
+    names.forEach((name) => {
+      const selector = name === "partner" ? '[data-panel="partner"]' : `[data-partial-target="${name}"]`;
+      const incoming = parsed.querySelector(selector);
+      const current = document.querySelector(selector);
+      if (!incoming || !current) throw new Error("목록 화면을 갱신하지 못했습니다.");
+      incoming.className = current.className;
+      current.replaceWith(incoming);
+    });
   }
 
   async function submitWithToast(event) {
@@ -72,7 +76,7 @@
       }
       if (payload.partialUrl) {
         try {
-          await refreshPartial(payload.partialUrl);
+          await refreshPartial(payload.partialUrl, payload.partialTargets);
         } catch (refreshError) {
           showSiteToast(refreshError?.message || "목록 갱신에 실패했습니다.", "error");
           return;
