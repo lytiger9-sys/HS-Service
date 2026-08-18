@@ -47,9 +47,20 @@ export function csrfProtection(req, res, next) {
     && expectedBuffer.length > 0
     && crypto.timingSafeEqual(expectedBuffer, providedBuffer);
   if (!matches) {
+    const requestedWith = String(req.get("X-Requested-With") || "").toLowerCase();
+    const accept = String(req.get("Accept") || "").toLowerCase();
+    const isFetchRequest = requestedWith === "fetch" || requestedWith === "xmlhttprequest" || accept.includes("application/json");
+    if (isFetchRequest) {
+      return res.status(403).json({
+        ok: false,
+        code: "csrf-expired",
+        message: "보안 토큰이 갱신되어 요청을 다시 시도합니다.",
+        csrfToken: expected || null
+      });
+    }
     return res.status(403).render("csrf-expired", {
       title: "보안 토큰 만료",
-      message: "보안 토큰이 만료되었거나 이미 사용된 페이지에서 요청되었습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요."
+      message: "보안 토큰이 만료되었거나 세션이 갱신되었습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요."
     });
   }
   return next();
