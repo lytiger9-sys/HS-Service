@@ -50,6 +50,16 @@ function buildPartnerApplicationModal() {
 export async function handleButtonInteraction(interaction, context) {
   const [scope, action, id, extra] = interaction.customId.split(":");
 
+  if (scope === "page" && action === "joinorder-jump") {
+    if (String(id) !== String(interaction.user.id)) {
+      return interaction.reply({ content: "이 페이지 버튼은 명령어를 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });
+    }
+    const modal = new ModalBuilder().setCustomId(`page:joinorder-modal:${id}:${extra}`).setTitle("페이지 이동");
+    const input = new TextInputBuilder().setCustomId("joinorder-page-number").setLabel(`페이지 번호 (1-${extra})`).setStyle(TextInputStyle.Short).setRequired(true).setMinLength(1).setMaxLength(3);
+    modal.addComponents(new ActionRowBuilder().addComponents(input));
+    return interaction.showModal(modal);
+  }
+
   if (scope === "page" && action === "joinorder") {
     if (String(id) !== String(interaction.user.id)) {
       return interaction.reply({ content: "이 페이지 버튼은 명령어를 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });

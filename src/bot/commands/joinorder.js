@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, SlashCommandBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { buildBaseEmbed, palette } from "../../shared/embeds.js";
 
 export const JOIN_ORDER_PAGE_SIZE = 10;
@@ -15,6 +15,7 @@ export function buildJoinOrderPayload(rows, page = 0, ownerId = "") {
   if (totalPages > 1) {
     components.push(new ActionRowBuilder().addComponents(
       new ButtonBuilder().setCustomId(`page:joinorder:${ownerId}:${currentPage - 1}`).setLabel("이전").setStyle(ButtonStyle.Secondary).setDisabled(currentPage === 0),
+      new ButtonBuilder().setCustomId(`page:joinorder-jump:${ownerId}:${totalPages}`).setLabel(`${currentPage + 1}/${totalPages}`).setStyle(ButtonStyle.Secondary),
       new ButtonBuilder().setCustomId(`page:joinorder:${ownerId}:${currentPage + 1}`).setLabel("다음").setStyle(ButtonStyle.Primary).setDisabled(currentPage >= totalPages - 1)
     ));
   }
@@ -33,19 +34,11 @@ export function buildJoinOrderPayload(rows, page = 0, ownerId = "") {
 export default {
   data: new SlashCommandBuilder()
     .setName("joinorder")
-    .setDescription("서버 입장 순서를 내림차순으로 보여줍니다.")
-    .addIntegerOption((option) =>
-      option
-        .setName("limit")
-        .setDescription("표시할 인원 수")
-        .setMinValue(1)
-        .setMaxValue(100)
-    ),
+    .setDescription("서버 입장 순서를 내림차순으로 보여줍니다."),
 
   async execute(interaction, context) {
     await interaction.deferReply({ ephemeral: true });
-    const limit = interaction.options.getInteger("limit") ?? 20;
-    const rows = await context.services.serverInfo.getJoinOrder(interaction.guild, limit);
+    const rows = await context.services.serverInfo.getJoinOrder(interaction.guild, 100);
 
     if (!rows.length) {
       return interaction.editReply({ content: "입장 순서를 가져올 수 없습니다." });
