@@ -367,6 +367,30 @@ export function createApiRouter(context) {
     } catch (error) { return res.status(400).send(error.message); }
   });
 
+  async function handlePollAdminAction(req, res, action) {
+    const { guildId, pollId } = req.params;
+    const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+    if (!access.allowed) return res.status(403).send("서버 관리자만 투표를 관리할 수 있습니다.");
+    const featureAccess = await requireFeature(context, guildId, "polls");
+    if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
+    if (action === "stop") await context.services.polls.stopPoll(guildId, pollId);
+    if (action === "republish") await context.services.polls.republishPoll(guildId, pollId);
+    if (action === "delete") await context.services.polls.deletePoll(guildId, pollId);
+    return wantsJson(req)
+      ? res.json({ ok: true, message: "투표 관리 작업을 완료했습니다." })
+      : res.redirect("/?section=polls&saved=1");
+  }
+
+  router.post("/:guildId/polls/:pollId/stop", async (req, res, next) => {
+    try { return await handlePollAdminAction(req, res, "stop"); } catch (error) { return next(error); }
+  });
+  router.post("/:guildId/polls/:pollId/republish", async (req, res, next) => {
+    try { return await handlePollAdminAction(req, res, "republish"); } catch (error) { return next(error); }
+  });
+  router.post("/:guildId/polls/:pollId/delete", async (req, res, next) => {
+    try { return await handlePollAdminAction(req, res, "delete"); } catch (error) { return next(error); }
+  });
+
   router.post("/:guildId/reset", async (req, res, next) => {
     try {
       const { guildId } = req.params;

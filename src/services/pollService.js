@@ -2,14 +2,13 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ChannelType,
   ContainerBuilder,
   MessageFlags,
   SeparatorBuilder,
   TextDisplayBuilder
 } from "discord.js";
 import { randomUUID } from "node:crypto";
-import { buildPollEmbed, createBaseEmbed, palette } from "../shared/embeds.js";
+
 import { clampText } from "../shared/naming.js";
 
 async function resolveTextChannel(guild, channelId) {
@@ -194,7 +193,7 @@ export function createPollService(context, guildState) {
     });
 
     const logMessage = await context.services.logs.sendLogByKey(guildId, "voteChannelId", {
-      embeds: [buildPollLogEmbed(poll, "투표 진행 중")]
+      ...buildPollLogPayload(poll, "투표 진행 중")
     });
     if (logMessage) {
       await guildState.patch(guildId, (guildStateValue) => {
@@ -232,25 +231,79 @@ export function createPollService(context, guildState) {
     return messageResult;
   }
 
-  function buildPollLogEmbed(poll, status) {
+  function buildPollLogPayload(poll, status = "투표 진행 중") {
     const total = poll.options.reduce((sum, option) => sum + Number(option.count || 0), 0);
-    const lines = poll.options.map((option) => `**${option.label}**: ${option.count}표`).join("\n");
-    return createBaseEmbed({
-      title: `투표 결과 · ${status}`,
-      description: `**${poll.question}**\n${poll.description || ""}\n\n${lines}\n\n총 투표 수: ${total}명`,
-      color: status === "투표 종료" ? palette.info : palette.success,
-      timestamp: Date.now()
-    });
+    const lines = poll.options.map((option) => `${option.label}: ${option.count}표`).join("\n");
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent([
+      `## 투표 결과 · ${status}`,
+      `**${poll.question}**`,
+      poll.description || "",
+      "",
+      lines,
+      `총 투표 수: ${total}명`
+    ].filter(Boolean).join("\n")));
+    container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+    const stopButton = new ButtonBuilder()
+      .setCustomId(`poll:stop:${poll.id}`)
+      .setLabel(poll.expired ? "투표 종료됨" : "투표 즉시 중지")
+      .setStyle(ButtonStyle.Danger)
+      .setDisabled(Boolean(poll.expired));
+    return {
+      flags: MessageFlags.IsComponentsV2,
+      components: [container, new ActionRowBuilder().addComponents(stopButton)]
+    };
   }
 
   async function syncPollLog(guildId, pollId, poll = null) {
     const current = poll || await getPoll(guildId, pollId);
     if (!current) return null;
     if (current.logMessageId) {
-      const edited = await context.services.logs.editLogByKey(guildId, "voteChannelId", current.logMessageId, { embeds: [buildPollLogEmbed(current, current.expired ? "투표 종료" : "투표 진행 중")] });
+      const edited = await context.services.logs.editLogByKey(guildId, "voteChannelId", current.logMessageId, buildPollLogPayload(current, current.expired ? "투표 종료" : "투표 진행 중"));
       if (edited) return edited;
     }
-    return context.services.logs.sendLogByKey(guildId, "voteChannelId", { embeds: [buildPollLogEmbed(current, current.expired ? "투표 종료" : "투표 진행 중")] });
+    const sent = await context.services.logs.sendLogByKey(guildId, "voteChannelId", buildPollLogPayload(current, current.expired ? "투표 종료" : "투표 진행 중"));
+    if (sent) {
+      await guildState.patch(guildId, (guild) => { guild.polls[pollId].logMessageId = sent.id; return guild.polls[pollId]; });
+    }
+    return sent;
+  }
+
+  async function stopPoll(guildId, pollId) {
+    const poll = await getPoll(guildId, pollId);
+    if (!poll) throw new Error("투표를 찾을 수 없습니다.");
+    if (!poll.expired) {
+      await guildState.patch(guildId, (guild) => { guild.polls[pollId].expired = true; return guild.polls[pollId]; });
+      await syncPollMessage(guildId, pollId);
+      await syncPollLog(guildId, pollId);
+    }
+    return getPoll(guildId, pollId);
+  }
+
+  async function republishPoll(guildId, pollId) {
+    const poll = await getPoll(guildId, pollId);
+    if (!poll) throw new Error("투표를 찾을 수 없습니다.");
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    const channel = guild && await resolveTextChannel(guild, poll.channelId);
+    if (!channel) throw new Error("투표를 게시할 채널을 찾을 수 없습니다.");
+    if (poll.messageId) await channel.messages.delete(poll.messageId).catch(() => null);
+    await guildState.patch(guildId, (state) => { state.polls[pollId].messageId = ""; state.polls[pollId].expired = false; state.polls[pollId].expiresAt = new Date(Date.now() + Math.max(1, Number(state.polls[pollId].expirationDays) || 7) * 86400000).toISOString(); return state.polls[pollId]; });
+    return publishPoll(guildId, pollId, channel.id);
+  }
+
+  async function deletePoll(guildId, pollId) {
+    const poll = await getPoll(guildId, pollId);
+    if (!poll) throw new Error("투표를 찾을 수 없습니다.");
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    if (guild && poll.channelId && poll.messageId) {
+      const channel = await resolveTextChannel(guild, poll.channelId);
+      await channel?.messages.delete(poll.messageId).catch(() => null);
+    }
+    if (guild && poll.logMessageId) {
+      await context.services.logs.editLogByKey(guildId, "voteChannelId", poll.logMessageId, { components: [] }).catch(() => null);
+    }
+    await guildState.patch(guildId, (state) => { delete state.polls[pollId]; return state.polls; });
+    return true;
   }
 
   async function expirePoll(guildId, pollId) {
@@ -317,6 +370,9 @@ export function createPollService(context, guildState) {
     handleFreeTextVote,
     handleChoiceVote,
     buildPollComponents,
-    processExpirations
+    processExpirations,
+    stopPoll,
+    republishPoll,
+    deletePoll
   };
 }

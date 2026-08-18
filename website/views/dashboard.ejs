@@ -358,6 +358,43 @@
           </div>
         </article>
 
+        <article class="card section-panel poll-management-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Active Polls</p>
+              <h3>현재 진행 중인 투표</h3>
+              <p class="muted">게시된 투표를 즉시 중지하거나 같은 설정으로 다시 게시·삭제할 수 있습니다.</p>
+            </div>
+          </div>
+          <% const activePolls = (polls || []).filter((poll) => !poll.expired); %>
+          <% if (activePolls.length) { %>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>질문</th><th>게시 채널</th><th>만료</th><th>현재 득표</th><th>관리</th></tr></thead>
+                <tbody>
+                  <% activePolls.forEach((poll) => { %>
+                    <tr>
+                      <td><strong><%= poll.question %></strong></td>
+                      <td><%= poll.channelId ? `#${channels.text.find((channel) => channel.id === poll.channelId)?.name || poll.channelId}` : '없음' %></td>
+                      <td><%= formatDate(poll.expiresAt) %></td>
+                      <td><%= (poll.options || []).reduce((total, option) => total + Number(option.count || 0), 0) %>표</td>
+                      <td>
+                        <div class="inline-actions">
+                          <form method="post" action="/guild/<%= guild.id %>/polls/<%= poll.id %>/stop"><button class="ghost" type="submit">즉시 중지</button></form>
+                          <form method="post" action="/guild/<%= guild.id %>/polls/<%= poll.id %>/republish"><button class="ghost" type="submit">재게시</button></form>
+                          <form method="post" action="/guild/<%= guild.id %>/polls/<%= poll.id %>/delete" onsubmit="return confirm('이 투표와 게시 메시지를 삭제할까요?');"><button class="ghost danger" type="submit">삭제</button></form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <p class="muted">현재 진행 중인 투표가 없습니다.</p>
+          <% } %>
+        </article>
+
       </section>
 
       <%- include('partials/logs-panel', { guild, channels, settings, panelClass }) %>

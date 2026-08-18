@@ -135,6 +135,14 @@ export async function handleButtonInteraction(interaction, context) {
     });
   }
 
+  if (scope === "poll" && action === "stop") {
+    if (!isAdministrator(interaction.member)) {
+      return interaction.reply({ content: "관리자만 투표를 중지할 수 있습니다.", ephemeral: true });
+    }
+    await context.services.polls.stopPoll(interaction.guildId, id);
+    return interaction.reply({ content: "투표를 즉시 중지했습니다.", ephemeral: true });
+  }
+
   if (scope === "poll" && id === "vote") {
     const pollId = action;
     const optionIndex = Number(extra);
