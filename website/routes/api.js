@@ -36,7 +36,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", partner: "partner" };
+  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", nickname: "nickname", partner: "partner" };
   return map[section] || null;
 }
 
@@ -181,6 +181,18 @@ function sectionPayload(section, body) {
         systemChannelId: readDiscordId(body.logSystemChannelId)
       }
     };
+  }
+  if (section === "nickname") {
+    const rules = {};
+    const submittedRules = body.nicknameRules && typeof body.nicknameRules === "object" ? body.nicknameRules : {};
+    for (const [roleId, rule] of Object.entries(submittedRules).slice(0, 250)) {
+      if (!/^\d{15,22}$/.test(roleId) || !rule || typeof rule !== "object") continue;
+      rules[roleId] = {
+        prefix: readText(rule.prefix, "", 24),
+        suffix: readText(rule.suffix, "", 24)
+      };
+    }
+    return { nickname: { enabled: readBoolean(body.nicknameEnabled), rules } };
   }
   if (section === "partner") {
     return {

@@ -1,0 +1,38 @@
+<section class="panel-stack <%= panelClass('nickname') %>" data-panel="nickname" hidden>
+  <article class="card section-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Nickname</p>
+        <h3>닉네임 설정</h3>
+        <p class="muted">봇 역할보다 아래에 있는 역할만 표시됩니다. 역할을 얻은 멤버에게 접두사와 접미사가 즉시 적용됩니다.</p>
+      </div>
+      <label class="field toggle section-toggle">
+        <input type="checkbox" form="nickname-settings-form" name="nicknameEnabled" <%= settings.nickname.enabled !== false ? 'checked' : '' %> />
+        <span>닉네임 기능 활성화</span>
+      </label>
+    </div>
+    <form class="settings-form nickname-settings-form" id="nickname-settings-form" method="post" action="/guild/<%= guild.id %>/settings/nickname">
+      <div class="nickname-role-list">
+        <% if (!roles.length) { %>
+          <p class="empty-state">봇 역할보다 아래에 있는 관리 가능한 역할이 없습니다.</p>
+        <% } %>
+        <% roles.forEach((role) => { const rule = settings.nickname.rules?.[role.id] || {}; %>
+          <div class="nickname-role-row">
+            <div class="nickname-role-name"><span class="role-dot" style="background:<%= role.color %>"></span><strong><%= role.name %></strong><code><%= role.id %></code></div>
+            <label class="field"><span>접두사</span><input type="text" name="nicknameRules[<%= role.id %>][prefix]" value="<%= rule.prefix || '' %>" maxlength="24" placeholder="예: [VIP] " /></label>
+            <label class="field"><span>접미사</span><input type="text" name="nicknameRules[<%= role.id %>][suffix]" value="<%= rule.suffix || '' %>" maxlength="24" placeholder="예: 님" /></label>
+          </div>
+        <% }) %>
+      </div>
+      <button class="primary" type="submit">저장</button>
+    </form>
+  </article>
+  <article class="card section-panel nickname-command-card">
+    <div class="section-head compact"><div><p class="eyebrow">Commands</p><h3>명령어 안내</h3></div></div>
+    <div class="nickname-command-list">
+      <div><code>/nickapply</code><p class="muted">현재 규칙을 서버의 모든 대상 멤버에게 적용합니다.</p></div>
+      <div><code>/nickrandom</code><p class="muted">봇 계정과 관리자 계정을 제외한 멤버의 닉네임을 랜덤으로 변경합니다.</p></div>
+      <div><code>/nickinit</code><p class="muted">랜덤 닉네임 초기화를 실행합니다.</p></div>
+    </div>
+  </article>
+</section>

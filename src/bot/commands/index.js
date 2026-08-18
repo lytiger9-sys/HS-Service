@@ -8,6 +8,9 @@ import tempvoice from "./tempvoice.js";
 import staff from "./staff.js";
 import honeypotban from "./honeypotban.js";
 import honeypotkick from "./honeypotkick.js";
+import nickapply from "./nickapply.js";
+import nickrandom from "./nickrandom.js";
+import nickinit from "./nickinit.js";
 
 export const commandList = [
   serverinfo,
@@ -19,7 +22,10 @@ export const commandList = [
   tempvoice,
   staff,
   honeypotban,
-  honeypotkick
+  honeypotkick,
+  nickapply,
+  nickrandom,
+  nickinit
 ];
 
 export const commandMap = new Map(commandList.map((command) => [command.data.name, command]));

@@ -5,6 +5,7 @@ function commandFeature(commandName) {
   if (commandName === "tempvoice") return "voice";
   if (commandName === "staff") return "administrators";
   if (["honeypotban", "honeypotkick"].includes(commandName)) return "honeypot";
+  if (["nickapply", "nickrandom", "nickinit"].includes(commandName)) return "nickname";
   return null;
 }
 

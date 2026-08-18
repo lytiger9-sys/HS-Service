@@ -2,6 +2,7 @@ import { ChannelType } from "discord.js";
 import { normalizeTicketSettings } from "../../src/shared/ticket.js";
 import { planHasFeature, planAllowsFeatureToggle } from "../../src/shared/planAccess.js";
 import { getPlanDefinition } from "../../src/config/plans.js";
+import { getBotManagedRoles } from "../../src/services/nicknameService.js";
 
 function formatDate(value) {
   if (!value) {
@@ -66,6 +67,7 @@ function buildSections() {
     { id: "embed", label: "임베드", description: "임베드 및 공지" },
     { id: "polls", label: "투표", description: "버튼 투표" },
     { id: "logs", label: "로그", description: "채널 연결" },
+    { id: "nickname", label: "닉네임", description: "역할별 이름 규칙" },
     { id: "partner", label: "파트너", description: "제휴 신청 및 채널" }
   ];
 }
@@ -125,6 +127,11 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
     ...settings,
     staff: staffSettings,
     ticket: ticketSettings,
+    nickname: {
+      enabled: true,
+      rules: {},
+      ...(settings.nickname || {})
+    },
     embed: {
       enabled: true,
       mode: "components",
@@ -150,10 +157,7 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
   };
 
   const groupedChannels = groupChannels(guild);
-  const roles = [...guild.roles.cache.values()]
-    .filter((role) => role.id !== guild.id)
-    .sort((left, right) => right.position - left.position)
-    .map(roleOption);
+  const roles = getBotManagedRoles(guild).map(roleOption);
 
   return {
     botName: context.config.botName,

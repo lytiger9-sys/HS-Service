@@ -16,6 +16,7 @@ import { createLicenseService } from "./licenseService.js";
 import { createPartnerService } from "./partnerService.js";
 import { createOverviewChannelService } from "./overviewChannelService.js";
 import { createEmbedService } from "./embedService.js";
+import { applyAllNicknames, randomizeNicknames, applyNickname, getBotManagedRoles } from "./nicknameService.js";
 
 export function createServices(context) {
   const guildState = createGuildStateService(context);
@@ -38,6 +39,7 @@ export function createServices(context) {
     licenses: createLicenseService(),
     partners: createPartnerService(context),
     overviewChannels: createOverviewChannelService(context),
-    embeds: createEmbedService(context)
+    embeds: createEmbedService(context),
+    nicknames: { applyAllNicknames, randomizeNicknames, applyNickname, getBotManagedRoles }
   };
 }

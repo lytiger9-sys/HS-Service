@@ -77,6 +77,10 @@ export function createDefaultGuildSettings() {
       channelId: "",
       roleId: ""
     },
+    nickname: {
+      enabled: true,
+      rules: {}
+    },
     voice: {
       enabled: true,
       categoryId: "",
