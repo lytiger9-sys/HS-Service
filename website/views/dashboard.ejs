@@ -13,7 +13,6 @@
           <div>
             <p class="eyebrow">Server Control</p>
             <h2><%= guild.name %></h2>
-            <p class="muted">서버 정보, 자동 환영, 보안, 티켓, 관리자 상태, 투표, 로그 설정을 한곳에서 관리합니다.</p>
           </div>
           <form class="hero-reset" method="post" action="/guild/<%= guild.id %>/reset" data-reset-form data-confirm-reset="true" data-confirm-message="이 서버의 데이터를 기본값으로 초기화할까요?">
             <button class="ghost danger" type="submit">DB 초기화</button>

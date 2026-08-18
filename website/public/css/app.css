@@ -1008,6 +1008,8 @@ a {
 }
 
 .staff-layout { align-items: start; }
+.staff-layout-full { display: block; }
+.staff-layout-full .settings-form { width: 100%; }
 
 .staff-panel .settings-form {
   position: relative;
