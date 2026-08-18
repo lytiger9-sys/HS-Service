@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
+import { formatKstDateTime } from "../../shared/time.js";
 
 const CURRENCIES = [
   ["KRW", "원"],
@@ -37,7 +38,7 @@ export default {
       if (!Number.isFinite(rate) || rate <= 0) throw new Error("해당 통화의 환율을 찾을 수 없습니다.");
       const converted = amount * rate;
       return interaction.editReply({
-        content: `**환율 계산 결과**\n${formatAmount(amount, base)} → **${formatAmount(converted, target)}**\n\n1 ${currencyLabel(base)} = ${formatAmount(rate, target)}${updatedAt ? `\n기준 시각: ${updatedAt}` : ""}`
+        content: `**환율 계산 결과**\n${formatAmount(amount, base)} → **${formatAmount(converted, target)}**\n\n1 ${currencyLabel(base)} = ${formatAmount(rate, target)}${updatedAt ? `\n기준 시각(KST): ${formatKstDateTime(updatedAt)}` : ""}`
       });
     } catch (error) {
       return interaction.editReply({ content: error.message || "환율 정보를 가져오지 못했습니다. 잠시 후 다시 시도해 주세요." });

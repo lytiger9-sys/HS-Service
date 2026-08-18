@@ -3,6 +3,7 @@ import { normalizeTicketSettings } from "../../src/shared/ticket.js";
 import { planHasFeature, planAllowsFeatureToggle } from "../../src/shared/planAccess.js";
 import { getPlanDefinition } from "../../src/config/plans.js";
 import { getBotManagedRoles } from "../../src/services/nicknameService.js";
+import { formatKstDateTime } from "../../src/shared/time.js";
 
 function formatDate(value) {
   if (!value) {
@@ -14,7 +15,7 @@ function formatDate(value) {
     return String(value);
   }
 
-  return date.toLocaleString("ko-KR");
+  return formatKstDateTime(date);
 }
 
 function channelOption(channel) {

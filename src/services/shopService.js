@@ -1,3 +1,4 @@
+import { kstDateKey, kstDateParts } from "../shared/time.js";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -28,7 +29,7 @@ const DEFAULT_SHOP = {
   purchases: []
 };
 
-function todayKey() { return new Date().toISOString().slice(0, 10); }
+function todayKey() { return kstDateKey(); }
 function normalizeShop(shop = {}) {
   return {
     ...DEFAULT_SHOP,
@@ -138,9 +139,7 @@ export function createShopService(context) {
     if (!message.guild || message.author.bot) return null;
     const settings = await context.services.settings.getSettings(message.guild.id);
     if (settings.shop?.enabled === false) return null;
-    const today = new Date();
-    const month = today.getUTCMonth() + 1;
-    const day = today.getUTCDate();
+    const { month, day } = kstDateParts();
     let birthdayResult = null;
     await patch(message.guild.id, (guild) => {
       guild.shop = normalizeShop(guild.shop);

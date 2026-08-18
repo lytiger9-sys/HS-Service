@@ -96,7 +96,7 @@
                   <td><%= license.durationDays %>일</td>
                   <td><span class="status-badge status-<%= license.status %>"><%= license.status %></span></td>
                   <td><%= license.assignedGuildId || '-' %></td>
-                  <td><%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR') : '-' %></td>
+                  <td><%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-' %></td>
                   <td>
                     <% if (license.status === 'active') { %>
                       <form method="post" action="/license/<%= license._id %>/work-stop"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><input type="hidden" name="stopped" value="<%= license.workStopped ? 'false' : 'true' %>" /><button class="ghost <%= license.workStopped ? '' : 'danger' %>" type="submit"><%= license.workStopped ? '작업재개' : '작업중지' %></button></form>

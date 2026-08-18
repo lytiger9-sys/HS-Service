@@ -1,6 +1,7 @@
 import { ContainerBuilder, EmbedBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
 import { applyPlaceholders } from "./placeholders.js";
 import { clampText } from "./naming.js";
+import { formatKstDateTime } from "./time.js";
 
 export const palette = {
   ink: 0x0f1115,
@@ -161,7 +162,7 @@ export function buildPollEmbed(poll, forceResults = true) {
 
   return createBaseEmbed({
     title: poll.question,
-    description: [poll.description || "설명 없음", "", ...lines, poll.expiresAt ? `만료: ${new Date(poll.expiresAt).toLocaleString("ko-KR")}` : ""].filter(Boolean).join("\n"),
+    description: [poll.description || "설명 없음", "", ...lines, poll.expiresAt ? `만료: ${formatKstDateTime(poll.expiresAt)}` : ""].filter(Boolean).join("\n"),
     color: palette.slate,
     footer: footerText,
     timestamp: poll.createdAt

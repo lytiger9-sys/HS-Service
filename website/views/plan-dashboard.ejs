@@ -10,7 +10,7 @@
         </div>
         <div class="plan-summary">
           <span class="plan-pill"><%= plan.label %></span>
-          <span class="muted">만료: <%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR') : '-' %></span>
+          <span class="muted">만료: <%= license.expiresAt ? new Date(license.expiresAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-' %></span>
         </div>
       </div>
     </section>
