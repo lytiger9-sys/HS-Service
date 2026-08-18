@@ -322,7 +322,7 @@ export function createApiRouter(context) {
       if (!featureAccess.allowed) return res.status(403).json({ ok: false, message: featureAccess.message });
       const body = {
         ...req.body,
-        channelId: readDiscordId(req.body.channelId),
+        channelId: readDiscordId(req.body.embedChannelId ?? req.body.channelId),
         destinationType: req.body.embedDestinationType === "webhook" ? "webhook" : "channel",
         webhookUrl: normalizeWebhookUrl(req.body.embedWebhookUrl)
       };
