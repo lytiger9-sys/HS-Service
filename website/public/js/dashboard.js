@@ -513,6 +513,15 @@ function setupChannelComboboxes() {
 function setupShopPanel() {
   const list = document.querySelector("[data-shop-product-list]");
   const add = document.querySelector("[data-shop-add-product]");
+  const settingsForm = document.querySelector("#shop-settings-form");
+  const channelSelect = settingsForm?.querySelector('[name="shopMessageChannelId"]');
+  const publishButton = settingsForm?.querySelector('button[formaction*="/shop/publish"]');
+  publishButton?.addEventListener("click", (event) => {
+    if (!channelSelect?.value) {
+      event.preventDefault();
+      showToast("상점 임베드를 게시할 채널을 선택하세요.");
+    }
+  });
   if (!list || !add) return;
   const bindRemove = (row) => row.querySelector("[data-shop-remove-product]")?.addEventListener("click", () => row.remove());
   list.querySelectorAll("[data-shop-product]").forEach(bindRemove);
