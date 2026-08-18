@@ -14,6 +14,13 @@ function storedBoolean(value, fallback = false) {
   return fallback;
 }
 
+function summarizeSettings(settings = {}) {
+  return Object.fromEntries(Object.entries(settings).map(([section, value]) => [section, {
+    enabled: value && typeof value === "object" ? value.enabled : undefined,
+    keys: value && typeof value === "object" ? Object.keys(value) : []
+  }]));
+}
+
 function normalizeGuildState(doc) {
   if (!doc) {
     return null;
@@ -154,7 +161,8 @@ export class StateStore {
       console.info("[storage] loaded guild states", {
         database: mongoose.connection.name,
         collection: GuildStateModel.collection.name,
-        count: docs.length
+        count: docs.length,
+        settings: summarizeSettings(docs[0]?.settings)
       });
       this.state = structuredClone(this.initialState);
       this.state.guilds = {};
@@ -192,7 +200,8 @@ export class StateStore {
       acknowledged: result.acknowledged,
       matchedCount: result.matchedCount,
       modifiedCount: result.modifiedCount,
-      upsertedCount: result.upsertedCount
+      upsertedCount: result.upsertedCount,
+      settings: summarizeSettings(persisted.settings)
     });
 
     return guildState;
