@@ -492,7 +492,7 @@ function setupShopPanel() {
     const row = document.createElement("div");
     row.className = "shop-product-row";
     row.dataset.shopProduct = "";
-    row.innerHTML = `<input type="hidden" name="productId" value="" /><label class="field"><span>상품명</span><input name="productName" required /></label><label class="field"><span>가격</span><input type="number" min="0" name="productPrice" value="0" required /></label><label class="field full"><span>상품 설명</span><input name="productDescription" /></label><label class="field full"><span>구매 후 DM 내용</span><textarea name="productDelivery" rows="3" required></textarea></label><label class="field toggle"><input type="checkbox" name="productEnabled" value="" checked /><span>판매 중</span></label><button class="ghost danger" type="button" data-shop-remove-product>삭제</button>`;
+    row.innerHTML = `<input type="hidden" name="productId" value="" /><label class="field"><span>상품명</span><input name="productName" required /></label><label class="field"><span>가격</span><input type="number" min="0" name="productPrice" value="0" required /></label><label class="field full"><span>상품 설명</span><input name="productDescription" /></label><label class="field full"><span>재고 내용(한 줄당 1개)</span><textarea name="productDelivery" rows="5" required placeholder="재고 1\n재고 2\n재고 3"></textarea><small class="muted">줄바꿈마다 재고 1개로 저장되며 구매 시 하나씩 DM으로 전달됩니다.</small></label><label class="field toggle"><input type="checkbox" name="productEnabled" value="" checked /><span>판매 중</span></label><button class="ghost danger" type="button" data-shop-remove-product>삭제</button>`;
     list.append(row); bindRemove(row);
   });
 }

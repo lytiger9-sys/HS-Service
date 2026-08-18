@@ -29,7 +29,7 @@ function normalizeShop(shop = {}) {
   return {
     ...DEFAULT_SHOP,
     ...shop,
-    products: Array.isArray(shop.products) ? shop.products : [],
+    products: Array.isArray(shop.products) ? shop.products.map(normalizeProduct) : [],
     wallets: shop.wallets && typeof shop.wallets === "object" ? shop.wallets : {},
     purchases: Array.isArray(shop.purchases) ? shop.purchases : []
   };
@@ -41,6 +41,22 @@ function walletOf(shop, userId) {
   return wallet;
 }
 function id() { return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`; }
+function stockLines(product = {}) {
+  if (Array.isArray(product.stock)) return product.stock.map((line) => String(line).trim()).filter(Boolean);
+  return String(product.delivery || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+}
+function normalizeProduct(product = {}) {
+  const stock = stockLines(product);
+  return {
+    id: product.id || id(),
+    name: String(product.name || "상품").slice(0, 100),
+    description: String(product.description || "").slice(0, 1000),
+    price: Math.max(0, Math.floor(Number(product.price) || 0)),
+    stock,
+    delivery: stock.join("\n"),
+    enabled: product.enabled !== false
+  };
+}
 
 export function createShopService(context) {
   async function state(guildId) {
@@ -112,7 +128,7 @@ export function createShopService(context) {
     return result;
   }
   async function saveProducts(guildId, products) {
-    const normalized = products.slice(0, 100).map((product) => ({ id: product.id || id(), name: String(product.name || "상품").slice(0, 100), description: String(product.description || "").slice(0, 1000), price: Math.max(0, Math.floor(Number(product.price) || 0)), delivery: String(product.delivery || "").slice(0, 4000), enabled: product.enabled !== false }));
+    const normalized = products.slice(0, 100).map((product) => normalizeProduct(product));
     await patch(guildId, (guild) => { guild.shop = normalizeShop(guild.shop); guild.shop.products = normalized; });
     return normalized;
   }
@@ -137,19 +153,23 @@ export function createShopService(context) {
   async function productMenu(guildId) {
     const shop = await getShop(guildId); const products = shop.products.filter((p) => p.enabled).slice(0, 25);
     if (!products.length) return { content: "현재 판매 중인 상품이 없습니다.", ephemeral: true };
-    return { content: "구매할 상품을 선택하세요.", components: [new ActionRowBuilder().addComponents(new StringSelectMenuBuilder().setCustomId("shop:purchase").setPlaceholder("상품 선택").addOptions(products.map((p) => ({ label: p.name.slice(0, 100), description: `${p.price.toLocaleString()} 캐시`, value: p.id }))))], ephemeral: true };
+    return { content: "구매할 상품을 선택하세요.", components: [new ActionRowBuilder().addComponents(new StringSelectMenuBuilder().setCustomId("shop:purchase").setPlaceholder("상품 선택").addOptions(products.map((p) => ({ label: p.name.slice(0, 100), description: `${p.price.toLocaleString()} 캐시 · 남은 재고 ${stockLines(p).length}개`.slice(0, 100), value: p.id }))))], ephemeral: true };
   }
   async function purchase(guild, user, productId) {
-    let product; let balance;
+    let product; let balance; let delivery;
     await patch(guild.id, async (state) => {
       state.shop = normalizeShop(state.shop); product = state.shop.products.find((p) => p.id === productId && p.enabled);
       if (!product) throw new Error("상품을 찾을 수 없습니다.");
+      product.stock = stockLines(product);
+      if (!product.stock.length) throw new Error("해당 상품의 재고가 없습니다.");
       const wallet = walletOf(state.shop, user.id); if (wallet.balance < product.price) throw new Error("캐시가 부족합니다.");
+      delivery = product.stock.shift();
+      product.delivery = product.stock.join("\n");
       wallet.balance -= product.price; balance = wallet.balance;
-      state.shop.purchases.unshift({ id: id(), userId: user.id, productId, productName: product.name, price: product.price, createdAt: new Date().toISOString() });
+      state.shop.purchases.unshift({ id: id(), userId: user.id, productId, productName: product.name, price: product.price, delivery, createdAt: new Date().toISOString() });
       state.shop.purchases = state.shop.purchases.slice(0, 500);
     });
-    try { await user.send(`구매가 완료되었습니다.\n상품: ${product.name}\n\n${product.delivery}`); }
+    try { await user.send(`구매가 완료되었습니다.\n상품: ${product.name}\n\n${delivery || "상품 지급 내용이 없습니다."}`); }
     catch { await grant(guild.id, user.id, product.price, "DM 전송 실패 환불"); throw new Error("DM을 보낼 수 없어 구매 금액을 환불했습니다."); }
     return { product, balance };
   }
