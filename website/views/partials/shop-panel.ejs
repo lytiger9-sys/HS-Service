@@ -1,19 +1,36 @@
 <section class="panel-stack <%= panelClass('shop') %>" data-panel="shop">
-  <article class="card section-panel">
+  <article class="card section-panel shop-settings-card">
     <div class="section-head">
       <div><p class="eyebrow">Shop Economy</p><h3>상점 및 캐시 설정</h3><p class="muted">활동 보상, 상품, 상점 임베드를 자판기처럼 관리합니다.</p></div>
       <label class="field toggle section-toggle"><input type="checkbox" form="shop-settings-form" name="shopEnabled" <%= shop.enabled !== false ? 'checked' : '' %> /><span>상점 기능 활성화</span></label>
     </div>
     <form class="settings-form" id="shop-settings-form" method="post" action="/guild/<%= guild.id %>/settings/shop">
-      <div class="form-grid">
-        <label class="field"><span>상점 게시 채널</span><select name="shopMessageChannelId"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= shop.messageChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
-        <label class="field"><span>출석 보상 캐시</span><input type="number" min="0" name="shopDailyReward" value="<%= shop.dailyReward %>" /></label>
-        <label class="field"><span>메시지 보상 캐시</span><input type="number" min="0" name="shopMessageReward" value="<%= shop.messageReward %>" /></label>
-        <label class="field"><span>메시지 보상 기준 개수</span><input type="number" min="1" name="shopMessageThreshold" value="<%= shop.messageThreshold %>" /></label>
-        <label class="field"><span>도박 성공 확률(%)</span><input type="number" min="1" max="99" name="shopGamblingWinRate" value="<%= shop.gamblingWinRate %>" /></label>
-        <label class="field"><span>도박 최대 금액</span><input type="number" min="1" name="shopGamblingMaxBet" value="<%= shop.gamblingMaxBet %>" /></label>
-        <label class="field toggle"><input type="checkbox" name="shopGamblingEnabled" <%= shop.gamblingEnabled !== false ? 'checked' : '' %> /><span>도박 기능 활성화</span></label>
+      <div class="shop-setting-block">
+        <div class="shop-setting-grid shop-top-settings">
+          <label class="field"><span>상점 게시 채널</span><select name="shopMessageChannelId"><option value="">선택 안 함</option><% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= shop.messageChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %></select></label>
+          <label class="field"><span>출석 보상 캐시</span><input type="number" min="0" name="shopDailyReward" value="<%= shop.dailyReward %>" /></label>
+          <label class="field"><span>메시지 보상 캐시</span><input type="number" min="0" name="shopMessageReward" value="<%= shop.messageReward %>" /></label>
+          <label class="field"><span>메시지 보상 기준 개수</span><input type="number" min="1" name="shopMessageThreshold" value="<%= shop.messageThreshold %>" /></label>
+        </div>
       </div>
+
+      <div class="shop-setting-block shop-gambling-block">
+        <div class="shop-subsection-head">
+          <div><p class="eyebrow">Gambling</p><h4>도박</h4></div>
+          <label class="field toggle shop-gambling-toggle"><input type="checkbox" name="shopGamblingEnabled" <%= shop.gamblingEnabled !== false ? 'checked' : '' %> /><span>도박 기능 활성화</span></label>
+        </div>
+        <div class="shop-setting-grid shop-gambling-settings">
+          <label class="field"><span>도박 성공 확률(%)</span><input type="number" min="1" max="99" name="shopGamblingWinRate" value="<%= shop.gamblingWinRate %>" /></label>
+          <label class="field"><span>도박 최대 금액</span><input type="number" min="1" name="shopGamblingMaxBet" value="<%= shop.gamblingMaxBet %>" /></label>
+        </div>
+      </div>
+
+      <div class="shop-setting-block shop-embed-body-block">
+        <div class="shop-subsection-head"><div><p class="eyebrow">Shop Embed</p><h4>상점 임베드 본문</h4></div></div>
+        <label class="field full"><span>가운데 설명란</span><textarea name="shopEmbedBody" rows="5" maxlength="4000" placeholder="상점 임베드 가운데에 표시할 본문을 입력하세요."><%= shop.embedBody || '상품을 확인하거나 내 캐시 잔액을 확인하세요.' %></textarea></label>
+        <p class="muted shop-field-help">저장 후 상점 임베드 게시를 누르면 상점 제목 아래의 가운데 설명 영역에 표시됩니다.</p>
+      </div>
+
       <div class="form-actions"><button class="primary" type="submit">설정 저장</button><button class="ghost" type="submit" formaction="/guild/<%= guild.id %>/shop/publish">상점 임베드 게시</button></div>
     </form>
   </article>

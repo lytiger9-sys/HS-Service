@@ -2523,6 +2523,19 @@ body.dashboard-page { background: var(--ink-deep); }
 }
 
 /* Shop vending-machine management */
+.shop-setting-block { display: grid; gap: 16px; padding: 20px 0; border-top: 1px solid var(--hairline-soft); }
+.shop-setting-block:first-child { padding-top: 0; border-top: 0; }
+.shop-setting-grid { display: grid; gap: 16px; }
+.shop-top-settings { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.shop-gambling-settings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.shop-subsection-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.shop-subsection-head .eyebrow { margin-bottom: 7px; }
+.shop-subsection-head h4 { margin: 0; color: var(--ink); font-size: 1.2rem; }
+.shop-gambling-toggle { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }
+.shop-field-help { margin: -6px 0 0; font-size: .8rem; }
+.shop-embed-body-block textarea { min-height: 120px; resize: vertical; }
+@media (max-width: 900px) { .shop-top-settings { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .shop-top-settings, .shop-gambling-settings { grid-template-columns: 1fr; } .shop-subsection-head { align-items: flex-start; flex-direction: column; } .shop-gambling-toggle { margin-left: 0; } }
 .shop-product-list { display: grid; gap: 16px; margin-bottom: 20px; }
 .shop-product-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(140px, .5fr) auto; gap: 14px; padding: 18px; border: 1px solid var(--hairline); background: rgba(255,255,255,.42); }
 .shop-product-row .full { grid-column: 1 / -1; }

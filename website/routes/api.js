@@ -231,7 +231,8 @@ function sectionPayload(section, body) {
       messageThreshold: readNumber(body.shopMessageThreshold, 20, 1, 100000),
       gamblingEnabled: readBoolean(body.shopGamblingEnabled),
       gamblingWinRate: readNumber(body.shopGamblingWinRate, 45, 1, 99),
-      gamblingMaxBet: readNumber(body.shopGamblingMaxBet, 100000, 1, 100000000)
+      gamblingMaxBet: readNumber(body.shopGamblingMaxBet, 100000, 1, 100000000),
+      embedBody: readText(body.shopEmbedBody, "상품을 확인하거나 내 캐시 잔액을 확인하세요.", 4000)
     } };
   }
   if (section === "partner") {

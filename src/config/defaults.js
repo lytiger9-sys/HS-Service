@@ -163,6 +163,7 @@ export function createDefaultGuildState() {
       gamblingEnabled: true,
       gamblingWinRate: 45,
       gamblingMaxBet: 100000,
+      embedBody: "상품을 확인하거나 내 캐시 잔액을 확인하세요.",
       products: [],
       wallets: {},
       purchases: []

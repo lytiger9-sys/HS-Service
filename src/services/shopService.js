@@ -19,6 +19,7 @@ const DEFAULT_SHOP = {
   gamblingEnabled: true,
   gamblingWinRate: 45,
   gamblingMaxBet: 100000,
+  embedBody: "상품을 확인하거나 내 캐시 잔액을 확인하세요.",
   products: [],
   wallets: {},
   purchases: []
@@ -144,7 +145,7 @@ export function createShopService(context) {
   }
   function shopPayload(guild, shop) {
     const container = new ContainerBuilder();
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${guild.name} 상점\n상품을 확인하거나 내 캐시 잔액을 확인하세요.`));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${guild.name} 상점\n${shop.embedBody || DEFAULT_SHOP.embedBody}`));
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder().setCustomId("shop:products").setLabel("상품 보기").setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId("shop:info").setLabel("내정보").setStyle(ButtonStyle.Secondary)
