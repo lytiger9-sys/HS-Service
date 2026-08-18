@@ -2824,3 +2824,31 @@ body.dashboard-page { background: var(--ink-deep); }
 .license-auth-page .license-form > button.primary:active {
   transform: translateY(1px);
 }
+
+/* Pretendard UI family for requested action labels and status text */
+:root { --pretendard: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
+.dashboard-page button,
+.license-page button,
+.license-auth-page button,
+.dashboard-page .variable-button,
+.dashboard-page .chip,
+.dashboard-page .admin-status-note,
+.dashboard-page .staff-status,
+.dashboard-page .status-chip,
+.dashboard-page .overview-stat,
+.dashboard-page .overview-stat-label,
+.dashboard-page .overview-stat-value {
+  font-family: var(--pretendard) !important;
+}
+.dashboard-page button,
+.license-page button,
+.license-auth-page button {
+  font-feature-settings: normal;
+  font-variant-numeric: tabular-nums;
+}
+.dashboard-page .variable-button,
+.dashboard-page .chip,
+.dashboard-page .admin-status-note,
+.dashboard-page .status-chip {
+  letter-spacing: 0;
+}
