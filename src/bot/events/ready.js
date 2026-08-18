@@ -6,7 +6,7 @@ export default async function handleReady(client, context) {
   console.log(`[bot] logged in as ${client.user.tag}`);
 
   const updatePresence = async () => {
-    const supportedGuilds = await context.services.licenses.countSupportedGuilds(client.guilds.cache.keys());
+    const supportedGuilds = await context.services.licenses.countSupportedGuilds(client.guilds.cache.keys(), [context.config.allowedGuildId]);
     client.user.setPresence({
       activities: [{ name: `Supporting ${supportedGuilds} servers`, type: ActivityType.Watching }],
       status: "online"

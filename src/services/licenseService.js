@@ -39,15 +39,16 @@ function refreshExpiredStatus(license) {
 
 export function createLicenseService() {
   return {
-    async countSupportedGuilds(guildIds = []) {
+    async countSupportedGuilds(guildIds = [], alwaysIncludeGuildIds = []) {
       const ids = [...new Set(guildIds.map((id) => String(id)).filter(Boolean))];
-      if (!ids.length) return 0;
+      const includedIds = new Set(alwaysIncludeGuildIds.map((id) => String(id)).filter(Boolean));
+      if (!ids.length) return includedIds.size;
       const assignedGuildIds = await LicenseModel.distinct("assignedGuildId", {
         kind: "service",
         status: "active",
         assignedGuildId: { $in: ids }
       });
-      return assignedGuildIds.length;
+      return new Set([...assignedGuildIds.map(String), ...includedIds]).size;
     },
 
     async list() {
