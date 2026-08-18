@@ -13,7 +13,7 @@ async function resolveVoiceChannel(guild, channelId) {
 }
 
 export function createTempChannelService(context, guildState) {
-  async function createTemporaryVoiceChannel({ guild, member, name }) {
+  async function createTemporaryVoiceChannel({ guild, member, name, userLimit = null }) {
     const settings = (await context.services.settings.getSettings(guild.id)).voice;
     if (settings.enabled === false) {
       throw new Error("현재 음성 채널 기능이 꺼져 있습니다.");
@@ -24,7 +24,7 @@ export function createTempChannelService(context, guildState) {
       name: channelName,
       type: ChannelType.GuildVoice,
       parent: settings.categoryId || null,
-      userLimit: Number(settings.maxUsers || 0) || undefined,
+      userLimit: userLimit === null || userLimit === undefined ? (Number(settings.maxUsers || 0) || undefined) : (Math.max(0, Math.min(99, Number(userLimit) || 0)) || undefined),
       permissionOverwrites: [
         {
           id: guild.roles.everyone.id,

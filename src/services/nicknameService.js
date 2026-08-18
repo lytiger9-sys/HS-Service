@@ -42,6 +42,16 @@ export async function applyAllNicknames(guild, settings) {
   return changed;
 }
 
+export async function restoreNicknames(guild) {
+  await guild.members.fetch().catch(() => null);
+  let changed = 0;
+  for (const member of guild.members.cache.values()) {
+    if (member.user?.bot || member.permissions?.has?.("Administrator") || !member.manageable || !member.nickname) continue;
+    if (await member.setNickname(null, "nickname restore").then(() => true).catch(() => false)) changed += 1;
+  }
+  return changed;
+}
+
 export async function randomizeNicknames(guild) {
   await guild.members.fetch().catch(() => null);
   let changed = 0;

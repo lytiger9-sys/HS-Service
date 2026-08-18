@@ -146,6 +146,7 @@ function componentsPayload(settings, guild) {
   }
   flush();
   if (settings.footer) {
+    container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${normalizeRoleMentions(settings.footer, guild)}`));
   }
   if (!lines.length && !settings.footer) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(" "));

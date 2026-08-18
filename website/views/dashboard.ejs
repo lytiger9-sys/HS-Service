@@ -46,10 +46,11 @@
         <section class="grid two-up">
         <article class="card" data-section="overview">
           <h3>최근 개요</h3>
-          <dl class="key-list">
+            <dl class="key-list">
             <div><dt>채널</dt><dd><%= overview.channels %>개</dd></div>
             <div><dt>역할</dt><dd><%= overview.roles %>개</dd></div>
             <div><dt>임시 음성</dt><dd><%= overview.tempChannels.length %>개</dd></div>
+            <div><dt>활성 투표</dt><dd><%= (overview.activePolls || []).length %>개</dd></div>
           </dl>
         </article>
 
@@ -138,34 +139,6 @@
           </form>
         </article>
 
-        <aside class="preview-column">
-          <div class="card">
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Live Preview</p>
-                <h3>환영 임베드</h3>
-              </div>
-            </div>
-            <div class="discord-preview" id="welcome-preview">
-              <div class="preview-bar"></div>
-              <div class="preview-body">
-                <h4 data-preview-title><%= settings.welcome.embedTitle %></h4>
-                <p data-preview-description><%= settings.welcome.embedDescription %></p>
-                <div class="preview-footer">
-                  <span data-preview-footer><%= guild.name %></span>
-                  <span data-preview-time>방금 전</span>
-                </div>
-              </div>
-            </div>
-            <div class="discord-preview dm-preview">
-              <div class="preview-bar preview-bar-dm"></div>
-              <div class="preview-body">
-                <h4 data-preview-dm-title><%= settings.welcome.dmTitle %></h4>
-                <p data-preview-dm-message><%= settings.welcome.dmMessage %></p>
-              </div>
-            </div>
-          </div>
-        </aside>
       </section>
 
       <%- include('partials/ticket-panel', { guild, channels, settings, panelClass }) %>
@@ -341,6 +314,10 @@
                 <span>질문</span>
                 <input type="text" name="pollQuestion" data-poll-preview="question" />
               </label>
+              <label class="field">
+                <span>투표 만료 일수</span>
+                <input type="number" name="pollExpirationDays" min="1" max="365" value="<%= settings.polls.expirationDays || 7 %>" />
+              </label>
               <label class="field full">
                 <span>설명</span>
                 <textarea name="pollDescription" rows="4" data-poll-preview="description"></textarea>
@@ -359,10 +336,6 @@
                   <option value="public" <%= (settings.polls.resultVisibility || 'public') !== 'private' ? 'selected' : '' %>>공개 결과</option>
                   <option value="private" <%= settings.polls.resultVisibility === 'private' ? 'selected' : '' %>>비공개 결과</option>
                 </select>
-              </label>
-              <label class="field">
-                <span>투표 만료 일수</span>
-                <input type="number" name="pollExpirationDays" min="1" max="365" value="<%= settings.polls.expirationDays || 7 %>" />
               </label>
             </div>
           </form>

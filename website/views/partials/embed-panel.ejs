@@ -93,22 +93,4 @@
       </div>
     </form>
   </article>
-  <aside class="preview-column">
-    <div class="card">
-      <div class="section-head compact">
-        <div><p class="eyebrow">Components V2 Preview</p><h3>실제 메시지 미리보기</h3><p class="muted">입력한 제목·텍스트·이미지·구분선·푸터가 Discord 메시지 순서대로 표시됩니다.</p></div>
-      </div>
-      <div class="discord-message" data-embed-preview-card>
-        <div class="discord-avatar"><%= guild.name.slice(0, 1) %></div>
-        <div class="discord-message-content">
-          <div class="discord-message-meta"><strong><%= guild.name %></strong><span>오늘 오전 12:00</span></div>
-          <div class="discord-components-message" data-embed-preview-components-card>
-            <div class="discord-components-preview" data-embed-preview-components></div>
-            <div class="discord-component-footer" data-embed-preview-footer><%= settings.embed.footer %></div>
-          </div>
-        </div>
-      </div>
-      <p class="muted preview-help">Discord의 어두운 메시지 레이아웃을 기준으로 표시합니다.</p>
-    </div>
-  </aside>
 </section>

@@ -16,7 +16,7 @@ import { createLicenseService } from "./licenseService.js";
 import { createPartnerService } from "./partnerService.js";
 import { createOverviewChannelService } from "./overviewChannelService.js";
 import { createEmbedService } from "./embedService.js";
-import { applyAllNicknames, randomizeNicknames, applyNickname, getBotManagedRoles } from "./nicknameService.js";
+import { applyAllNicknames, randomizeNicknames, restoreNicknames, applyNickname, getBotManagedRoles } from "./nicknameService.js";
 import { createShopService } from "./shopService.js";
 import { createServerAuditLogService } from "./serverAuditLogService.js";
 
@@ -42,7 +42,7 @@ export function createServices(context) {
     partners: createPartnerService(context),
     overviewChannels: createOverviewChannelService(context),
     embeds: createEmbedService(context),
-    nicknames: { applyAllNicknames, randomizeNicknames, applyNickname, getBotManagedRoles },
+    nicknames: { applyAllNicknames, randomizeNicknames, restoreNicknames, applyNickname, getBotManagedRoles },
     shop: createShopService(context),
     serverAuditLogs: createServerAuditLogService(context)
   };

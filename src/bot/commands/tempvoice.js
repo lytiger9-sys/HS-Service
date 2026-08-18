@@ -9,16 +9,24 @@ export default {
         .setName("name")
         .setDescription("채널 이름")
         .setRequired(false)
-    ),
+    )
+    .addIntegerOption((option) => option
+      .setName("limit")
+      .setDescription("채널 최대 인원수 (0이면 제한 없음)")
+      .setMinValue(0)
+      .setMaxValue(99)
+      .setRequired(false)),
 
   async execute(interaction, context) {
     await interaction.deferReply({ ephemeral: true });
     const name = interaction.options.getString("name") ?? "";
+    const userLimit = interaction.options.getInteger("limit");
     try {
       const channel = await context.services.tempChannels.createTemporaryVoiceChannel({
         guild: interaction.guild,
         member: interaction.member,
-        name
+        name,
+        userLimit
       });
 
       return interaction.editReply({
