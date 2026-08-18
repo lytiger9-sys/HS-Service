@@ -213,8 +213,23 @@ async function submitForm(form, submitter = null) {
   return payload;
 }
 
+function ensureToggleFallbacks(form) {
+  if (!form.id) return;
+  document.querySelectorAll(`input[form="${form.id}"][type="checkbox"][name$="Enabled"]`).forEach((toggle) => {
+    const selector = `input[data-toggle-fallback="${toggle.name}"]`;
+    if (form.querySelector(selector)) return;
+    const fallback = document.createElement("input");
+    fallback.type = "hidden";
+    fallback.name = toggle.name;
+    fallback.value = "off";
+    fallback.dataset.toggleFallback = toggle.name;
+    form.appendChild(fallback);
+  });
+}
+
 function setupForms() {
   forms.forEach((form) => {
+    ensureToggleFallbacks(form);
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
