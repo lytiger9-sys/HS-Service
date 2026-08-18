@@ -18,8 +18,10 @@ export function createEmojiService(context) {
     await guild.emojis.fetch();
     if (guild.emojis.cache.some((emoji) => emoji.name === name)) throw new Error(`이미 같은 이름의 이모지 '${name}'가 있습니다.`);
     const extension = source.animated ? "gif" : "png";
-    const response = await fetch(`https://cdn.discordapp.com/emojis/${source.id}.${extension}?size=256&quality=lossless`);
+    const response = await fetch(`https://cdn.discordapp.com/emojis/${source.id}.${extension}?size=256&quality=lossless`, { signal: AbortSignal.timeout(8000) });
     if (!response.ok) throw new Error("원본 이모지 이미지를 가져오지 못했습니다.");
+    const contentLength = Number(response.headers.get("content-length") || 0);
+    if (contentLength > MAX_BYTES) throw new Error("이모지 이미지가 너무 큽니다.");
     const buffer = Buffer.from(await response.arrayBuffer());
     if (buffer.length > MAX_BYTES) throw new Error("이모지 이미지가 너무 큽니다.");
     const created = await guild.emojis.create({ attachment: buffer, name, reason: `이모지 스틸: ${userId}` });

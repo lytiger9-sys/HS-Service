@@ -44,12 +44,15 @@ export default {
         .setDescription("삭제할 개수. 비우면 가능한 만큼 삭제")
         .setMinValue(1)
         .setMaxValue(1000)
-    ),
+    )
+    .addBooleanOption((option) => option.setName("확인").setDescription("메시지를 삭제한다는 것을 확인합니다.").setRequired(true)),
 
   async execute(interaction) {
     if (!isAdministrator(interaction.member)) {
       return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
     }
+
+    if (!interaction.options.getBoolean("확인", true)) return interaction.reply({ content: "삭제를 진행하려면 확인을 true로 설정해야 합니다.", ephemeral: true });
 
     const channel = interaction.channel;
     if (!channel?.isTextBased?.()) {

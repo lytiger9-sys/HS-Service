@@ -19,12 +19,17 @@ export const emojiSteal = {
 };
 
 export const emojiList = {
-  data: new SlashCommandBuilder().setName("이모지목록").setDescription("현재 서버의 커스텀 이모지 목록을 보여줍니다."),
+  data: new SlashCommandBuilder().setName("이모지목록").setDescription("현재 서버의 커스텀 이모지 목록을 보여줍니다.").addIntegerOption((option) => option.setName("페이지").setDescription("확인할 페이지").setMinValue(1).setRequired(false)),
   async execute(interaction, context) {
     try {
       const emojis = await context.services.emojis.list(interaction.guild);
-      const content = emojis.length ? emojis.map((emoji) => `${emoji} ${emoji.name}`).join("\n") : "등록된 커스텀 이모지가 없습니다.";
-      return interaction.reply({ content: content.slice(0, 1900), ephemeral: true });
+      const page = interaction.options.getInteger("페이지") || 1;
+      const pageSize = 20;
+      const pageCount = Math.max(1, Math.ceil(emojis.length / pageSize));
+      const currentPage = Math.min(page, pageCount);
+      const items = emojis.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+      const content = items.length ? items.map((emoji) => `${emoji} ${emoji.name} — ${emoji.id}`).join("\n") : "등록된 커스텀 이모지가 없습니다.";
+      return interaction.reply({ content: `${content.slice(0, 1800)}\n\n페이지 ${currentPage}/${pageCount}`, ephemeral: true });
     } catch {
       return interaction.reply({ content: "이모지 목록을 가져오지 못했습니다.", ephemeral: true });
     }
@@ -32,8 +37,9 @@ export const emojiList = {
 };
 
 export const emojiDelete = {
-  data: new SlashCommandBuilder().setName("이모지삭제").setDescription("현재 서버의 커스텀 이모지를 삭제합니다.").addStringOption((option) => option.setName("이모지").setDescription("삭제할 커스텀 이모지를 그대로 입력").setRequired(true)),
+  data: new SlashCommandBuilder().setName("이모지삭제").setDescription("현재 서버의 커스텀 이모지를 삭제합니다.").addStringOption((option) => option.setName("이모지").setDescription("삭제할 커스텀 이모지를 그대로 입력").setRequired(true)).addBooleanOption((option) => option.setName("확인").setDescription("이모지 삭제를 확인합니다.").setRequired(true)),
   async execute(interaction, context) {
+    if (!interaction.options.getBoolean("확인", true)) return interaction.reply({ content: "삭제를 진행하려면 확인을 true로 설정해야 합니다.", ephemeral: true });
     await interaction.deferReply({ ephemeral: true });
     try {
       const emoji = await context.services.emojis.removeByValue(interaction.guild, interaction.options.getString("이모지", true), interaction.member);

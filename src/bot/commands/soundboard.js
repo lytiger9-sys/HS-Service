@@ -20,13 +20,18 @@ export const soundboardSteal = {
 };
 
 export const soundboardList = {
-  data: new SlashCommandBuilder().setName("사운드목록").setDescription("현재 서버의 사운드보드 목록을 보여줍니다."),
+  data: new SlashCommandBuilder().setName("사운드목록").setDescription("현재 서버의 사운드보드 목록을 보여줍니다.").addIntegerOption((option) => option.setName("페이지").setDescription("확인할 페이지").setMinValue(1).setRequired(false)),
   async execute(interaction, context) {
     await interaction.deferReply({ ephemeral: true });
     try {
       const sounds = await context.services.soundboards.list(interaction.guild);
-      const content = sounds.length ? sounds.map((sound) => `**${sound.name}** — \`${sound.id}\``).join("\n") : "등록된 사운드보드가 없습니다.";
-      return interaction.editReply(content.slice(0, 1900));
+      const page = interaction.options.getInteger("페이지") || 1;
+      const pageSize = 15;
+      const pageCount = Math.max(1, Math.ceil(sounds.length / pageSize));
+      const currentPage = Math.min(page, pageCount);
+      const items = sounds.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+      const content = items.length ? items.map((sound) => `**${sound.name}** — ${sound.id}`).join("\n") : "등록된 사운드보드가 없습니다.";
+      return interaction.editReply(`${content.slice(0, 1800)}\n\n페이지 ${currentPage}/${pageCount}`);
     } catch {
       return interaction.editReply("사운드보드 목록을 가져오지 못했습니다.");
     }
@@ -34,8 +39,9 @@ export const soundboardList = {
 };
 
 export const soundboardDelete = {
-  data: new SlashCommandBuilder().setName("사운드삭제").setDescription("현재 서버의 사운드보드를 삭제합니다.").addStringOption((option) => option.setName("사운드id").setDescription("삭제할 사운드 ID").setRequired(true)),
+  data: new SlashCommandBuilder().setName("사운드삭제").setDescription("현재 서버의 사운드보드를 삭제합니다.").addStringOption((option) => option.setName("사운드id").setDescription("삭제할 사운드 ID").setRequired(true)).addBooleanOption((option) => option.setName("확인").setDescription("사운드 삭제를 확인합니다.").setRequired(true)),
   async execute(interaction, context) {
+    if (!interaction.options.getBoolean("확인", true)) return interaction.reply({ content: "삭제를 진행하려면 확인을 true로 설정해야 합니다.", ephemeral: true });
     await interaction.deferReply({ ephemeral: true });
     try {
       const sound = await context.services.soundboards.remove(interaction.guild, interaction.options.getString("사운드id", true), interaction.member);

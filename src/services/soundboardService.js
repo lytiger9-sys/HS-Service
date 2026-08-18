@@ -20,8 +20,10 @@ export function createSoundboardService(context) {
     if (!sourceGuild) throw new Error("원본 서버에 봇이 들어가 있지 않거나 서버를 찾을 수 없습니다.");
     const sourceSound = await sourceGuild.soundboardSounds.fetch(soundId).catch(() => null);
     if (!sourceSound?.url) throw new Error("원본 사운드를 찾을 수 없습니다.");
-    const response = await fetch(sourceSound.url);
+    const response = await fetch(sourceSound.url, { signal: AbortSignal.timeout(8000) });
     if (!response.ok) throw new Error("원본 사운드 파일을 가져오지 못했습니다.");
+    const contentLength = Number(response.headers.get("content-length") || 0);
+    if (contentLength > MAX_FILE_BYTES) throw new Error("사운드 파일이 Discord 제한인 512KB를 초과합니다.");
     const buffer = Buffer.from(await response.arrayBuffer());
     if (buffer.length > MAX_FILE_BYTES) throw new Error("사운드 파일이 Discord 제한인 512KB를 초과합니다.");
     const created = await targetGuild.soundboardSounds.create({ file: buffer, name: cleanName(name, sourceSound.name), contentType: response.headers.get("content-type") || "audio/mpeg", volume: sourceSound.volume, emojiName: sourceSound.emoji?.name, reason: `사운드보드 스틸: ${userId}` });

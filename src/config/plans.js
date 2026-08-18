@@ -60,7 +60,6 @@ export const PLAN_TAB_LABELS = {
   assignment: "역할",
   voice: "음성",
   honeypot: "허니팟",
-  embed: "임베드 및 공지",
   polls: "투표",
   logs: "로그",
   partner: "파트너",
