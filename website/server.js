@@ -23,7 +23,14 @@ export async function startWebsite(context) {
   }
   app.use(express.urlencoded({ extended: true, limit: "100kb" }));
   app.use(express.json({ limit: "100kb" }));
-  app.use(express.static(path.join(__dirname, "public")));
+  app.locals.assetVersion = process.env.RENDER_GIT_COMMIT || process.env.COMMIT_SHA || Date.now().toString(36);
+  app.use(express.static(path.join(__dirname, "public"), {
+    setHeaders: (res, filePath) => {
+      if (/\.(?:css|js)$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "no-cache, must-revalidate");
+      }
+    }
+  }));
   app.get("/HS.gif", (_req, res) => {
     res.sendFile(path.join(__dirname, "..", "HS.gif"));
   });
@@ -36,6 +43,7 @@ export async function startWebsite(context) {
   app.use(requestRateLimit);
 
   app.use((req, res, next) => {
+    if (req.accepts("html")) res.setHeader("Cache-Control", "no-store");
     res.locals.currentUser = req.user || null;
     res.locals.isAuthenticated = typeof req.isAuthenticated === "function" ? req.isAuthenticated() : false;
     next();
