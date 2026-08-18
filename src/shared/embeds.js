@@ -1,4 +1,4 @@
-import { EmbedBuilder } from "discord.js";
+import { ContainerBuilder, EmbedBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
 import { applyPlaceholders } from "./placeholders.js";
 import { clampText } from "./naming.js";
 
@@ -124,29 +124,28 @@ export function buildNoticeEmbed(guild, notice) {
   });
 }
 
-export function buildServerInfoEmbed(guild, stats) {
-  const embed = createBaseEmbed({
-    title: `${guild.name} 서버 정보`,
-    description: "현재 서버의 핵심 정보를 정리한 요약입니다.",
-    color: palette.ink,
-    fields: [
-      { name: "전체 인원", value: `${stats.totalMembers}명`, inline: true },
-      { name: "사람", value: `${stats.humans}명`, inline: true },
-      { name: "봇", value: `${stats.bots}명`, inline: true },
-      { name: "채널 수", value: `${stats.channels}개`, inline: true },
-      { name: "역할 수", value: `${stats.roles}개`, inline: true },
-      { name: "생성일", value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:F>`, inline: true }
-    ],
-    footer: `Owner: ${stats.ownerTag || guild.ownerId}`,
-    timestamp: Date.now()
-  });
+export function buildServerInfoComponents(guild, stats) {
+  const container = new ContainerBuilder()
+    .setAccentColor(palette.ink)
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${guild.name} 서버 정보`))
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent([
+      `**서버 ID**\n${guild.id}`,
+      `**서버 소유자**\n<@${guild.ownerId}>`,
+      `**생성일**\n<t:${Math.floor(guild.createdTimestamp / 1000)}:F>`
+    ].join("\n\n")))
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent([
+      `**전체 인원**\n${stats.totalMembers}명`,
+      `**사람**\n${stats.humans}명`,
+      `**봇**\n${stats.bots}명`,
+      `**채널**\n${stats.channels}개`,
+      `**역할**\n${stats.roles}개`
+    ].join("\n\n")))
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**관리자 수** ${stats.adminCount}명`));
 
-  const icon = guild.iconURL({ size: 128 });
-  if (icon) {
-    embed.setThumbnail(icon);
-  }
-
-  return embed;
+  return { flags: MessageFlags.IsComponentsV2, components: [container], allowedMentions: { parse: [] } };
 }
 
 export function buildPollEmbed(poll, forceResults = true) {

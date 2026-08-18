@@ -1,4 +1,4 @@
-import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export const soundboardSteal = {
   data: new SlashCommandBuilder()
@@ -19,10 +19,41 @@ export const soundboardSteal = {
   }
 };
 
+export function buildSoundboardListPayload(sounds, page = 1, userId = "") {
+  const pageSize = 20;
+  const pageCount = Math.max(1, Math.ceil(sounds.length / pageSize));
+  const currentPage = Math.min(Math.max(1, Number(page) || 1), pageCount);
+  const items = sounds.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const content = items.length
+    ? items.map((sound) => `**${sound.name}** — ${sound.soundId || sound.id}`).join("\n")
+    : "등록된 사운드가 없습니다.";
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId(`page:sound:${userId}:${currentPage - 1}:${pageCount}`).setLabel("‹").setStyle(ButtonStyle.Secondary).setDisabled(currentPage <= 1),
+    new ButtonBuilder().setCustomId(`page:sound:${userId}:${currentPage + 1}:${pageCount}`).setLabel(`${currentPage}/${pageCount}`).setStyle(ButtonStyle.Secondary).setDisabled(true),
+    new ButtonBuilder().setCustomId(`page:sound:${userId}:${currentPage + 1}:${pageCount}`).setLabel("›").setStyle(ButtonStyle.Secondary).setDisabled(currentPage >= pageCount)
+  );
+  return { content: `${content}\n\n페이지 ${currentPage}/${pageCount}`, components: [row], ephemeral: true };
+}
+
+export const soundboardList = {
+  data: new SlashCommandBuilder()
+    .setName("사운드목록")
+    .setDescription("현재 서버의 사운드보드 목록을 보여줍니다.")
+    .addIntegerOption((option) => option.setName("페이지").setDescription("확인할 페이지").setMinValue(1).setRequired(false)),
+  async execute(interaction, context) {
+    try {
+      const sounds = await context.services.soundboards.list(interaction.guild);
+      return interaction.reply(buildSoundboardListPayload(sounds, interaction.options.getInteger("페이지") || 1, interaction.user.id));
+    } catch (error) {
+      return interaction.reply({ content: error.message || "사운드 목록을 가져오지 못했습니다.", ephemeral: true });
+    }
+  }
+};
+
 export const soundboardDelete = {
   data: new SlashCommandBuilder().setName("사운드삭제").setDescription("현재 서버의 사운드보드를 삭제합니다.").addStringOption((option) => option.setName("사운드id").setDescription("삭제할 사운드 ID").setRequired(true)).addBooleanOption((option) => option.setName("확인").setDescription("사운드 삭제를 확인합니다.").setRequired(true)),
   async execute(interaction, context) {
-    if (!interaction.options.getBoolean("확인", true)) return interaction.reply({ content: "삭제를 진행하려면 확인을 true로 설정해야 합니다.", ephemeral: true });
+    if (!interaction.options.getBoolean("확인", false)) return interaction.reply({ content: "삭제를 진행하려면 `확인: true` 옵션을 선택하세요.", ephemeral: true });
     await interaction.deferReply({ ephemeral: true });
     try {
       const sound = await context.services.soundboards.remove(interaction.guild, interaction.options.getString("사운드id", true), interaction.member);

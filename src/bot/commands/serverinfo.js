@@ -7,7 +7,7 @@ export default {
 
   async execute(interaction, context) {
     await interaction.deferReply({ ephemeral: true });
-    const embed = await context.services.serverInfo.buildInfoEmbed(interaction.guild);
-    return interaction.editReply({ embeds: [embed] });
+    const payload = await context.services.serverInfo.buildInfoEmbed(interaction.guild);
+    return interaction.editReply(payload);
   }
 };

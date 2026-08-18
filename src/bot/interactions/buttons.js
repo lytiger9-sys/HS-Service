@@ -1,6 +1,7 @@
 import { isAdministrator } from "../../shared/guards.js";
 import { buildJoinOrderPayload } from "../commands/joinorder.js";
 import { buildEmojiListPayload } from "../commands/emoji.js";
+import { buildSoundboardListPayload } from "../commands/soundboard.js";
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
 function buildFreeTextModal(pollId) {
@@ -65,8 +66,16 @@ export async function handleButtonInteraction(interaction, context) {
     if (String(id) !== String(interaction.user.id)) {
       return interaction.reply({ content: "이 페이지 버튼은 명령어를 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });
     }
-    const rows = await context.services.serverInfo.getJoinOrder(interaction.guild, 100);
+    const rows = await context.services.serverInfo.getJoinOrder(interaction.guild);
     return interaction.update(buildJoinOrderPayload(rows, Number(extra), interaction.user.id));
+  }
+
+  if (scope === "page" && action === "sound") {
+    if (String(id) !== String(interaction.user.id)) return interaction.reply({ content: "이 페이지는 목록을 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });
+    const page = Number(extra) || 1;
+    const pageCount = Number(total) || 1;
+    const sounds = await context.services.soundboards.list(interaction.guild);
+    return interaction.update(buildSoundboardListPayload(sounds, Math.min(Math.max(page, 1), pageCount), interaction.user.id));
   }
 
   if (scope === "page" && action === "emoji") {

@@ -1,5 +1,5 @@
 import { PermissionFlagsBits } from "discord.js";
-import { buildServerInfoEmbed } from "../shared/embeds.js";
+import { buildServerInfoComponents } from "../shared/embeds.js";
 
 function sortMembersByJoinDate(members) {
   return [...members.values()]
@@ -47,12 +47,12 @@ export function createServerInfoService(context, guildState) {
 
   async function buildInfoEmbed(guild) {
     const stats = await getOverview(guild);
-    return buildServerInfoEmbed(guild, stats);
+    return buildServerInfoComponents(guild, stats);
   }
 
-  async function getJoinOrder(guild, limit = 20) {
+  async function getJoinOrder(guild) {
     const members = await guild.members.fetch().catch(() => guild.members.cache);
-    return sortMembersByJoinDate(members).slice(0, limit).map((member, index) => ({
+    return sortMembersByJoinDate(members).map((member, index) => ({
       rank: index + 1,
       user: member.user,
       joinedTimestamp: member.joinedTimestamp

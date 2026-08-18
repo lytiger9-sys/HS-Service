@@ -11,7 +11,7 @@ export async function handleModalInteraction(interaction, context) {
     if (!Number.isInteger(requestedPage) || requestedPage < 1 || requestedPage > maxPage) {
       return interaction.reply({ content: `페이지 번호는 1부터 ${maxPage} 사이의 정수로 입력해 주세요.`, ephemeral: true });
     }
-    const rows = await context.services.serverInfo.getJoinOrder(interaction.guild, 100);
+    const rows = await context.services.serverInfo.getJoinOrder(interaction.guild);
     return interaction.update(buildJoinOrderPayload(rows, requestedPage - 1, interaction.user.id));
   }
 

@@ -17,7 +17,7 @@ import profile from "./profile.js";
 import exchange from "./exchange.js";
 import clone from "./clone.js";
 import { emojiSteal, emojiList, emojiDelete } from "./emoji.js";
-import { soundboardSteal, soundboardDelete } from "./soundboard.js";
+import { soundboardSteal, soundboardList, soundboardDelete } from "./soundboard.js";
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 import birthday from "./birthday.js";
 
@@ -45,6 +45,7 @@ export const commandList = [
   emojiList,
   emojiDelete,
   soundboardSteal,
+  soundboardList,
   soundboardDelete,
   shop,
   balanceCommand,
