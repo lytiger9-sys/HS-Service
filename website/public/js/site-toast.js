@@ -58,6 +58,13 @@
     buttons.forEach((button) => { button.disabled = true; });
     try {
       const data = new FormData(form);
+      const checkboxInputs = new Set([
+        ...Array.from(form.querySelectorAll('input[type="checkbox"][name]')),
+        ...(form.id ? Array.from(document.querySelectorAll(`input[type="checkbox"][form="${form.id}"][name]`)) : [])
+      ]);
+      checkboxInputs.forEach((input) => {
+        data.set(input.name, input.checked ? "on" : "off");
+      });
       if (submitter?.name && !data.has(submitter.name)) data.append(submitter.name, submitter.value || "");
       const response = await fetch(form.action, {
         method: "POST",
