@@ -2593,3 +2593,37 @@ body.dashboard-page { background: var(--ink-deep); }
   .dashboard-page .poll-action-group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); min-width: 222px; }
   .dashboard-page .poll-action { min-width: 0; padding-inline: 7px; }
 }
+
+/* Shop action buttons: slimmer height, wider editorial controls */
+.dashboard-page .shop-action-button {
+  min-width: 148px;
+  min-height: 42px;
+  padding: 9px 28px;
+  border-radius: 9px;
+  font-size: .72rem;
+  letter-spacing: .16em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.dashboard-page .shop-action-row {
+  align-items: center;
+  gap: 12px;
+}
+.dashboard-page .shop-products-card .section-head > .shop-action-button {
+  min-width: 116px;
+}
+.dashboard-page .shop-products-card .shop-product-row > .shop-action-button {
+  min-width: 116px;
+  margin-top: 4px;
+}
+@media (max-width: 560px) {
+  .dashboard-page .shop-action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .dashboard-page .shop-action-row .shop-action-button {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 14px;
+  }
+}
