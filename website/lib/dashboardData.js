@@ -67,8 +67,8 @@ function buildSections() {
     { id: "embed", label: "임베드", description: "임베드 및 공지" },
     { id: "polls", label: "투표", description: "버튼 투표" },
     { id: "logs", label: "로그", description: "채널 연결" },
-    { id: "nickname", label: "닉네임", description: "역할별 이름 규칙" },
-    { id: "partner", label: "파트너", description: "제휴 신청 및 채널" }
+    { id: "partner", label: "파트너", description: "제휴 신청 및 채널" },
+    { id: "nickname", label: "닉네임", description: "역할별 이름 규칙" }
   ];
 }
 
