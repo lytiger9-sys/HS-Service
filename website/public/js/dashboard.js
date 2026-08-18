@@ -384,7 +384,7 @@ function setupEmbedPanel() {
 }
 
 function setupChannelComboboxes() {
-  const selectors = 'select[name*="ChannelId"], select[name*="CategoryId"], select[data-embed-channel]';
+  const selectors = 'select';
   const selects = [...document.querySelectorAll(selectors)].filter((select) => !select.dataset.comboReady);
   const closeAll = (except) => {
     document.querySelectorAll(".channel-combobox.is-open").forEach((combo) => {

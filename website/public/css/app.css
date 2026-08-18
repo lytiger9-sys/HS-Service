@@ -2464,3 +2464,18 @@ body.dashboard-page { background: var(--ink-deep); }
 .sidebar-tab .nav-description { color: rgba(248, 249, 250, 0.76); }
 .sidebar-tab { color: rgba(248, 249, 250, 0.76); }
 .sidebar-tab .nav-index { color: rgba(248, 249, 250, 0.52); }
+
+/* Combobox overlay readability */
+.dashboard-page .channel-combobox.is-open { z-index: 1000; }
+.dashboard-page .channel-combobox-list {
+  z-index: 1001;
+  background: #ffffff !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  isolation: isolate;
+}
+.dashboard-page .channel-combobox-option,
+.dashboard-page .channel-combobox-empty {
+  opacity: 1;
+}
