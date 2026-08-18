@@ -1,13 +1,15 @@
 import { canUseFeature, featureDeniedMessage, getGuildPlanAccess } from "../../shared/planAccess.js";
 
-function commandFeature(commandName) {
-  if (["저장", "저장내용"].includes(commandName)) return "ticket";
-  if (commandName === "tempvoice") return "voice";
-  if (commandName === "staff") return "administrators";
-  if (["honeypotban", "honeypotkick"].includes(commandName)) return "honeypot";
-  if (["nickapply", "nickrandom", "nickinit"].includes(commandName)) return "nickname";
-  if (["도박", "캐시", "캐시지급", "생일"].includes(commandName)) return "shop";
-  if (["이모지스틸", "이모지목록", "이모지삭제", "사운드스틸", "사운드목록", "사운드삭제"].includes(commandName)) return "voice";
+export function commandFeature(commandName) {
+  const name = String(commandName || "");
+  if (["save", "savednote", "savednotes", "저장", "저장내용"].includes(name)) return "ticket";
+  if (["clear", "punishments", "honeypotban", "honeypotkick", "exithoneypot"].includes(name)) return "security";
+  if (["tempvoice", "이모지스틸", "이모지목록", "이모지삭제", "사운드스틸", "사운드목록", "사운드삭제"].includes(name)) return "voice";
+  if (["serverinfo", "joinorder", "staff", "프로필", "복제", "카테고리삭제"].includes(name)) return "administrators";
+  if (["nickapply", "nickrandom", "nickinit"].includes(name)) return "nickname";
+  if (["도박", "캐시", "캐시지급", "생일"].includes(name)) return "shop";
+  if (["booston", "boostoff"].includes(name)) return "logs";
+  if (name === "환율") return "events";
   return null;
 }
 

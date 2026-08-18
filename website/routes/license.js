@@ -10,7 +10,9 @@ import {
 import { PLAN_TAB_LABELS } from "../../src/config/plans.js";
 
 function wantsJson(req) {
-  return req.get("X-Requested-With") === "fetch" || req.accepts(["json", "html"]) === "json";
+  const requestedWith = String(req.get("X-Requested-With") || "").toLowerCase();
+  const accept = String(req.get("Accept") || "").toLowerCase();
+  return requestedWith === "fetch" || requestedWith === "xmlhttprequest" || accept.includes("application/json");
 }
 
 function regenerateSession(req) {
@@ -93,8 +95,9 @@ export function createLicenseRouter(context) {
   router.post("/feature-control", async (req, res, next) => {
     try {
       const featureBans = Object.fromEntries(Object.keys(PLAN_TAB_LABELS).filter((id) => id !== "overview").map((id) => [id, String(req.body[`feature_${id}`] || "") !== "on"]));
-      await context.services.adminControl.update({ featureBans, otherCommandsEnabled: String(req.body.otherCommandsEnabled || "") === "on" });
-      return wantsJson(req) ? res.json({ ok: true, message: "점검 모드 설정이 저장되었습니다." }) : res.redirect("/license/dashboard");
+      const saved = await context.services.adminControl.update({ featureBans, otherCommandsEnabled: String(req.body.otherCommandsEnabled || "") === "on" });
+      const message = "점검 모드 설정이 저장되었습니다.";
+      return wantsJson(req) ? res.json({ ok: true, message, featureBans: saved.featureBans, otherCommandsEnabled: saved.otherCommandsEnabled }) : res.redirect("/license/dashboard");
     } catch (error) {
       return wantsJson(req)
         ? res.status(400).json({ ok: false, message: error.message || "점검 모드 저장에 실패했습니다." })

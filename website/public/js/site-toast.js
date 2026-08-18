@@ -24,6 +24,7 @@
     const method = String(form.method || "get").toLowerCase();
     const action = String(form.action || "");
     if (method !== "post") return false;
+    if (form.dataset.toastForm === "true") return true;
     if (!/^https?:\/\//i.test(action) && !action.startsWith("/")) return false;
     if (!action.includes("/guild/") && !action.includes("/license/")) return false;
     return !/\/license\/(login|logout)(?:[/?#]|$)/.test(action);

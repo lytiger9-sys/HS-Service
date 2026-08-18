@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { commandMap } from "../src/bot/commands/index.js";
+import { commandFeature } from "../src/bot/interactions/slash.js";
 import { PLAN_TAB_LABELS, getPlanDefinition } from "../src/config/plans.js";
 
 function option(commandName, optionName) {
@@ -16,6 +17,13 @@ test("일괄 변경·삭제 명령어는 확인 옵션을 요구한다", () => {
 test("생일설정 명령어는 등록되지 않는다", () => {
   assert.equal(commandMap.has("생일설정"), false);
   assert.ok(commandMap.has("생일"));
+});
+
+test("점검 모드 명령어 기능 매핑이 실제 탭과 연결된다", () => {
+  assert.equal(commandFeature("생일"), "shop");
+  assert.equal(commandFeature("사운드목록"), "voice");
+  assert.equal(commandFeature("카테고리삭제"), "administrators");
+  assert.equal(commandFeature("booston"), "logs");
 });
 
 test("닉네임 일괄 적용 명령어가 등록되어 있다", () => {

@@ -61,7 +61,7 @@
             <h2>기능별 점검 모드</h2>
           </div>
         </div>
-        <form method="post" action="/license/feature-control" class="license-form feature-control-form">
+        <form method="post" action="/license/feature-control" class="license-form feature-control-form" data-toast-form="true">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <p class="muted">토글을 끄면 해당 탭의 기능과 연결된 명령어·버튼이 서버 전체에서 일시 중지됩니다.</p>
           <div class="license-feature-grid">
