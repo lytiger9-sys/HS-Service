@@ -224,6 +224,9 @@ function ensureToggleFallbacks(form) {
     fallback.value = "off";
     fallback.dataset.toggleFallback = toggle.name;
     form.appendChild(fallback);
+    const sync = () => { fallback.value = toggle.checked ? "on" : "off"; };
+    toggle.addEventListener("change", sync);
+    sync();
   });
 }
 
