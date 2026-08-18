@@ -1377,7 +1377,7 @@ a {
 
 .muted { color: rgba(13, 13, 13, 0.72); }
 
-[data-panel].is-hidden { display: none; }
+[data-panel].is-hidden { display: none !important; }
 
 /* -------------------------------------------------------------------------
    Status / Auth / Forbidden pages
