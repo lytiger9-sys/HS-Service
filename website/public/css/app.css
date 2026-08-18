@@ -2884,3 +2884,19 @@ body.dashboard-page { background: var(--ink-deep); }
     min-width: 0;
   }
 }
+
+/* Overview metrics: remove the extra outer rule and keep only white rounded tiles */
+.dashboard-page section.hero.card {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.dashboard-page section.hero.card:hover {
+  border-color: transparent;
+}
+.dashboard-page .hero-grid .metric {
+  border: 1px solid rgba(17, 19, 22, .08);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 5px 16px rgba(17, 19, 22, .045);
+}
