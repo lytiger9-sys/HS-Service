@@ -2096,3 +2096,37 @@ body.dashboard-page { background: var(--ink-deep); }
   .dashboard-page .section-panel { padding: 22px 18px; }
   .dashboard-page .section-head { display: grid; gap: 14px; }
 }
+
+/* Form overlap guardrails */
+.dashboard-page .settings-form,
+.dashboard-page .form-grid,
+.dashboard-page .field { min-width: 0; }
+.dashboard-page .field { align-content: start; }
+.dashboard-page .field > span,
+.dashboard-page .field > small,
+.dashboard-page .field > .muted,
+.dashboard-page .component-tools-title { display: block; min-width: 0; line-height: 1.45; overflow-wrap: anywhere; }
+.dashboard-page .field > span { height: auto; white-space: normal; }
+.dashboard-page .field input:not([type="checkbox"]),
+.dashboard-page .field textarea,
+.dashboard-page .field select { box-sizing: border-box; min-width: 0; max-width: 100%; line-height: 1.45; }
+.dashboard-page .field input:not([type="checkbox"]),
+.dashboard-page .field select { min-height: 50px; }
+.dashboard-page .field textarea { min-height: 128px; height: auto; }
+.dashboard-page .field input[type="checkbox"] { width: 20px; min-width: 20px; max-width: 20px; height: 20px; min-height: 20px; padding: 0; margin: 0; }
+.dashboard-page .field.toggle { min-width: 0; align-items: center; }
+.dashboard-page .field.toggle > span { min-width: 0; line-height: 1.35; }
+.dashboard-page .section-head { align-items: flex-start; }
+.dashboard-page .section-toggle { flex: 0 1 260px; min-width: 190px; }
+.dashboard-page .component-tool-list { min-width: 0; }
+.dashboard-page .component-tool-list button,
+.dashboard-page .component-tool-list select { box-sizing: border-box; min-height: 42px; max-width: 100%; white-space: normal; }
+.dashboard-page .component-tool-list button span { line-height: 1.25; }
+@media (max-width: 760px) {
+  .dashboard-page .form-grid { grid-template-columns: 1fr; gap: 16px; }
+  .dashboard-page .field.full { grid-column: auto; }
+  .dashboard-page .section-toggle { width: 100%; min-width: 0; max-width: none; }
+  .dashboard-page .field input:not([type="checkbox"]),
+  .dashboard-page .field textarea,
+  .dashboard-page .field select { font-size: 16px; }
+}
