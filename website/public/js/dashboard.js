@@ -516,6 +516,18 @@ function setupShopPanel() {
   const settingsForm = document.querySelector("#shop-settings-form");
   const channelSelect = settingsForm?.querySelector('[name="shopMessageChannelId"]');
   const publishButton = settingsForm?.querySelector('button[formaction*="/shop/publish"]');
+  const shopBodyInput = settingsForm?.querySelector('[name="shopEmbedBody"]');
+  const imageInsertButton = settingsForm?.querySelector("[data-shop-image-insert]");
+  imageInsertButton?.addEventListener("click", () => {
+    if (!shopBodyInput) return;
+    const start = shopBodyInput.selectionStart ?? shopBodyInput.value.length;
+    const end = shopBodyInput.selectionEnd ?? start;
+    const syntax = "[Image] (이미지링크)";
+    shopBodyInput.value = `${shopBodyInput.value.slice(0, start)}${syntax}${shopBodyInput.value.slice(end)}`;
+    shopBodyInput.focus();
+    shopBodyInput.setSelectionRange(start + syntax.length, start + syntax.length);
+    shopBodyInput.dispatchEvent(new Event("input", { bubbles: true }));
+  });
   publishButton?.addEventListener("click", (event) => {
     if (!channelSelect?.value) {
       event.preventDefault();
