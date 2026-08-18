@@ -2436,3 +2436,31 @@ body.dashboard-page { background: var(--ink-deep); }
 @media (max-width: 760px) {
   .dashboard-page .poll-settings-actions { grid-template-columns: 1fr 1fr; gap: 8px; }
 }
+
+/* Readability tuning: shared mono UI text and action labels */
+:root { --mono-weight: 600; }
+
+.brand-kicker,
+.sidebar-tab .nav-index,
+.eyebrow,
+.field > span,
+.key-list dt,
+.primary,
+.ghost,
+.component-tool-list button,
+.save-toast {
+  font-weight: var(--mono-weight);
+}
+
+.primary,
+.ghost,
+.component-tool-list button {
+  text-shadow: 0 0 0.01px currentColor;
+}
+
+.primary { font-weight: 700; }
+.ghost { font-weight: 700; }
+.muted { color: rgba(13, 13, 13, 0.82); font-weight: 500; }
+.sidebar-tab .nav-description { color: rgba(248, 249, 250, 0.76); }
+.sidebar-tab { color: rgba(248, 249, 250, 0.76); }
+.sidebar-tab .nav-index { color: rgba(248, 249, 250, 0.52); }
