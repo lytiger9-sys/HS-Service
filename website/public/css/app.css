@@ -764,12 +764,14 @@ a {
 }
 
 .save-toast {
-  position: sticky;
-  top: 18px;
-  z-index: 10;
-  margin: 0 0 18px auto;
-  width: fit-content;
-  max-width: 100%;
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  top: auto;
+  z-index: 10000;
+  margin: 0;
+  width: max-content;
+  max-width: min(420px, calc(100vw - 32px));
   padding: 14px 18px;
   border: 1px solid var(--control-border-strong);
   background: rgba(255, 255, 255, 0.92);
