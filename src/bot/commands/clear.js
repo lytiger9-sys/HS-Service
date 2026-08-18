@@ -38,14 +38,14 @@ export default {
   data: new SlashCommandBuilder()
     .setName("clear")
     .setDescription("메시지를 대량 삭제합니다.")
+    .addBooleanOption((option) => option.setName("확인").setDescription("메시지를 삭제한다는 것을 확인합니다.").setRequired(true))
     .addIntegerOption((option) =>
       option
         .setName("count")
         .setDescription("삭제할 개수. 비우면 가능한 만큼 삭제")
         .setMinValue(1)
         .setMaxValue(1000)
-    )
-    .addBooleanOption((option) => option.setName("확인").setDescription("메시지를 삭제한다는 것을 확인합니다.").setRequired(true)),
+    ),
 
   async execute(interaction) {
     if (!isAdministrator(interaction.member)) {
