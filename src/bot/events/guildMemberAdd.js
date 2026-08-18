@@ -10,6 +10,7 @@ export default async function handleGuildMemberAdd(member, context) {
   await context.services.overviewChannels.syncGuild(member.guild).catch((error) => {
     console.error(`[overview] member addition sync failed for ${member.guild.id}:`, error);
   });
+  await context.services.moderation.evaluateMemberJoin(member).catch(() => null);
   if (member.user.bot) {
     return;
   }

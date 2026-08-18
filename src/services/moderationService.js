@@ -2,6 +2,10 @@ import { PermissionFlagsBits } from "discord.js";
 import { buildBaseEmbed, palette } from "../shared/embeds.js";
 
 const recentMessages = new Map();
+const recentJoins = new Map();
+const RAID_WINDOW_MS = 10 * 1000;
+const RAID_JOIN_THRESHOLD = 5;
+const RAID_TIMEOUT_SECONDS = 10 * 60;
 
 function normalizeContent(content) {
   return String(content ?? "")
@@ -53,18 +57,18 @@ function detectSpam(message, settings) {
   return sameCount >= (settings.spamRepeatThreshold || 3);
 }
 
-async function applyTimeout(context, message, minutes, reason, type) {
+async function applyTimeout(context, message, timeoutSeconds, reason, type) {
   const member = message.member ?? await message.guild.members.fetch(message.author.id).catch(() => null);
   if (!member || !member.moderatable) {
     return false;
   }
 
-  const duration = Math.min(Math.max(Number(minutes) || 0, 0), 60 * 24 * 28);
-  if (duration <= 0) {
+  const durationSeconds = Math.min(Math.max(Number(timeoutSeconds) || 0, 0), 60 * 60 * 24 * 28);
+  if (durationSeconds <= 0) {
     return false;
   }
 
-  await member.timeout(duration * 60 * 1000, reason).catch(() => null);
+  await member.timeout(durationSeconds * 1000, reason).catch(() => null);
   const punishment = await context.services.punishments.addPunishment(message.guild.id, {
     type,
     memberId: member.id,
@@ -72,10 +76,10 @@ async function applyTimeout(context, message, minutes, reason, type) {
     moderatorId: context.client.user.id,
     moderatorTag: context.client.user.tag,
     reason,
-    durationMinutes: duration,
+    durationMinutes: Math.ceil(durationSeconds / 60),
     source: "auto-moderation",
     channelId: message.channelId,
-    expiresAt: new Date(Date.now() + duration * 60 * 1000).toISOString()
+    expiresAt: new Date(Date.now() + durationSeconds * 1000).toISOString()
   });
 
   await context.services.logs.sendLogByKey(message.guild.id, "moderationChannelId", {
@@ -86,7 +90,7 @@ async function applyTimeout(context, message, minutes, reason, type) {
         color: palette.danger,
         fields: [
           { name: "사유", value: reason, inline: false },
-          { name: "기간", value: `${duration}분`, inline: true },
+          { name: "기간", value: `${Math.ceil(durationSeconds / 60)}분`, inline: true },
           { name: "채널", value: `<#${message.channelId}>`, inline: true }
         ],
         timestamp: Date.now()
@@ -100,10 +104,6 @@ async function applyTimeout(context, message, minutes, reason, type) {
 export function createModerationService(context, guildState) {
   async function evaluateMessage(message) {
     if (!message.guild || message.author.bot) {
-      return null;
-    }
-
-    if (message.guild.id !== context.config.allowedGuildId) {
       return null;
     }
 
@@ -122,7 +122,7 @@ export function createModerationService(context, guildState) {
       triggers.push({
         type: "mass-mention",
         label: "전체 멘션",
-        minutes: settings.massMentionTimeoutMinutes
+        timeoutSeconds: Number(settings.massMentionTimeoutMinutes || 0) * 60
       });
     }
 
@@ -130,7 +130,7 @@ export function createModerationService(context, guildState) {
       triggers.push({
         type: "invite-link",
         label: "초대 링크",
-        minutes: settings.inviteTimeoutMinutes
+        timeoutSeconds: Number(settings.inviteTimeoutSeconds || 0)
       });
     }
 
@@ -138,7 +138,7 @@ export function createModerationService(context, guildState) {
       triggers.push({
         type: "profanity",
         label: "욕설",
-        minutes: settings.profanityTimeoutMinutes
+        timeoutSeconds: Number(settings.profanityTimeoutMinutes || 0) * 60
       });
     }
 
@@ -146,7 +146,7 @@ export function createModerationService(context, guildState) {
       triggers.push({
         type: "spam",
         label: "도배",
-        minutes: settings.spamTimeoutMinutes
+        timeoutSeconds: Number(settings.spamTimeoutMinutes || 0) * 60
       });
     }
 
@@ -154,12 +154,25 @@ export function createModerationService(context, guildState) {
       return null;
     }
 
-    const minutes = Math.max(...triggers.map((entry) => Number(entry.minutes) || 0));
+    const timeoutSeconds = Math.max(...triggers.map((entry) => Number(entry.timeoutSeconds) || 0));
     const reason = triggers.map((entry) => entry.label).join(", ");
-    return applyTimeout(context, message, minutes, reason, triggers[0].type);
+    return applyTimeout(context, message, timeoutSeconds, reason, triggers[0].type);
+  }
+
+  async function evaluateMemberJoin(member) {
+    if (!member?.guild || member.user?.bot) return null;
+    const key = member.guild.id;
+    const now = Date.now();
+    const joins = (recentJoins.get(key) || []).filter((at) => now - at <= RAID_WINDOW_MS);
+    joins.push(now);
+    recentJoins.set(key, joins);
+    if (joins.length < RAID_JOIN_THRESHOLD || !member.moderatable) return null;
+    await member.timeout(RAID_TIMEOUT_SECONDS * 1000, "레이드 방지: 짧은 시간 내 다수의 멤버 가입").catch(() => null);
+    return { type: "raid-protection", count: joins.length, timeoutSeconds: RAID_TIMEOUT_SECONDS };
   }
 
   return {
-    evaluateMessage
+    evaluateMessage,
+    evaluateMemberJoin
   };
 }
