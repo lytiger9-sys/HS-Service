@@ -176,7 +176,9 @@ export function createEmbedService(context) {
   }
 
   async function sendConfigured(guild, channelId, settingsOverride = null) {
-    const settings = settingsOverride || normalizeSettings(await context.services.settings.getSettings(guild.id));
+    const stored = await context.services.settings.getSettings(guild.id);
+    if (stored.embed?.enabled === false) throw new Error("현재 임베드 기능이 꺼져 있습니다.");
+    const settings = settingsOverride || normalizeSettings(stored);
     const webhookUrl = settings.destinationType === "webhook" ? normalizeWebhookUrl(settings.webhookUrl) : "";
     if (settings.destinationType === "webhook") {
       if (!webhookUrl) throw new Error("유효한 Discord 웹훅 링크를 입력해야 합니다.");
@@ -217,6 +219,7 @@ export function createEmbedService(context) {
   async function processSchedules() {
     for (const guild of context.client?.guilds.cache.values() || []) {
       const settings = normalizeSettings(await context.services.settings.getSettings(guild.id));
+      if (settings.enabled === false) continue;
       const hasDestination = settings.destinationType === "webhook" ? Boolean(settings.webhookUrl) : Boolean(settings.channelId);
       if (!settings.scheduleEnabled || !hasDestination) continue;
       const interval = Math.max(1, Number(settings.scheduleIntervalMinutes) || 60) * 60 * 1000;

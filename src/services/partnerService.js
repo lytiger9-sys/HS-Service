@@ -140,6 +140,8 @@ export function createPartnerService(context) {
   }
 
   async function createApplication(interaction) {
+    const current = state(interaction.guildId);
+    if (current.settings?.partner?.enabled === false) throw new Error("현재 파트너 기능이 꺼져 있습니다.");
     const values = {
       affiliateName: text(interaction.fields.getTextInputValue("partner-affiliate-name"), "", 80),
       memberCount: text(interaction.fields.getTextInputValue("partner-member-count"), "", 30),
@@ -153,7 +155,6 @@ export function createPartnerService(context) {
       try { parsed = new URL(value); } catch { parsed = null; }
       if (!parsed || parsed.protocol !== "https:") throw new Error(`${label}은 https URL이어야 합니다.`);
     }
-    const current = state(interaction.guildId);
     if ((current.partners || []).some((item) => ["pending", "active"].includes(item.status) && item.requesterId === interaction.user.id)) {
       throw new Error("이미 처리 중인 파트너 신청이 있습니다.");
     }
@@ -181,6 +182,7 @@ export function createPartnerService(context) {
 
   async function approve(guildId, applicationId, moderator) {
     const current = state(guildId);
+    if (current.settings?.partner?.enabled === false) throw new Error("현재 파트너 기능이 꺼져 있습니다.");
     const application = (current.partners || []).find((item) => item.id === applicationId);
     if (!application || application.status !== "pending") return null;
     const settings = current.settings.partner;
@@ -224,6 +226,8 @@ export function createPartnerService(context) {
   }
 
   async function reject(guildId, applicationId, moderator) {
+    const current = state(guildId);
+    if (current.settings?.partner?.enabled === false) throw new Error("현재 파트너 기능이 꺼져 있습니다.");
     let rejected = null;
     await patch(guildId, (draft) => {
       const item = draft.partners.find((partner) => partner.id === applicationId);
@@ -246,6 +250,7 @@ export function createPartnerService(context) {
 
   async function handleMessage(message) {
     const current = state(message.guild.id);
+    if (current.settings?.partner?.enabled === false) return false;
     const partner = (current.partners || []).find((item) => item.status === "active" && item.channelId === message.channel.id);
     if (!partner) return false;
     await patch(message.guild.id, (draft) => {

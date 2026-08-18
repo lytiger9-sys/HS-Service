@@ -70,10 +70,18 @@ export function createShopService(context) {
     const guild = await state(guildId);
     return normalizeShop({ ...(guild.shop || {}), ...(guild.settings?.shop || {}), products: guild.shop?.products || [], wallets: guild.shop?.wallets || {}, purchases: guild.shop?.purchases || [] });
   }
+  async function requireEnabled(guildId) {
+    const settings = await context.services.settings.getSettings(guildId);
+    const guild = await state(guildId);
+    const shopSettings = settings.shop || guild.shop || {};
+    if (shopSettings.enabled === false) throw new Error("현재 상점 기능이 꺼져 있습니다.");
+    return shopSettings;
+  }
   async function updateSettings(guildId, patchData) {
     return context.services.settings.updateSettings(guildId, { shop: patchData });
   }
   async function awardAttendance(guildId, userId) {
+    await requireEnabled(guildId);
     let result;
     await patch(guildId, (guild) => {
       guild.shop = normalizeShop(guild.shop);
@@ -103,8 +111,9 @@ export function createShopService(context) {
     });
     return result;
   }
-  async function getBalance(guildId, userId) { const shop = await getShop(guildId); return walletOf(shop, userId).balance; }
+  async function getBalance(guildId, userId) { await requireEnabled(guildId); const shop = await getShop(guildId); return walletOf(shop, userId).balance; }
   async function grant(guildId, userId, amount, reason = "관리자 지급") {
+    await requireEnabled(guildId);
     const value = Math.max(0, Math.floor(Number(amount) || 0));
     if (!value) throw new Error("지급할 캐시를 입력해야 합니다.");
     let balance;
@@ -112,6 +121,7 @@ export function createShopService(context) {
     return { amount: value, balance, reason };
   }
   async function gamble(guildId, userId, amount) {
+    await requireEnabled(guildId);
     const shop = await getShop(guildId);
     if (shop.gamblingEnabled === false) throw new Error("도박 기능이 비활성화되어 있습니다.");
     const bet = Math.floor(Number(amount) || 0);
@@ -142,6 +152,7 @@ export function createShopService(context) {
     return { flags: MessageFlags.IsComponentsV2, components: [container, row], allowedMentions: { parse: [] } };
   }
   async function publish(guild, channelId) {
+    await requireEnabled(guild.id);
     const shop = await getShop(guild.id); const channel = guild.channels.cache.get(channelId || shop.messageChannelId);
     if (!channel?.isTextBased?.()) throw new Error("상점 게시 채널을 찾을 수 없습니다.");
     const message = shop.messageId ? await channel.messages.fetch(shop.messageId).catch(() => null) : null;
@@ -151,11 +162,13 @@ export function createShopService(context) {
     return sent;
   }
   async function productMenu(guildId) {
+    await requireEnabled(guildId);
     const shop = await getShop(guildId); const products = shop.products.filter((p) => p.enabled).slice(0, 25);
     if (!products.length) return { content: "현재 판매 중인 상품이 없습니다.", ephemeral: true };
     return { content: "구매할 상품을 선택하세요.", components: [new ActionRowBuilder().addComponents(new StringSelectMenuBuilder().setCustomId("shop:purchase").setPlaceholder("상품 선택").addOptions(products.map((p) => ({ label: p.name.slice(0, 100), description: `${p.price.toLocaleString()} 캐시 · 남은 재고 ${stockLines(p).length}개`.slice(0, 100), value: p.id }))))], ephemeral: true };
   }
   async function purchase(guild, user, productId) {
+    await requireEnabled(guild.id);
     let product; let balance; let delivery;
     await patch(guild.id, async (state) => {
       state.shop = normalizeShop(state.shop); product = state.shop.products.find((p) => p.id === productId && p.enabled);
