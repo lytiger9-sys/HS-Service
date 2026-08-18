@@ -1,10 +1,22 @@
-import { buildBaseEmbed, palette } from "../shared/embeds.js";
+import { ContainerBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
+import { palette } from "../shared/embeds.js";
 
 export function createServerAuditLogService(context) {
+  function componentsLog(title, description, fields = []) {
+    const container = new ContainerBuilder()
+      .setAccentColor(palette.info)
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${title}`))
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(description));
+    if (fields.length) {
+      container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(fields.map((field) => `**${field.name}**\n${field.value}`).join("\n\n")));
+    }
+    return { flags: MessageFlags.IsComponentsV2, components: [container], allowedMentions: { parse: [] } };
+  }
+
   async function send(guildId, eventKey, title, description, fields = []) {
-    return context.services.logs.sendLogByKey(guildId, eventKey, {
-      embeds: [buildBaseEmbed({ title, description, fields, color: palette.info, timestamp: Date.now() })]
-    });
+    return context.services.logs.sendLogByKey(guildId, eventKey, componentsLog(title, description, fields));
   }
 
   async function handleGuildUpdate(oldGuild, newGuild) {
