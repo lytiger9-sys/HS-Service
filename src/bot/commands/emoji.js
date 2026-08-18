@@ -32,11 +32,11 @@ export const emojiList = {
 };
 
 export const emojiDelete = {
-  data: new SlashCommandBuilder().setName("이모지삭제").setDescription("현재 서버의 커스텀 이모지를 삭제합니다.").addStringOption((option) => option.setName("이모지id").setDescription("삭제할 이모지 ID").setRequired(true)),
+  data: new SlashCommandBuilder().setName("이모지삭제").setDescription("현재 서버의 커스텀 이모지를 삭제합니다.").addStringOption((option) => option.setName("이모지").setDescription("삭제할 커스텀 이모지를 그대로 입력").setRequired(true)),
   async execute(interaction, context) {
     await interaction.deferReply({ ephemeral: true });
     try {
-      const emoji = await context.services.emojis.remove(interaction.guild, interaction.options.getString("이모지id", true), interaction.member);
+      const emoji = await context.services.emojis.removeByValue(interaction.guild, interaction.options.getString("이모지", true), interaction.member);
       return interaction.editReply(`이모지 **${emoji.name}**를 삭제했습니다.`);
     } catch (error) {
       return interaction.editReply(error.message || "이모지를 삭제하지 못했습니다.");

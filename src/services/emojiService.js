@@ -48,5 +48,10 @@ export function createEmojiService(context) {
     return emoji;
   }
 
-  return { importEmoji, list, remove };
+  async function removeByValue(guild, value, member) {
+    const source = parseEmoji(value);
+    return remove(guild, source.id, member);
+  }
+
+  return { importEmoji, list, remove, removeByValue };
 }
