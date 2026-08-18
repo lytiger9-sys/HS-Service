@@ -1,7 +1,7 @@
 <section class="panel-stack <%= panelClass('shop') %>" data-panel="shop">
   <article class="card section-panel shop-settings-card">
     <div class="section-head">
-      <div><p class="eyebrow">Shop Economy</p><h3>상점 및 캐시 설정</h3><p class="muted">활동 보상, 상품, 상점 임베드를 자판기처럼 관리합니다.</p></div>
+      <div><p class="eyebrow">Shop Economy</p><h3>상점 및 캐시 설정</h3></div>
       <label class="field toggle section-toggle"><input type="checkbox" form="shop-settings-form" name="shopEnabled" <%= shop.enabled !== false ? 'checked' : '' %> /><span>상점 기능 활성화</span></label>
     </div>
     <form class="settings-form" id="shop-settings-form" method="post" action="/guild/<%= guild.id %>/settings/shop">
@@ -29,14 +29,13 @@
         <div class="shop-subsection-head"><div><p class="eyebrow">Shop Embed</p><h4>상점 임베드 본문</h4></div></div>
         <label class="field full"><span>가운데 설명란</span><textarea name="shopEmbedBody" rows="5" maxlength="4000" placeholder="상점 임베드 가운데에 표시할 본문을 입력하세요."><%= shop.embedBody || '상품을 확인하거나 내 캐시 잔액을 확인하세요.' %></textarea></label>
         <div class="shop-embed-guide" role="note"><strong>사용 가능한 이미지 입력</strong><code>[Image] (이미지링크)</code><span>예: <code>[Image] (https://example.com/shop-banner.png)</code>를 한 줄에 입력하면 해당 위치에 이미지가 표시됩니다.</span></div>
-        <p class="muted shop-field-help">저장 후 상점 임베드 게시를 누르면 제목과 설명 사이에 실선이 추가되고, 설명·버튼·고정 푸터가 순서대로 표시됩니다.</p>
       </div>
 
       <div class="form-actions"><button class="primary" type="submit">설정 저장</button><button class="ghost" type="submit" formaction="/guild/<%= guild.id %>/shop/publish">상점 임베드 게시</button></div>
     </form>
   </article>
   <article class="card section-panel">
-    <div class="section-head"><div><p class="eyebrow">Vending Machine</p><h3>상품 관리</h3><p class="muted">구매 시 DM으로 전달할 상품 내용을 설정합니다.</p></div><button class="ghost" type="button" data-shop-add-product>상품 추가</button></div>
+    <div class="section-head"><div><p class="eyebrow">Vending Machine</p><h3>상품 관리</h3></div><button class="ghost" type="button" data-shop-add-product>상품 추가</button></div>
     <form method="post" action="/guild/<%= guild.id %>/shop/products" data-shop-products-form>
       <div class="shop-product-list" data-shop-product-list>
         <% (shop.products || []).forEach((product) => { %>

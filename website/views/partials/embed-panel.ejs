@@ -16,7 +16,6 @@
         <div class="field full">
           <span>전송 형식</span>
           <strong>Components V2</strong>
-          <small class="muted">Text Display, Separator, Media Gallery, Thumbnail을 조합해 Discord 메시지를 만듭니다.</small>
         </div>
         <label class="field full">
           <span>전송 대상</span>
@@ -38,7 +37,6 @@
         <label class="field full" data-embed-webhook-field <%= settings.embed.destinationType !== 'webhook' ? 'hidden' : '' %>>
           <span>Discord 웹훅 링크</span>
           <input type="url" name="embedWebhookUrl" value="<%= settings.embed.webhookUrl || '' %>" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" />
-          <small class="muted">Discord 웹훅 URL만 허용됩니다. 링크는 서버 설정에 저장되므로 외부에 공유하지 마세요.</small>
         </label>
         <label class="field">
           <span>제목</span>
@@ -75,7 +73,6 @@
         <label class="field full">
           <span>푸터</span>
           <input type="text" name="embedFooter" value="<%= settings.embed.footer %>" data-embed-preview="footer" placeholder="메시지 하단에 표시할 푸터" />
-          <small class="muted">입력한 푸터는 Components V2 메시지의 마지막 Text Display로 추가됩니다.</small>
         </label>
 
         <label class="field check-field full">
