@@ -1,6 +1,21 @@
 import { buildJoinOrderPayload } from "../commands/joinorder.js";
+import { buildEmojiListPayload } from "../commands/emoji.js";
 
 export async function handleModalInteraction(interaction, context) {
+  if (interaction.customId.startsWith("page:emoji-modal:")) {
+    const [, , ownerId, totalPages] = interaction.customId.split(":");
+    if (String(ownerId) !== String(interaction.user.id)) {
+      return interaction.reply({ content: "이 페이지는 명령어를 실행한 사용자만 변경할 수 있습니다.", ephemeral: true });
+    }
+    const requestedPage = Number(interaction.fields.getTextInputValue("emoji-page-number"));
+    const maxPage = Number(totalPages);
+    if (!Number.isInteger(requestedPage) || requestedPage < 1 || requestedPage > maxPage) {
+      return interaction.reply({ content: `페이지 번호는 1부터 ${maxPage} 사이의 정수로 입력해 주세요.`, ephemeral: true });
+    }
+    const emojis = await context.services.emojis.list(interaction.guild);
+    return interaction.update(buildEmojiListPayload(emojis, requestedPage - 1, interaction.user.id));
+  }
+
   if (interaction.customId.startsWith("page:joinorder-modal:")) {
     const [, , ownerId, totalPages] = interaction.customId.split(":");
     if (String(ownerId) !== String(interaction.user.id)) {

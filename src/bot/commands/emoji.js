@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { buildBaseEmbed, palette } from "../../shared/embeds.js";
 
 export const emojiSteal = {
   data: new SlashCommandBuilder()
@@ -18,17 +19,32 @@ export const emojiSteal = {
   }
 };
 
-export function buildEmojiListPayload(emojis, page, userId) {
-  const pageSize = 20;
-  const pageCount = Math.max(1, Math.ceil(emojis.length / pageSize));
-  const currentPage = Math.min(Math.max(1, Number(page) || 1), pageCount);
-  const items = emojis.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const content = items.length ? items.map((emoji) => `${emoji} ${emoji.name} — ${emoji.id}`).join("\n") : "등록된 커스텀 이모지가 없습니다.";
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId(`page:emoji:${userId}:${currentPage - 1}:${pageCount}`).setLabel("‹").setStyle(ButtonStyle.Secondary).setDisabled(currentPage <= 1),
-    new ButtonBuilder().setCustomId(`page:emoji:${userId}:${currentPage + 1}:${pageCount}`).setLabel("›").setStyle(ButtonStyle.Secondary).setDisabled(currentPage >= pageCount)
-  );
-  return { content: `${content.slice(0, 1800)}\n\n페이지 ${currentPage}/${pageCount}`, components: [row], ephemeral: true };
+export const EMOJI_LIST_PAGE_SIZE = 10;
+
+export function buildEmojiListPayload(emojis, page = 0, userId) {
+  const totalPages = Math.max(1, Math.ceil(emojis.length / EMOJI_LIST_PAGE_SIZE));
+  const currentPage = Math.min(Math.max(Number(page) || 0, 0), totalPages - 1);
+  const pageItems = emojis.slice(currentPage * EMOJI_LIST_PAGE_SIZE, (currentPage + 1) * EMOJI_LIST_PAGE_SIZE);
+  const lines = pageItems.map((emoji) => `${emoji} ${emoji.name}`);
+  const components = [];
+  if (totalPages > 1) {
+    components.push(new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId(`page:emoji:${userId}:${currentPage - 1}`).setLabel("이전").setStyle(ButtonStyle.Secondary).setDisabled(currentPage === 0),
+      new ButtonBuilder().setCustomId(`page:emoji-jump:${userId}:${totalPages}`).setLabel(`${currentPage + 1}/${totalPages}`).setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId(`page:emoji:${userId}:${currentPage + 1}`).setLabel("다음").setStyle(ButtonStyle.Primary).setDisabled(currentPage >= totalPages - 1)
+    ));
+  }
+  return {
+    embeds: [buildBaseEmbed({
+      title: "서버 이모지 목록",
+      description: lines.length ? lines.join("\n") : "등록된 커스텀 이모지가 없습니다.",
+      color: palette.ink,
+      footer: `페이지 ${currentPage + 1}/${totalPages} · 표시 ${emojis.length}개`,
+      timestamp: Date.now()
+    })],
+    components,
+    ephemeral: true
+  };
 }
 
 export const emojiList = {
@@ -36,8 +52,8 @@ export const emojiList = {
   async execute(interaction, context) {
     try {
       const emojis = await context.services.emojis.list(interaction.guild);
-      const page = interaction.options.getInteger("페이지") || 1;
-      return interaction.reply(buildEmojiListPayload(emojis, interaction.options.getInteger("페이지") || 1, interaction.user.id));
+      const page = Math.max(0, (interaction.options.getInteger("페이지") || 1) - 1);
+      return interaction.reply(buildEmojiListPayload(emojis, page >= 0 ? page : 0, interaction.user.id));
     } catch {
       return interaction.reply({ content: "이모지 목록을 가져오지 못했습니다.", ephemeral: true });
     }

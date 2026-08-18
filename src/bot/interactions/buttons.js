@@ -78,12 +78,18 @@ export async function handleButtonInteraction(interaction, context) {
     return interaction.update(buildSoundboardListPayload(sounds, Math.min(Math.max(page, 1), pageCount), interaction.user.id));
   }
 
+  if (scope === "page" && action === "emoji-jump") {
+    if (String(id) !== String(interaction.user.id)) return interaction.reply({ content: "이 페이지 버튼은 목록을 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });
+    const modal = new ModalBuilder().setCustomId(`page:emoji-modal:${id}:${extra}`).setTitle("페이지 이동");
+    const input = new TextInputBuilder().setCustomId("emoji-page-number").setLabel(`페이지 번호 (1-${extra})`).setStyle(TextInputStyle.Short).setRequired(true).setMinLength(1).setMaxLength(3);
+    modal.addComponents(new ActionRowBuilder().addComponents(input));
+    return interaction.showModal(modal);
+  }
+
   if (scope === "page" && action === "emoji") {
     if (String(id) !== String(interaction.user.id)) return interaction.reply({ content: "이 페이지 버튼은 목록을 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });
-    const page = Number(extra) || 1;
-    const pageCount = Number(total) || 1;
     const emojis = await context.services.emojis.list(interaction.guild);
-    return interaction.update(buildEmojiListPayload(emojis, Math.min(Math.max(page, 1), pageCount), interaction.user.id));
+    return interaction.update(buildEmojiListPayload(emojis, Number(extra) || 0, interaction.user.id));
   }
 
   if (interaction.customId === "shop:products") {
