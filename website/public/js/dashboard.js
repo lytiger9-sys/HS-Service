@@ -238,53 +238,17 @@ function ensureToggleFallbacks(form) {
 }
 
 function setupForms() {
-  // 일부 패널은 저장 버튼을 form 밖에 배치하고 `form` 속성으로 연결한다.
-  // 브라우저의 암시적 제출에 의존하지 않고 클릭 시 명시적으로 submit을 발생시킨다.
-  document.querySelectorAll("button[type=submit][form]").forEach((button) => {
-    const form = document.getElementById(button.getAttribute("form"));
-    if (!form || !form.classList.contains("settings-form")) return;
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      if (typeof form.requestSubmit === "function") {
-        form.requestSubmit(button);
-      } else {
-        form.dispatchEvent(new SubmitEvent("submit", { bubbles: true, cancelable: true, submitter: button }));
-      }
-    });
-  });
-
+  // 설정 저장은 브라우저 native POST를 사용한다. fetch로 가로채지 않아
+  // DOM의 모든 form-associated control이 Express body parser에 전달된다.
   forms.forEach((form) => {
     ensureToggleFallbacks(form);
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const submitButton = event.submitter || form.querySelector("button[type='submit']");
-      const initialLabel = submitButton?.textContent || "";
-
-      try {
-        if (submitButton) {
-          submitButton.disabled = true;
-          submitButton.textContent = "저장 중...";
+    if (form.dataset.confirmReset === "true") {
+      form.addEventListener("submit", (event) => {
+        if (!window.confirm(form.dataset.confirmMessage || "서버 데이터를 초기화할까요?")) {
+          event.preventDefault();
         }
-
-        if (form.dataset.confirmReset === "true" && !window.confirm(form.dataset.confirmMessage || "서버 데이터를 초기화할까요?")) {
-          return;
-        }
-
-        const payload = await submitForm(form, event.submitter);
-        showToast(payload.message || "저장되었습니다.");
-        if (payload.section) {
-          activateTab(payload.section, { scroll: false });
-        }
-      } catch (error) {
-        showToast(error.message || "저장에 실패했습니다.");
-      } finally {
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.textContent = initialLabel;
-        }
-      }
-    });
+      });
+    }
   });
 }
 
