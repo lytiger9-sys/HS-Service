@@ -229,6 +229,10 @@ function setupEmbedPanel() {
   if (!form) return;
   const channelSelect = form.querySelector("[data-embed-channel]");
   const channelSearch = form.querySelector('[data-channel-search="embed-channel-select"]');
+  const destinationSelect = form.querySelector("[data-embed-destination]");
+  const channelField = form.querySelector("[data-embed-channel-field]");
+  const webhookField = form.querySelector("[data-embed-webhook-field]");
+  const webhookInput = form.querySelector('[name="embedWebhookUrl"]');
   const sendButton = form.querySelector("[data-embed-send]");
   const modeSelect = form.querySelector("[data-embed-mode]");
   const titleInput = form.querySelector('[data-embed-preview="title"]');
@@ -338,8 +342,23 @@ function setupEmbedPanel() {
   form.querySelector('[name="embedComponentsBody"]')?.addEventListener("input", updatePreview);
   updatePreview();
 
+  const updateDestinationFields = () => {
+    const useWebhook = destinationSelect?.value === "webhook";
+    if (channelField) channelField.hidden = useWebhook;
+    if (webhookField) webhookField.hidden = !useWebhook;
+    if (channelSelect) channelSelect.required = !useWebhook;
+    if (webhookInput) webhookInput.required = useWebhook;
+  };
+  destinationSelect?.addEventListener("change", updateDestinationFields);
+  updateDestinationFields();
+
   sendButton?.addEventListener("click", async () => {
-    if (!channelSelect?.value) {
+    const useWebhook = destinationSelect?.value === "webhook";
+    if (useWebhook && !webhookInput?.value.trim()) {
+      showToast("웹훅 링크를 입력하세요.");
+      return;
+    }
+    if (!useWebhook && !channelSelect?.value) {
       showToast("전송할 채널을 선택하세요.");
       return;
     }

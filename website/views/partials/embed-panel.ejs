@@ -19,6 +19,14 @@
           <small class="muted">Text Display, Separator, Media Gallery, Thumbnail을 조합해 Discord 메시지를 만듭니다.</small>
         </div>
         <label class="field full">
+          <span>전송 대상</span>
+          <select name="embedDestinationType" data-embed-destination>
+            <option value="channel" <%= settings.embed.destinationType !== 'webhook' ? 'selected' : '' %>>Discord 채널</option>
+            <option value="webhook" <%= settings.embed.destinationType === 'webhook' ? 'selected' : '' %>>Discord 웹훅</option>
+          </select>
+          <small class="muted">채널을 선택하거나, 별도 서버·채널의 웹훅 링크로 전송할 수 있습니다.</small>
+        </label>
+        <label class="field full" data-embed-channel-field <%= settings.embed.destinationType === 'webhook' ? 'hidden' : '' %>>
           <span>전송 채널 검색</span>
           <select id="embed-channel-select" name="embedChannelId" data-embed-channel>
             <option value="">전송할 채널 선택</option>
@@ -26,6 +34,11 @@
               <option value="<%= channel.id %>" <%= settings.embed.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
             <% }) %>
           </select>
+        </label>
+        <label class="field full" data-embed-webhook-field <%= settings.embed.destinationType !== 'webhook' ? 'hidden' : '' %>>
+          <span>Discord 웹훅 링크</span>
+          <input type="url" name="embedWebhookUrl" value="<%= settings.embed.webhookUrl || '' %>" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" />
+          <small class="muted">Discord 웹훅 URL만 허용됩니다. 링크는 서버 설정에 저장되므로 외부에 공유하지 마세요.</small>
         </label>
         <label class="field">
           <span>제목</span>

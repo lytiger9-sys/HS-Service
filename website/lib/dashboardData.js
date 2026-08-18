@@ -136,6 +136,8 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
       enabled: true,
       mode: "components",
       channelId: "",
+      destinationType: "channel",
+      webhookUrl: "",
       title: "서버 공지",
       description: "공지사항이 아직 설정되지 않았습니다.",
       color: "#1a1d23",

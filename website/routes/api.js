@@ -31,6 +31,19 @@ function splitLines(value, maxItems = 100, maxLength = 100) {
     .slice(0, maxItems);
 }
 
+function normalizeWebhookUrl(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    const allowedHost = url.hostname === "discord.com" || url.hostname === "discordapp.com";
+    if (url.protocol !== "https:" || !allowedHost || !/^\/api\/webhooks\/\d+\/[^/]+$/.test(url.pathname)) return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
 function wantsJson(req) {
   return req.get("X-Requested-With") === "fetch" || req.accepts(["json", "html"]) === "json";
 }
@@ -142,6 +155,8 @@ function sectionPayload(section, body) {
         enabled: readBoolean(body.embedEnabled ?? body.noticeEnabled),
         mode: body.embedMode === "legacy" ? "legacy" : "components",
         channelId: readDiscordId(body.embedChannelId),
+        destinationType: body.embedDestinationType === "webhook" ? "webhook" : "channel",
+        webhookUrl: normalizeWebhookUrl(body.embedWebhookUrl),
         title: readText(body.embedTitle, "서버 공지", 256),
         description: readText(body.embedDescription ?? body.noticeContent, "", 4000),
         color: /^#[0-9a-f]{6}$/i.test(body.embedColor || "") ? body.embedColor : "#1a1d23",
@@ -286,7 +301,12 @@ export function createApiRouter(context) {
       }
       const featureAccess = await requireFeature(context, guildId, "embed");
       if (!featureAccess.allowed) return res.status(403).json({ ok: false, message: featureAccess.message });
-      const body = { ...req.body, channelId: readDiscordId(req.body.channelId) };
+      const body = {
+        ...req.body,
+        channelId: readDiscordId(req.body.channelId),
+        destinationType: req.body.embedDestinationType === "webhook" ? "webhook" : "channel",
+        webhookUrl: normalizeWebhookUrl(req.body.embedWebhookUrl)
+      };
       const message = await context.services.embeds.sendFromBody(access.guild, body);
       return res.json({ ok: true, messageId: message.id, message: "임베드를 전송했습니다." });
     } catch (error) {

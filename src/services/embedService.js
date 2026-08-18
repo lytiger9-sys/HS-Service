@@ -7,7 +7,8 @@ import {
   SectionBuilder,
   SeparatorBuilder,
   TextDisplayBuilder,
-  ThumbnailBuilder
+  ThumbnailBuilder,
+  WebhookClient
 } from "discord.js";
 import { parseColor } from "../shared/embeds.js";
 
@@ -15,6 +16,8 @@ const DEFAULTS = {
   enabled: true,
   mode: "components",
   channelId: "",
+  destinationType: "channel",
+  webhookUrl: "",
   title: "서버 공지",
   description: "공지사항이 아직 설정되지 않았습니다.",
   color: "#1a1d23",
@@ -141,6 +144,18 @@ function componentsPayload(settings, guild) {
 }
 
 export function createEmbedService(context) {
+  function normalizeWebhookUrl(value) {
+    const raw = String(value || "").trim();
+    try {
+      const url = new URL(raw);
+      const allowedHost = url.hostname === "discord.com" || url.hostname === "discordapp.com";
+      if (url.protocol !== "https:" || !allowedHost || !/^\/api\/webhooks\/\d+\/[^/]+$/.test(url.pathname)) return "";
+      return url.toString();
+    } catch {
+      return "";
+    }
+  }
+
   async function resolveChannel(guild, channelId) {
     const channel = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
     return channel?.isTextBased?.() ? channel : null;
@@ -153,6 +168,14 @@ export function createEmbedService(context) {
 
   async function sendConfigured(guild, channelId, settingsOverride = null) {
     const settings = settingsOverride || normalizeSettings(await context.services.settings.getSettings(guild.id));
+    const webhookUrl = settings.destinationType === "webhook" ? normalizeWebhookUrl(settings.webhookUrl) : "";
+    if (settings.destinationType === "webhook") {
+      if (!webhookUrl) throw new Error("유효한 Discord 웹훅 링크를 입력해야 합니다.");
+      const webhook = new WebhookClient({ url: webhookUrl });
+      const message = await webhook.send(buildPayload(guild, settings));
+      await context.services.settings.updateSettings(guild.id, { embed: { lastSentAt: new Date().toISOString() } });
+      return message;
+    }
     const target = await resolveChannel(guild, channelId || settings.channelId);
     if (!target) throw new Error("전송할 텍스트 채널을 찾을 수 없습니다.");
     const message = await target.send(buildPayload(guild, settings));
@@ -185,7 +208,8 @@ export function createEmbedService(context) {
   async function processSchedules() {
     for (const guild of context.client?.guilds.cache.values() || []) {
       const settings = normalizeSettings(await context.services.settings.getSettings(guild.id));
-      if (!settings.scheduleEnabled || !settings.channelId) continue;
+      const hasDestination = settings.destinationType === "webhook" ? Boolean(settings.webhookUrl) : Boolean(settings.channelId);
+      if (!settings.scheduleEnabled || !hasDestination) continue;
       const interval = Math.max(1, Number(settings.scheduleIntervalMinutes) || 60) * 60 * 1000;
       const last = settings.lastSentAt ? Date.parse(settings.lastSentAt) : 0;
       if (!last || Date.now() - last >= interval) {
