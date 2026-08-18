@@ -186,17 +186,23 @@ async function submitForm(form, submitter = null) {
       ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {})
     },
     body: (() => {
-      const data = new FormData(form);
+      const data = new FormData();
+      const controls = new Set([
+        ...(form.elements ? Array.from(form.elements) : []),
+        ...(form.id ? Array.from(document.querySelectorAll(`[form="${form.id}"]`)) : [])
+      ]);
+      controls.forEach((input) => {
+        if (!input.name || input.disabled || input.type === "submit" || input.type === "button" || input.type === "reset") return;
+        if ((input.type === "checkbox" || input.type === "radio") && !input.checked) return;
+        data.append(input.name, input.value ?? "");
+      });
       if (csrfToken) data.set("_csrf", csrfToken);
-      const externalControls = form.id
-        ? document.querySelectorAll(`input[form="${form.id}"][type="checkbox"]`)
-        : [];
       const toggleInputs = new Set([
-        ...form.querySelectorAll('input[type="checkbox"][name$="Enabled"]'),
-        ...externalControls
+        ...Array.from(form.querySelectorAll('input[type="checkbox"][name$="Enabled"]')),
+        ...(form.id ? Array.from(document.querySelectorAll(`input[form="${form.id}"][type="checkbox"][name$="Enabled"]`)) : [])
       ]);
       toggleInputs.forEach((input) => {
-        if (input.name?.endsWith("Enabled")) data.set(input.name, input.checked ? "on" : "off");
+        data.set(input.name, input.checked ? "on" : "off");
       });
       return data;
     })()
