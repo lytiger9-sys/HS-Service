@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 
 const CSRF_SESSION_KEY = "csrfToken";
-const CSRF_COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 7;
+const CSRF_COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 30;
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS_PER_WINDOW = 120;
 const rateBuckets = new Map();
@@ -20,16 +20,22 @@ export function applySecurityHeaders(_req, res, next) {
   next();
 }
 
+function setCsrfCookie(req, res, token) {
+  if (!token) return;
+  res.cookie("csrf-token", token, {
+    httpOnly: false,
+    sameSite: "lax",
+    secure: Boolean(req.session?.cookie?.secure),
+    path: "/",
+    maxAge: CSRF_COOKIE_MAX_AGE
+  });
+}
+
 export function ensureCsrfToken(req, res, next) {
   if (req.session) {
     req.session[CSRF_SESSION_KEY] ??= crypto.randomBytes(32).toString("hex");
     res.locals.csrfToken = req.session[CSRF_SESSION_KEY];
-    res.cookie("csrf-token", req.session[CSRF_SESSION_KEY], {
-      httpOnly: false,
-      sameSite: "lax",
-      secure: req.secure,
-      maxAge: CSRF_COOKIE_MAX_AGE
-    });
+    setCsrfCookie(req, res, req.session[CSRF_SESSION_KEY]);
   }
   next();
 }
@@ -51,6 +57,7 @@ export function csrfProtection(req, res, next) {
     const accept = String(req.get("Accept") || "").toLowerCase();
     const isFetchRequest = requestedWith === "fetch" || requestedWith === "xmlhttprequest" || accept.includes("application/json");
     if (isFetchRequest) {
+      setCsrfCookie(req, res, expected);
       return res.status(403).json({
         ok: false,
         code: "csrf-expired",

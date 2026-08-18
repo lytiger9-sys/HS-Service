@@ -68,7 +68,8 @@ export function configureWebAuth(app, context) {
         httpOnly: true,
         sameSite: "lax",
         secure: context.config.sessionCookieSecure,
-        maxAge: 1000 * 60 * 60 * 24 * 7
+        path: "/",
+        maxAge: 1000 * 60 * 60 * 24 * 30
       }
     })
   );
