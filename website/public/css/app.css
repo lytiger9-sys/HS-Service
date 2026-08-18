@@ -2420,3 +2420,19 @@ body.dashboard-page { background: var(--ink-deep); }
   .dashboard-page .banner-section-head { align-items: stretch; }
   .dashboard-page .banner-section-head .banner-toggle { width: 100%; min-width: 0; margin-left: 0; }
 }
+
+/* Poll actions and Components V2 preview */
+.dashboard-page .poll-settings-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+}
+.dashboard-page .poll-settings-actions > button { width: 100%; min-height: 50px; margin: 0; }
+.dashboard-page .discord-components-message { min-height: 120px; }
+.dashboard-page .discord-components-preview { min-height: 24px; }
+@media (max-width: 760px) {
+  .dashboard-page .poll-settings-actions { grid-template-columns: 1fr 1fr; gap: 8px; }
+}

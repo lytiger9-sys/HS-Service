@@ -312,11 +312,9 @@
             </label>
           </div>
 
-          <form class="settings-form" id="polls-settings-form" method="post" action="/guild/<%= guild.id %>/settings/polls">
-            <button class="ghost" type="submit">저장</button>
-          </form>
+          <form class="settings-form" id="polls-settings-form" method="post" action="/guild/<%= guild.id %>/settings/polls"></form>
 
-          <form class="settings-form" method="post" action="/guild/<%= guild.id %>/polls">
+          <form class="settings-form" id="poll-publish-form" method="post" action="/guild/<%= guild.id %>/polls">
             <div class="form-grid">
               <label class="field">
                 <span>게시 채널</span>
@@ -344,8 +342,11 @@
                 <span>마지막 항목 자유 입력</span>
               </label>
             </div>
-            <button class="primary" type="submit">게시</button>
           </form>
+          <div class="poll-settings-actions">
+            <button class="primary" type="submit" form="polls-settings-form">저장</button>
+            <button class="ghost" type="submit" form="poll-publish-form">게시</button>
+          </div>
         </article>
 
         <aside class="preview-column">

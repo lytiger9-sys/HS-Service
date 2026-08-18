@@ -35,7 +35,7 @@ const DEFAULTS = {
 };
 
 function normalizeSettings(settings = {}) {
-  const embed = { ...DEFAULTS, ...(settings.embed || {}), mode: "components" };
+  const embed = { ...DEFAULTS, ...(settings.embed || {}), mode: "components", description: "" };
   embed.mentionRoleIds = Array.isArray(embed.mentionRoleIds)
     ? embed.mentionRoleIds.filter((id) => /^\d{15,22}$/.test(String(id)))
     : [];
@@ -99,7 +99,6 @@ function componentsPayload(settings, guild) {
   const container = new ContainerBuilder();
   const contentParts = [];
   if (settings.title) contentParts.push(`# ${settings.title}`);
-  if (settings.description) contentParts.push(settings.description);
   if (settings.componentsBody) contentParts.push(settings.componentsBody);
   const lines = normalizeRoleMentions(contentParts.join("\n\n"), guild).split(/\r?\n/);
   let text = [];

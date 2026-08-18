@@ -35,10 +35,6 @@
           <span>색상</span>
           <input type="color" name="embedColor" value="<%= settings.embed.color %>" data-embed-preview="color" />
         </label>
-        <label class="field full">
-          <span>설명</span>
-          <textarea name="embedDescription" rows="5" data-embed-preview="description"><%= settings.embed.description %></textarea>
-        </label>
 
         <div class="field full" data-embed-format="components" style="<%= settings.embed.mode === 'legacy' ? 'display:none' : '' %>" aria-hidden="<%= settings.embed.mode === 'legacy' ? 'true' : 'false' %>">
           <span>메시지 내용</span>
@@ -87,24 +83,15 @@
   <aside class="preview-column">
     <div class="card">
       <div class="section-head compact">
-        <div><p class="eyebrow">Discord Preview</p><h3>실제 메시지 미리보기</h3></div>
+        <div><p class="eyebrow">Components V2 Preview</p><h3>실제 메시지 미리보기</h3><p class="muted">입력한 제목·텍스트·이미지·구분선·푸터가 Discord 메시지 순서대로 표시됩니다.</p></div>
       </div>
       <div class="discord-message" data-embed-preview-card>
         <div class="discord-avatar"><%= guild.name.slice(0, 1) %></div>
         <div class="discord-message-content">
           <div class="discord-message-meta"><strong><%= guild.name %></strong><span>오늘 오전 12:00</span></div>
-          <div class="discord-message-text" data-embed-preview-description-text hidden><%= settings.embed.description %></div>
           <div class="discord-components-message" data-embed-preview-components-card>
             <div class="discord-components-preview" data-embed-preview-components></div>
             <div class="discord-component-footer" data-embed-preview-footer><%= settings.embed.footer %></div>
-          </div>
-          <div class="discord-embed-card" data-embed-preview-legacy-card hidden>
-            <div class="discord-embed-accent"></div>
-            <div class="discord-embed-inner">
-              <h4 data-embed-preview-title><%= settings.embed.title %></h4>
-              <p data-embed-preview-description><%= settings.embed.description %></p>
-              <div class="discord-embed-footer"><%= settings.embed.footer || guild.name %></div>
-            </div>
           </div>
         </div>
       </div>
