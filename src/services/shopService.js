@@ -97,6 +97,15 @@ export function createShopService(context) {
     });
     return result;
   }
+  async function notifyAward(message, result) {
+    const amount = Number(result?.attendanceAmount || 0) + Number(result?.amount || 0);
+    if (!amount) return;
+    const reasons = [];
+    if (result?.attendanceAmount) reasons.push("오늘 첫 메시지 보상");
+    if (result?.amount) reasons.push("활동 메시지 보상");
+    await message.author.send(`캐시 지급 안내\n+${amount.toLocaleString()} 캐시 (${reasons.join(" + ")})\n현재 잔액: ${Number(result.balance || 0).toLocaleString()} 캐시`).catch(() => null);
+  }
+
   async function recordMessage(message) {
     if (!message.guild || message.author.bot) return null;
     const settings = await context.services.settings.getSettings(message.guild.id);
@@ -121,6 +130,7 @@ export function createShopService(context) {
         result = { ...(result || {}), amount, balance: wallet.balance };
       }
     });
+    await notifyAward(message, result);
     return result;
   }
   async function getBalance(guildId, userId) { await requireEnabled(guildId); const shop = await getShop(guildId); return walletOf(shop, userId).balance; }
