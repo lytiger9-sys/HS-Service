@@ -199,21 +199,38 @@ export function createEmbedService(context) {
   async function sendFromBody(guild, body) {
     let fields = [];
     try {
-      fields = typeof body.fields === "string" ? JSON.parse(body.fields || "[]") : (body.fields || []);
+      fields = typeof body.embedFields === "string"
+        ? JSON.parse(body.embedFields || "[]")
+        : (body.embedFields || body.fields || []);
     } catch {
       fields = [];
     }
     const bool = (value) => normalizeBoolean(value, false);
     const settings = normalizeSettings({
       embed: {
-        ...body,
+        enabled: body.embedEnabled,
+        mode: body.embedMode,
+        channelId: body.embedChannelId || body.channelId,
+        destinationType: body.embedDestinationType,
+        webhookUrl: body.embedWebhookUrl,
+        title: body.embedTitle,
+        description: body.embedDescription,
+        color: body.embedColor,
+        footer: body.embedFooter,
+        authorName: body.embedAuthorName,
+        authorUrl: body.embedAuthorUrl,
+        thumbnailUrl: body.embedThumbnailUrl,
+        imageUrl: body.embedImageUrl,
+        componentsBody: body.embedComponentsBody,
         fields,
-        mentionEveryone: bool(body.mentionEveryone),
-        mentionHere: bool(body.mentionHere),
-        scheduleEnabled: bool(body.scheduleEnabled)
+        mentionEveryone: bool(body.embedMentionEveryone ?? body.mentionEveryone),
+        mentionHere: bool(body.embedMentionHere ?? body.mentionHere),
+        mentionRoleIds: body.embedMentionRoleIds,
+        scheduleEnabled: bool(body.embedScheduleEnabled ?? body.scheduleEnabled),
+        scheduleIntervalMinutes: body.embedScheduleIntervalMinutes
       }
     });
-    return sendConfigured(guild, body.channelId, settings);
+    return sendConfigured(guild, body.embedChannelId || body.channelId, settings);
   }
 
   async function processSchedules() {
