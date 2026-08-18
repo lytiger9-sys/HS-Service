@@ -17,7 +17,7 @@
     showSiteToast.timer = window.setTimeout(() => {
       toast.classList.remove("is-visible");
       toast.hidden = true;
-    }, type === "error" ? 4200 : 2600);
+    }, type === "error" ? 6000 : 5000);
   }
 
   window.showSiteToast = showSiteToast;
