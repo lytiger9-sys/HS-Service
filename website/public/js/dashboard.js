@@ -186,8 +186,15 @@ async function submitForm(form, submitter = null) {
     },
     body: (() => {
       const data = new FormData(form);
-      form.querySelectorAll('input[type="checkbox"][name$="Enabled"]').forEach((input) => {
-        data.set(input.name, input.checked ? "on" : "off");
+      const externalControls = form.id
+        ? document.querySelectorAll(`input[form="${form.id}"][type="checkbox"]`)
+        : [];
+      const toggleInputs = new Set([
+        ...form.querySelectorAll('input[type="checkbox"][name$="Enabled"]'),
+        ...externalControls
+      ]);
+      toggleInputs.forEach((input) => {
+        if (input.name?.endsWith("Enabled")) data.set(input.name, input.checked ? "on" : "off");
       });
       return data;
     })()
