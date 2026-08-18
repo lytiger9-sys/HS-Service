@@ -1,4 +1,5 @@
 import { isAdministrator } from "../../shared/guards.js";
+import { buildJoinOrderPayload } from "../commands/joinorder.js";
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
 function buildFreeTextModal(pollId) {
@@ -48,6 +49,14 @@ function buildPartnerApplicationModal() {
 
 export async function handleButtonInteraction(interaction, context) {
   const [scope, action, id, extra] = interaction.customId.split(":");
+
+  if (scope === "page" && action === "joinorder") {
+    if (String(id) !== String(interaction.user.id)) {
+      return interaction.reply({ content: "이 페이지 버튼은 명령어를 실행한 사용자만 사용할 수 있습니다.", ephemeral: true });
+    }
+    const rows = await context.services.serverInfo.getJoinOrder(interaction.guild, 100);
+    return interaction.update(buildJoinOrderPayload(rows, Number(extra), interaction.user.id));
+  }
 
   if (interaction.customId === "shop:products") {
     return interaction.reply(await context.services.shop.productMenu(interaction.guildId));
