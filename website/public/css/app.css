@@ -4231,3 +4231,13 @@ input[type="reset"] {
     padding-bottom: 0;
   }
 }
+
+/* Align the bottom of the quick-link stack with the activation title */
+.activation-quick-links {
+  top: 45px;
+}
+@media (max-width: 600px) {
+  .activation-quick-links {
+    top: 38px;
+  }
+}
