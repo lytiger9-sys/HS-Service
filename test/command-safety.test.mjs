@@ -16,6 +16,12 @@ test("일괄 변경·삭제 명령어는 확인 옵션을 요구하고 clear는 
   }
 });
 
+test("계좌 명령어가 등록되고 계좌설정은 모달 실행 명령어다", () => {
+  assert.ok(commandMap.has("계좌설정"));
+  assert.ok(commandMap.has("계좌"));
+  assert.deepEqual(commandMap.get("계좌설정").data.toJSON().options ?? [], []);
+});
+
 test("생일설정 명령어는 등록되지 않는다", () => {
   assert.equal(commandMap.has("생일설정"), false);
   assert.ok(commandMap.has("생일"));

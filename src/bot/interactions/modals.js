@@ -1,5 +1,6 @@
 import { buildJoinOrderPayload } from "../commands/joinorder.js";
 import { buildEmojiListPayload } from "../commands/emoji.js";
+import { PermissionFlagsBits } from "discord.js";
 
 export async function handleModalInteraction(interaction, context) {
   if (interaction.customId.startsWith("page:emoji-modal:")) {
@@ -28,6 +29,22 @@ export async function handleModalInteraction(interaction, context) {
     }
     const rows = await context.services.serverInfo.getJoinOrder(interaction.guild);
     return interaction.update(buildJoinOrderPayload(rows, requestedPage - 1, interaction.user.id));
+  }
+
+  if (interaction.customId === "account:settings") {
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
+    }
+    const bank = interaction.fields.getTextInputValue("account-bank").trim();
+    const number = interaction.fields.getTextInputValue("account-number").trim();
+    const holder = interaction.fields.getTextInputValue("account-holder").trim();
+    if (!bank || !number || !holder) {
+      return interaction.reply({ content: "은행·계좌번호·예금주를 모두 입력해 주세요.", ephemeral: true });
+    }
+    await context.services.guildState.patch(interaction.guildId, (draft) => {
+      draft.account = { bank, number, holder };
+    });
+    return interaction.reply({ content: "계좌 정보가 저장되었습니다.", ephemeral: true });
   }
 
   if (interaction.customId === "partner:application") {

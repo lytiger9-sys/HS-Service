@@ -156,6 +156,7 @@ export function createDefaultGuildState() {
     tempChannels: {},
     partners: [],
     bannerSlots: [],
+    account: { bank: "", number: "", holder: "" },
     expressions: { emojis: [], sounds: [] },
     shop: {
       enabled: true,

@@ -56,6 +56,13 @@ function normalizeGuildState(doc) {
     },
     partners: Array.isArray(data.partners) ? data.partners : [],
     bannerSlots: Array.isArray(data.bannerSlots) ? data.bannerSlots : [],
+    account: {
+      ...defaults.account,
+      ...(data.account || {}),
+      bank: String(data.account?.bank || ""),
+      number: String(data.account?.number || ""),
+      holder: String(data.account?.holder || "")
+    },
     expressions: {
       ...defaults.expressions,
       ...(data.expressions || {}),

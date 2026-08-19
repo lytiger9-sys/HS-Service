@@ -22,6 +22,7 @@ import { soundboardSteal, soundboardList, soundboardDelete } from "./soundboard.
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 import birthday from "./birthday.js";
 import partnermsg from "./partnermsg.js";
+import { accountSettings, account } from "./account.js";
 
 export const commandList = [
   serverinfo,
@@ -54,7 +55,9 @@ export const commandList = [
   balanceCommand,
   adminGrantCommand,
   birthday,
-  partnermsg
+  partnermsg,
+  accountSettings,
+  account
 ];
 
 export const commandMap = new Map(commandList.map((command) => [command.data.name, command]));
