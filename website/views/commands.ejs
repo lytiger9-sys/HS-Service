@@ -1,0 +1,58 @@
+<%- include('partials/head', { title }) %>
+<body class="guide-page guide-commands-page">
+  <header class="guide-nav">
+    <a class="guide-brand" href="/guide">
+      <span class="guide-brand-mark"><img src="/assets/HS.gif" alt="HS-Service 로고" /></span>
+      <span><%= botName %> 명령어 안내</span>
+    </a>
+    <nav class="guide-nav-links" aria-label="주요 메뉴">
+      <a href="/guide">플랜 가이드</a>
+    </nav>
+  </header>
+
+  <main class="guide-shell guide-commands-shell">
+    <a class="guide-back-link" href="/guide">← 플랜 가이드로 돌아가기</a>
+    <section class="guide-commands-hero">
+      <p class="guide-kicker">COMMAND REFERENCE · HS-SERVICE</p>
+      <h1>명령어 안내</h1>
+      <p>HS-Service에서 사용할 수 있는 Discord 명령어와 기능, 필요 권한, 사용 가능한 플랜을 확인하세요.</p>
+    </section>
+
+    <section class="guide-detail-section guide-commands-table-section">
+      <div class="guide-section-heading">
+        <div>
+          <p class="guide-kicker">ALL COMMANDS</p>
+          <h2>전체 명령어 목록</h2>
+        </div>
+        <p><strong><%= commands.length %>개</strong> 명령어를 기능과 플랜별로 정리했습니다.</p>
+      </div>
+      <div class="guide-command-table-wrap">
+        <table class="guide-command-table">
+          <thead>
+            <tr>
+              <th scope="col">명령어</th>
+              <th scope="col">기능</th>
+              <th scope="col">설명</th>
+              <th scope="col">필요 권한</th>
+              <th scope="col">사용 가능 플랜</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% commands.forEach((command) => { %>
+              <tr>
+                <td><code>/<%= command.name %></code></td>
+                <td><span class="guide-feature-tag"><%= command.feature %></span></td>
+                <td><%= command.description %></td>
+                <td><%= command.permission %></td>
+                <td><div class="guide-command-plan-list"><% command.plans.forEach((plan) => { %><span><%= plan %></span><% }) %></div></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

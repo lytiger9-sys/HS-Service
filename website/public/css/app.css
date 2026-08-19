@@ -4140,3 +4140,16 @@ input[type="reset"] {
   -webkit-user-drag: auto;
   user-drag: auto;
 }
+
+/* Commands reference page */
+.guide-commands-shell { max-width: 1320px; }
+.guide-commands-hero { padding: 28px 0 52px; border-bottom: 1px solid rgba(13,13,13,.13); }
+.guide-commands-hero h1 { margin: 0; color: #1b2427; font-size: clamp(58px, 9vw, 112px); font-weight: 700; letter-spacing: -.09em; line-height: .9; }
+.guide-commands-hero > p:last-child { max-width: 620px; margin: 24px 0 0; color: #687678; font-size: 15px; line-height: 1.8; }
+.guide-command-plan-list { display: flex; flex-wrap: wrap; gap: 5px; min-width: 150px; }
+.guide-command-plan-list span { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: #e9edef; color: #687174; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.guide-commands-page .guide-command-table code { color: #7e5b2d; font-family: "Pretendard", "Noto Sans KR", sans-serif !important; font-size: 12px; font-weight: 700; }
+@media (max-width: 720px) {
+  .guide-commands-hero { padding-top: 12px; }
+  .guide-commands-hero h1 { font-size: clamp(58px, 18vw, 96px); }
+}

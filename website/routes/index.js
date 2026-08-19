@@ -133,6 +133,16 @@ export function createIndexRouter(context) {
     });
   });
 
+  router.get("/commands", (req, res) => {
+    const guide = buildGuideData();
+    return res.render("commands", {
+      title: `명령어 안내 · ${context.config.botName}`,
+      botName: context.config.botName,
+      currentUser: req.user || null,
+      commands: guide.commands
+    });
+  });
+
   router.get("/guide/:planSlug", async (req, res, next) => {
     try {
       const guide = buildGuideData();
