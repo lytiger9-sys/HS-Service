@@ -4473,3 +4473,12 @@ input[type="reset"] {
     font-size: 1.166rem;
   }
 }
+
+/* Unified background for all plan-related Guide pages */
+:root {
+  --guide-bg: #f4f6f4;
+}
+.guide-page,
+.guide-page.guide-home-page {
+  background: var(--guide-bg) !important;
+}
