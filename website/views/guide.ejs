@@ -31,6 +31,22 @@
       </div>
     </section>
 
+    <nav class="guide-quick-links" aria-label="가이드 섹션 바로가기">
+      <a href="#plans">플랜</a>
+      <a href="#dashboard-features">대시보드 기능</a>
+      <a href="#commands">명령어</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <div class="guide-search-bar guide-search-bar-top">
+      <label class="guide-search-label" for="guide-search">GUIDE SEARCH</label>
+      <div class="guide-search-control">
+        <input id="guide-search" type="search" placeholder="명령어, 기능, 플랜, 권한으로 검색" autocomplete="off" />
+        <button id="guide-search-clear" type="button" aria-label="검색어 지우기">초기화</button>
+      </div>
+      <p id="guide-search-status" class="guide-search-status"><%= commands.length %>개 명령어 · <%= dashboardFeatures.length %>개 대시보드 기능이 표시되고 있습니다.</p>
+    </div>
+
     <section class="guide-section" id="plans">
       <div class="guide-section-heading">
         <div>
@@ -92,14 +108,6 @@
           <h2>명령어 목록</h2>
         </div>
         <p>명령어를 사용하려면 해당 플랜의 기능 범위와 아래 권한 조건을 모두 충족해야 합니다.</p>
-      </div>
-      <div class="guide-search-bar">
-        <label class="guide-search-label" for="guide-search">GUIDE SEARCH</label>
-        <div class="guide-search-control">
-          <input id="guide-search" type="search" placeholder="명령어, 기능, 플랜, 권한으로 검색" autocomplete="off" />
-          <button id="guide-search-clear" type="button" aria-label="검색어 지우기">초기화</button>
-        </div>
-        <p id="guide-search-status" class="guide-search-status"><%= commands.length %>개 명령어 · <%= dashboardFeatures.length %>개 대시보드 기능이 표시되고 있습니다.</p>
       </div>
       <div class="guide-command-table-wrap">
         <table class="guide-command-table">

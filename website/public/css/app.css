@@ -3378,3 +3378,75 @@ input[type="reset"] {
   .guide-feature-grid { grid-template-columns: 1fr; }
   .guide-feature-card > p { min-height: 0; }
 }
+
+/* Guide polish pass */
+.guide-page { background: #eef2f4; }
+.guide-nav, .guide-shell { width: min(1180px, calc(100% - 72px)); }
+.guide-nav { padding: 24px 0; border-bottom-color: rgba(13,13,13,.12); }
+.guide-shell { padding: 66px 0 110px; }
+.guide-hero { grid-template-columns: minmax(0, 1fr) 220px; gap: 44px; padding: 0 0 52px; }
+.guide-hero h1 { max-width: 700px; font-size: clamp(42px, 5.3vw, 68px); letter-spacing: -.065em; }
+.guide-intro { max-width: 530px; margin-top: 22px; color: #777c7e; font-size: 14px; line-height: 1.75; }
+.guide-hero-meta { padding-left: 22px; }
+.guide-quick-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 18px;
+  padding: 4px;
+  border: 1px solid rgba(13,13,13,.13);
+  border-radius: 999px;
+  background: rgba(255,255,255,.5);
+}
+.guide-quick-links a {
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: #686e70;
+  font-size: 12px;
+  font-weight: 700;
+  transition: background .2s ease, color .2s ease;
+}
+.guide-quick-links a:hover { background: #151616; color: #f7f8f8; }
+.guide-search-bar-top { margin-bottom: 0; border-color: rgba(13,13,13,.13); background: rgba(255,255,255,.7); }
+.guide-search-control input { background: rgba(255,255,255,.85); }
+.guide-section { padding-top: 72px; }
+.guide-section-heading { margin-bottom: 26px; }
+.guide-section-heading h2, .guide-notice-card h2 { font-size: 28px; letter-spacing: -.055em; }
+.guide-section-heading > p { color: #7a7f81; }
+.guide-plan-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.guide-plan-card { min-height: 218px; padding: 22px; border-color: rgba(13,13,13,.13); border-radius: 18px; background: rgba(255,255,255,.74); box-shadow: 0 8px 24px rgba(36,50,56,.045); }
+.guide-plan-card:nth-child(4), .guide-plan-card:nth-child(5) { min-height: 190px; }
+.guide-plan-card h3 { min-height: 0; margin: 17px 0 8px; font-size: 15px; }
+.guide-chip { padding: 4px 8px; background: #e9edef; color: #687174; }
+.guide-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.guide-feature-card { min-height: 176px; padding: 22px 24px; border-color: rgba(13,13,13,.13); border-radius: 18px; background: rgba(255,255,255,.74); box-shadow: 0 8px 24px rgba(36,50,56,.045); }
+.guide-feature-card h3 { margin: 17px 0 8px; font-size: 19px; }
+.guide-feature-card > p { min-height: 0; margin-bottom: 15px; color: #70777a; }
+.guide-feature-plans { color: #8c9395; }
+.guide-command-table-wrap { border-color: rgba(13,13,13,.13); border-radius: 18px; background: rgba(255,255,255,.78); box-shadow: 0 8px 24px rgba(36,50,56,.045); }
+.guide-command-table { min-width: 980px; }
+.guide-command-table th, .guide-command-table td { padding: 14px 16px; }
+.guide-command-table th { background: #e3e8ea; color: #687174; }
+.guide-command-table tbody tr:hover { background: #f1f4f5; }
+.guide-plan-tags { gap: 0; }
+.guide-plan-tags span { padding: 0; background: transparent; color: #747c7f; font-size: 11px; }
+.guide-plan-tags span:not(:last-child)::after { content: " · "; color: #b0b6b7; padding: 0 4px; }
+.guide-feature-tag { background: #edf0f1; color: #697275; }
+.guide-notice-card { border-radius: 18px; }
+.guide-faq-list { border-top-color: rgba(13,13,13,.13); }
+.guide-faq-item { border-bottom-color: rgba(13,13,13,.13); }
+@media (max-width: 850px) {
+  .guide-plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .guide-nav, .guide-shell { width: min(100% - 34px, 600px); }
+  .guide-shell { padding-top: 46px; }
+  .guide-hero { grid-template-columns: 1fr; gap: 28px; padding-bottom: 40px; }
+  .guide-hero h1 { font-size: clamp(40px, 12vw, 60px); }
+  .guide-quick-links { width: 100%; overflow-x: auto; }
+  .guide-quick-links a { flex: 0 0 auto; padding: 8px 11px; }
+  .guide-plan-grid, .guide-feature-grid { grid-template-columns: 1fr; }
+  .guide-plan-card, .guide-plan-card:nth-child(4), .guide-plan-card:nth-child(5) { min-height: auto; }
+}
