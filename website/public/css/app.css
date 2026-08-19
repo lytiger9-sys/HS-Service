@@ -4453,3 +4453,13 @@ input[type="reset"] {
     width: 100%;
   }
 }
+
+/* Enterprise early-access accent: 30% larger */
+.guide-early-access {
+  font-size: clamp(.884rem, 1.3vw, 1.118rem);
+}
+@media (max-width: 720px) {
+  .guide-early-access {
+    font-size: 1.014rem;
+  }
+}
