@@ -37,6 +37,27 @@ export function createIndexRouter(context) {
       이모지스틸: "manageExpressions", 이모지삭제: "manageExpressions", 사운드스틸: "manageExpressions",
       사운드삭제: "manageExpressions", 캐시지급: "administrator", partnermsg: "administrator", 계좌설정: "administrator"
     };
+    const dashboardFeatureDetails = [
+      ["overview", "개요", "서버 현황과 전체 인원·봇·관리자·활성 투표·임시 음성채널 상태를 한눈에 확인합니다."],
+      ["administrators", "관리자", "관리자 계정 상태와 출퇴근 현황, 서버 관리에 필요한 운영 정보를 관리합니다."],
+      ["welcome", "환영", "신규 멤버 입장 시 채널과 DM으로 보낼 환영 메시지, 제목, 색상과 변수 사용을 설정합니다."],
+      ["ticket", "티켓", "티켓 카테고리·질문·저장 메모와 문의 채널 운영 방식을 관리합니다."],
+      ["security", "보안", "레이드 방지, 도배·욕설·초대 링크 대응과 타임아웃 및 보안 로그 설정을 관리합니다."],
+      ["assignment", "할당", "메시지 버튼으로 지급할 역할과 서버 역할 기반의 자동 할당 기능을 설정합니다."],
+      ["voice", "음성", "임시 음성채널 카테고리, 채널 이름, 최대 인원 등 음성채널 생성 규칙을 관리합니다."],
+      ["embed", "임베드", "Components V2 공지 메시지, 채널·웹훅 전송, 이미지·푸터·예약 전송을 설정합니다."],
+      ["polls", "투표", "투표 생성, 자유 입력, 결과 공개 범위, 만료일, 실시간 투표 로그와 진행 중인 투표를 관리합니다."],
+      ["logs", "로그", "서버 변경·메시지·채널·역할 지급·제재 등 서버 로그를 통합 채널과 항목별로 설정합니다."],
+      ["partner", "파트너", "파트너 신청·승인 채널, 파트너 채널, 홍보 웹훅과 상단배너 라이선스를 관리합니다."],
+      ["nickname", "닉네임", "역할별 닉네임 접두사·접미사 규칙과 역할 획득 시 적용되는 닉네임 기능을 설정합니다."],
+      ["shop", "상점", "캐시 보상, 상품 재고·구매, 도박, 상점 임베드와 생일 보상을 관리합니다."]
+    ].map(([id, label, description]) => ({
+      id,
+      label,
+      description,
+      plans: PLAN_DEFINITIONS.filter((plan) => plan.tabs.includes(id)).map((plan) => plan.label)
+    }));
+
     const commands = [...commandMap.entries()].map(([name, command]) => {
       const feature = commandFeature(name);
       return {
@@ -52,6 +73,7 @@ export function createIndexRouter(context) {
       botName: context.config.botName,
       currentUser: req.user || null,
       commands,
+      dashboardFeatures: dashboardFeatureDetails,
       plans: PLAN_DEFINITIONS.map((plan) => ({ ...plan, tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab) }))
     });
   });

@@ -58,6 +58,33 @@
       </div>
     </section>
 
+    <section class="guide-section" id="dashboard-features">
+      <div class="guide-section-heading">
+        <div>
+          <p class="guide-kicker">DASHBOARD FEATURES</p>
+          <h2>대시보드 해금 기능</h2>
+        </div>
+        <p>각 플랜에서 열리는 웹 대시보드 탭과 실제로 관리할 수 있는 기능을 확인하세요.</p>
+      </div>
+      <div class="guide-feature-grid">
+        <% dashboardFeatures.forEach((feature) => { %>
+          <article class="guide-feature-card" data-guide-search-item data-search="<%= [feature.label, feature.description, ...feature.plans].join(' ').toLowerCase() %>">
+            <div class="guide-feature-card-topline">
+              <span class="guide-feature-index"><%= String(feature.id).slice(0, 2).toUpperCase() %></span>
+              <span class="guide-feature-plans"><%= feature.plans.join(' · ') %></span>
+            </div>
+            <h3><%= feature.label %></h3>
+            <p><%= feature.description %></p>
+            <div class="guide-chip-list">
+              <% feature.plans.forEach((plan) => { %>
+                <span class="guide-chip"><%= plan %></span>
+              <% }) %>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+
     <section class="guide-section" id="commands">
       <div class="guide-section-heading guide-command-heading">
         <div>
@@ -72,7 +99,7 @@
           <input id="guide-search" type="search" placeholder="명령어, 기능, 플랜, 권한으로 검색" autocomplete="off" />
           <button id="guide-search-clear" type="button" aria-label="검색어 지우기">초기화</button>
         </div>
-        <p id="guide-search-status" class="guide-search-status"><%= commands.length %>개의 명령어가 표시되고 있습니다.</p>
+        <p id="guide-search-status" class="guide-search-status"><%= commands.length %>개 명령어 · <%= dashboardFeatures.length %>개 대시보드 기능이 표시되고 있습니다.</p>
       </div>
       <div class="guide-command-table-wrap">
         <table class="guide-command-table">
@@ -87,7 +114,7 @@
           </thead>
           <tbody>
             <% commands.forEach((command) => { %>
-              <tr data-guide-command data-search="<%= [command.name, command.description, command.feature, command.permission, ...command.plans].join(' ').toLowerCase() %>">
+              <tr data-guide-command data-guide-search-item data-search="<%= [command.name, command.description, command.feature, command.permission, ...command.plans].join(' ').toLowerCase() %>">
                 <td><code>/<%= command.name %></code></td>
                 <td><span class="guide-feature-tag"><%= command.feature %></span></td>
                 <td><%= command.permission %></td>
