@@ -4318,6 +4318,8 @@ input[type="reset"] {
   align-self: flex-end;
   flex: 0 0 auto;
   margin: 0;
+  position: relative;
+  top: -1.1em;
   padding-bottom: .08em;
   color: #a1824e;
   font-family: "Great Vibes Local", cursive !important;
@@ -4327,7 +4329,7 @@ input[type="reset"] {
   letter-spacing: .01em;
   line-height: .9;
   white-space: nowrap;
-  transform: rotate(-6deg) translateY(.16em);
+  transform: rotate(-6deg);
   transform-origin: right bottom;
 }
 @media (max-width: 720px) {
@@ -4338,9 +4340,10 @@ input[type="reset"] {
   }
   .guide-early-access {
     align-self: flex-start;
+    position: static;
     margin: 0 0 8px 6px;
     font-size: .78rem;
-    transform: rotate(-4deg) translateY(0);
+    transform: rotate(-4deg);
   }
 }
 

@@ -410,6 +410,8 @@ function setupChannelComboboxes() {
     const list = document.createElement("div");
     list.className = "channel-combobox-list";
     list.setAttribute("role", "listbox");
+    const allowEmpty = select.dataset.comboNoEmpty !== "true";
+    const emptyPlaceholder = select.dataset.comboPlaceholder || "채널 이름 검색 또는 선택";
     combo.append(input, list);
     select.parentNode.insertBefore(combo, select);
     select.style.display = "none";
@@ -417,23 +419,25 @@ function setupChannelComboboxes() {
     const updateLabel = () => {
       const selected = select.options[select.selectedIndex];
       input.value = selected?.value ? selected.textContent.trim() : "";
-      input.placeholder = selected?.value ? "채널 변경" : "채널 이름 검색 또는 선택";
+      input.placeholder = selected?.value ? (select.dataset.comboPlaceholder || "채널 변경") : emptyPlaceholder;
     };
     const render = (query = "") => {
       const normalized = query.trim().toLowerCase();
       list.replaceChildren();
-      const empty = document.createElement("button");
-      empty.type = "button";
-      empty.className = "channel-combobox-option is-empty";
-      empty.textContent = "선택 안 함";
-      empty.addEventListener("click", () => {
-        select.value = "";
-        select.dispatchEvent(new Event("change", { bubbles: true }));
-        updateLabel();
-        combo.classList.remove("is-open");
-        input.setAttribute("aria-expanded", "false");
-      });
-      list.append(empty);
+      if (allowEmpty) {
+        const empty = document.createElement("button");
+        empty.type = "button";
+        empty.className = "channel-combobox-option is-empty";
+        empty.textContent = "선택 안 함";
+        empty.addEventListener("click", () => {
+          select.value = "";
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          updateLabel();
+          combo.classList.remove("is-open");
+          input.setAttribute("aria-expanded", "false");
+        });
+        list.append(empty);
+      }
       const matches = getOptions().filter((option) => option.textContent.toLowerCase().includes(normalized));
       matches.forEach((option) => {
         const item = document.createElement("button");
