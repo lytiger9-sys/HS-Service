@@ -1,7 +1,8 @@
 import express from "express";
 import { buildDashboardViewModel } from "../lib/dashboardData.js";
 import { getAccessMessage, getAllowedGuild, resolveDashboardAccess } from "../lib/dashboardAccess.js";
-import { getPlanDefinition, PLAN_LABELS, PLAN_TAB_LABELS } from "../../src/config/plans.js";
+import { getPlanDefinition, PLAN_DEFINITIONS, PLAN_LABELS, PLAN_TAB_LABELS } from "../../src/config/plans.js";
+import { commandMap, commandFeature } from "../../src/bot/commands/index.js";
 
 function getActiveLicenseId(req) {
   return req.session?.activeLicenseId || "";
@@ -18,6 +19,42 @@ function renderActivation(res, context, message = "") {
 
 export function createIndexRouter(context) {
   const router = express.Router();
+
+  router.get("/guide", (req, res) => {
+    const permissionLabels = {
+      administrator: "Administrator",
+      manageGuild: "서버 관리 또는 Administrator",
+      manageChannels: "채널 관리 또는 Administrator",
+      manageExpressions: "표현식 관리 권한",
+      conditional: "명령어별 조건 적용",
+      public: "전체 사용자"
+    };
+    const permissions = {
+      save: "administrator", savednotes: "administrator", clear: "administrator", punishments: "conditional",
+      tempvoice: "administrator", staff: "administrator", honeypotban: "administrator", honeypotkick: "administrator",
+      exithoneypot: "administrator", nickapply: "administrator", nickrandom: "administrator", nickinit: "administrator",
+      booston: "manageGuild", boostoff: "manageGuild", 복제: "manageChannels", 카테고리삭제: "manageChannels",
+      이모지스틸: "manageExpressions", 이모지삭제: "manageExpressions", 사운드스틸: "manageExpressions",
+      사운드삭제: "manageExpressions", 캐시지급: "administrator", partnermsg: "administrator", 계좌설정: "administrator"
+    };
+    const commands = [...commandMap.entries()].map(([name, command]) => {
+      const feature = commandFeature(name);
+      return {
+        name,
+        description: command.data.toJSON().description || "서버 기능을 실행합니다.",
+        feature: feature ? (PLAN_TAB_LABELS[feature] || feature) : "공통",
+        permission: permissionLabels[permissions[name] || "public"],
+        plans: PLAN_DEFINITIONS.filter((plan) => !feature || plan.tabs.includes(feature)).map((plan) => plan.label)
+      };
+    });
+    return res.render("guide", {
+      title: `${context.config.botName} 가이드`,
+      botName: context.config.botName,
+      currentUser: req.user || null,
+      commands,
+      plans: PLAN_DEFINITIONS.map((plan) => ({ ...plan, tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab) }))
+    });
+  });
 
   router.get("/", async (req, res, next) => {
     try {

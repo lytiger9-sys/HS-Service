@@ -1,0 +1,117 @@
+<%- include('partials/head', { title }) %>
+<body class="guide-page">
+  <header class="guide-nav">
+    <a class="guide-brand" href="/">
+      <span class="guide-brand-mark">HS</span>
+      <span><%= botName %></span>
+    </a>
+    <nav class="guide-nav-links" aria-label="주요 메뉴">
+      <a href="/">메인으로</a>
+      <% if (currentUser) { %>
+        <a class="guide-nav-button" href="/">대시보드</a>
+      <% } else { %>
+        <a class="guide-nav-button" href="/auth/discord">Discord 로그인</a>
+      <% } %>
+    </nav>
+  </header>
+
+  <main class="guide-shell">
+    <section class="guide-hero">
+      <div>
+        <p class="guide-kicker">HS SERVICE · COMMAND GUIDE</p>
+        <h1>서버 운영을 위한<br><em>한눈에 보는 가이드</em></h1>
+        <p class="guide-intro">명령어 사용법과 권한, 플랜별 기능 범위를 한곳에서 확인하세요. 모든 명령어는 서버 라이선스와 기능 점검 상태에 따라 추가로 제한될 수 있습니다.</p>
+      </div>
+      <div class="guide-hero-meta">
+        <span class="guide-stat-number"><%= commands.length %></span>
+        <span class="guide-stat-label">등록된 명령어</span>
+        <span class="guide-stat-divider"></span>
+        <span class="guide-stat-number"><%= plans.length %></span>
+        <span class="guide-stat-label">서비스 플랜</span>
+      </div>
+    </section>
+
+    <section class="guide-section" id="plans">
+      <div class="guide-section-heading">
+        <div>
+          <p class="guide-kicker">ACCESS LEVELS</p>
+          <h2>플랜별 기능 범위</h2>
+        </div>
+        <p>상위 플랜은 하위 플랜의 기능을 포함하며, 서버에 활성 라이선스가 있어야 사용할 수 있습니다.</p>
+      </div>
+      <div class="guide-plan-grid">
+        <% plans.forEach((plan) => { %>
+          <article class="guide-plan-card">
+            <div class="guide-plan-topline">
+              <span class="guide-plan-order">0<%= plan.order %></span>
+              <span class="guide-plan-label"><%= plan.label %></span>
+            </div>
+            <h3><%= plan.description %></h3>
+            <p class="guide-plan-count"><strong><%= plan.tabLabels.length %></strong>개 기능 영역</p>
+            <div class="guide-chip-list">
+              <% plan.tabLabels.forEach((label) => { %>
+                <span class="guide-chip"><%= label %></span>
+              <% }) %>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+
+    <section class="guide-section" id="commands">
+      <div class="guide-section-heading">
+        <div>
+          <p class="guide-kicker">SLASH COMMANDS</p>
+          <h2>명령어 목록</h2>
+        </div>
+        <p>명령어를 사용하려면 해당 플랜의 기능 범위와 아래 권한 조건을 모두 충족해야 합니다.</p>
+      </div>
+      <div class="guide-command-table-wrap">
+        <table class="guide-command-table">
+          <thead>
+            <tr>
+              <th>명령어</th>
+              <th>기능 영역</th>
+              <th>필요 권한</th>
+              <th>사용 가능 플랜</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% commands.forEach((command) => { %>
+              <tr>
+                <td><code>/<%= command.name %></code></td>
+                <td><span class="guide-feature-tag"><%= command.feature %></span></td>
+                <td><%= command.permission %></td>
+                <td>
+                  <div class="guide-plan-tags">
+                    <% command.plans.forEach((plan) => { %>
+                      <span><%= plan %></span>
+                    <% }) %>
+                  </div>
+                </td>
+                <td><%= command.description %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="guide-notice-grid">
+      <article class="guide-notice-card">
+        <p class="guide-kicker">BEFORE YOU START</p>
+        <h2>사용 전 확인사항</h2>
+        <p>봇이 서버에 참여하고 있어야 하며, 활성 라이선스가 등록되어야 합니다. 플랜 기능이 켜져 있어도 관리자 점검 모드에서 해당 기능이 중지되어 있으면 명령어를 사용할 수 없습니다.</p>
+      </article>
+      <article class="guide-notice-card guide-notice-dark">
+        <p class="guide-kicker">ADMIN ACCESS</p>
+        <h2>관리자 명령어</h2>
+        <p>서버 설정 변경, 채널 삭제·복제, 닉네임 일괄 변경, 계좌 정보 설정과 같은 명령어는 Discord Administrator 또는 해당 관리 권한이 필요합니다.</p>
+      </article>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
