@@ -55,4 +55,19 @@ export default async function handleReady(client, context) {
   await context.services.polls.processExpirations().catch(() => null);
   const pollExpirationTimer = setInterval(() => void context.services.polls.processExpirations().catch(() => null), 60 * 1000);
   pollExpirationTimer.unref?.();
+
+  let lastPartnerPromoDate = "";
+  const processPartnerPromotions = async () => {
+    const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+    const dateKey = kstNow.toISOString().slice(0, 10);
+    const hour = kstNow.getUTCHours();
+    const minute = kstNow.getUTCMinutes();
+    if (hour !== 17 || minute > 5 || lastPartnerPromoDate === dateKey) return;
+    lastPartnerPromoDate = dateKey;
+    const result = await context.services.partners.processDailyMessages();
+    console.log(`[partner] daily promotions processed at KST 17:00`, result);
+  };
+  await processPartnerPromotions().catch((error) => console.error("[partner] daily promotion failed:", error));
+  const partnerPromoTimer = setInterval(() => void processPartnerPromotions().catch((error) => console.error("[partner] daily promotion failed:", error)), 30 * 1000);
+  partnerPromoTimer.unref?.();
 }

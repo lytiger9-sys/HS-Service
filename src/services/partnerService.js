@@ -9,7 +9,8 @@ import {
   MessageFlags,
   PermissionFlagsBits,
   SeparatorBuilder,
-  TextDisplayBuilder
+  TextDisplayBuilder,
+  WebhookClient
 } from "discord.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -248,6 +249,93 @@ export function createPartnerService(context) {
     return rejected;
   }
 
+  async function getByChannel(guildId, channelId) {
+    const current = state(guildId);
+    return (current.partners || []).find((item) => item.status === "active" && item.channelId === channelId) || null;
+  }
+
+  async function saveLatestMessage(guildId, channelId) {
+    const guild = await context.client.guilds.fetch(guildId);
+    const channel = await guild.channels.fetch(channelId).catch(() => null);
+    if (!channel?.isTextBased()) return null;
+    const messages = await channel.messages.fetch({ limit: 1 });
+    const message = messages.first();
+    if (!message) return null;
+    const snapshot = {
+      id: message.id,
+      content: text(message.content, "", 2000),
+      embeds: message.embeds.slice(0, 10).map((embed) => embed.toJSON()),
+      attachments: message.attachments.map((attachment) => ({
+        url: attachment.url,
+        name: attachment.name || "attachment"
+      })).slice(0, 10),
+      savedAt: nowIso()
+    };
+    await patch(guildId, (draft) => {
+      const item = (draft.partners || []).find((entry) => entry.status === "active" && entry.channelId === channelId);
+      if (item) item.promoMessage = snapshot;
+    });
+    return snapshot;
+  }
+
+  function normalizePromoWebhook(value) {
+    try {
+      const url = new URL(String(value || ""));
+      if (url.protocol !== "https:" || !["discord.com", "discordapp.com"].includes(url.hostname) || !/^\/api\/webhooks\/\d+\/[^/]+$/.test(url.pathname)) return "";
+      return url.toString();
+    } catch {
+      return "";
+    }
+  }
+
+  async function invalidatePartner(guildId, partnerId) {
+    const partner = (state(guildId).partners || []).find((item) => item.id === partnerId);
+    if (!partner) return;
+    await deletePartner(guildId, partnerId).catch(() => null);
+  }
+
+  async function sendPartnerMessage(guildId, partner) {
+    const webhookUrl = normalizePromoWebhook(partner.promoWebhook);
+    const promoMessage = partner.promoMessage;
+    if (!promoMessage) return { sent: false, skipped: true };
+    if (!webhookUrl) {
+      await invalidatePartner(guildId, partner.id);
+      return { sent: false, skipped: false, invalidated: true };
+    }
+    const payload = {
+      content: promoMessage.content || undefined,
+      embeds: promoMessage.embeds || [],
+      files: (promoMessage.attachments || []).map((attachment) => ({ attachment: attachment.url, name: attachment.name })),
+      allowedMentions: { parse: [] }
+    };
+    if (!payload.content && !payload.embeds.length && !payload.files.length) return { sent: false, skipped: true };
+    try {
+      const webhook = new WebhookClient({ url: webhookUrl });
+      await webhook.send(payload);
+      webhook.destroy();
+      return { sent: true, skipped: false };
+    } catch (error) {
+      console.error(`[partner] promo webhook failed for ${guildId}/${partner.id}:`, error?.message || error);
+      await invalidatePartner(guildId, partner.id);
+      return { sent: false, skipped: false, invalidated: true };
+    }
+  }
+
+  async function processDailyMessages() {
+    const results = { sent: 0, invalidated: 0, skipped: 0 };
+    for (const guild of context.client.guilds.cache.values()) {
+      const current = state(guild.id);
+      if (current.settings?.partner?.enabled === false) continue;
+      for (const partner of (current.partners || []).filter((item) => item.status === "active" && item.promoWebhook && item.promoMessage)) {
+        const result = await sendPartnerMessage(guild.id, partner);
+        if (result.sent) results.sent += 1;
+        else if (result.invalidated) results.invalidated += 1;
+        else results.skipped += 1;
+      }
+    }
+    return results;
+  }
+
   async function handleMessage(message) {
     const current = state(message.guild.id);
     if (current.settings?.partner?.enabled === false) return false;
@@ -348,7 +436,7 @@ export function createPartnerService(context) {
     return partner;
   }
 
-  return { syncConditionsMessage, syncBannerMessage, createApplication, approve, reject, handleMessage, listStale, deletePartner, issueBannerLicense, createBanner, cleanupExpiredBanners };
+  return { syncConditionsMessage, syncBannerMessage, createApplication, approve, reject, handleMessage, getByChannel, saveLatestMessage, processDailyMessages, listStale, deletePartner, issueBannerLicense, createBanner, cleanupExpiredBanners };
 }
 
 export { conditionComponents, bannerComponents };

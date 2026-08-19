@@ -9,6 +9,7 @@ export function commandFeature(commandName) {
   if (["nickapply", "nickrandom", "nickinit"].includes(name)) return "nickname";
   if (["도박", "캐시", "캐시지급", "생일"].includes(name)) return "shop";
   if (["booston", "boostoff"].includes(name)) return "logs";
+  if (name === "partnermsg") return "partner";
   if (name === "환율") return "events";
   return null;
 }
