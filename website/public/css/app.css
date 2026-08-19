@@ -3053,3 +3053,21 @@ input[type="reset"] {
   font-weight: 700;
   letter-spacing: 0;
 }
+
+/* Softer, shorter license inventory controls */
+.license-page .license-filter-bar {
+  padding: 12px 14px;
+  gap: 12px;
+  border-radius: 22px;
+}
+.license-page .license-filter-bar .field input,
+.license-page .license-filter-bar .field select {
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 13px;
+}
+.license-page .license-filter-actions button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 13px;
+}
