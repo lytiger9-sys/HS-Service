@@ -4304,6 +4304,13 @@ input[type="reset"] {
   font-weight: 400;
   font-display: swap;
 }
+@font-face {
+  font-family: "Nanum Pen Script Local";
+  src: url("/fonts/NanumPenScript-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
 /* Enterprise early-access accent */
 .guide-feature-title-line {
@@ -4322,7 +4329,7 @@ input[type="reset"] {
   top: -1.1em;
   padding-bottom: .08em;
   color: #a1824e;
-  font-family: "Great Vibes Local", cursive !important;
+  font-family: "Nanum Pen Script Local", "Great Vibes Local", cursive !important;
   font-size: clamp(.68rem, 1vw, .86rem);
   font-style: normal;
   font-weight: 400;
