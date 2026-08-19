@@ -3643,3 +3643,48 @@ input[type="reset"] {
   .guide-home-page .guide-plan-card-interactive { min-height: 250px; }
   .guide-home-page .guide-plan-card-interactive .guide-plan-title { margin-top: 28px; }
 }
+
+/* Minimal Guide landing */
+.guide-home-shell { max-width: 1440px; padding-top: 90px; }
+.guide-brand-wordmark {
+  margin: 0 0 72px;
+  color: #151718;
+  font-size: clamp(72px, 12vw, 176px);
+  font-weight: 800;
+  letter-spacing: -.12em;
+  line-height: .82;
+}
+.guide-home-page .guide-plan-section { padding-top: 0; }
+.guide-home-page .guide-plan-grid-interactive { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+.guide-home-page .guide-plan-card-interactive {
+  min-height: 500px;
+  padding: 30px 26px 25px;
+  border-radius: 24px;
+}
+.guide-home-page .guide-plan-card-interactive .guide-plan-title {
+  margin: 90px 0 20px;
+  font-size: clamp(36px, 4vw, 62px);
+  letter-spacing: -.1em;
+}
+.guide-home-page .guide-plan-price { margin-bottom: 20px; font-size: 18px; }
+.guide-home-page .guide-plan-audience { min-height: 70px; font-size: 14px; line-height: 1.75; }
+.guide-home-page .guide-plan-card-hint { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(13,13,13,.12); }
+@media (max-width: 1200px) {
+  .guide-home-page .guide-plan-grid-interactive { gap: 12px; }
+  .guide-home-page .guide-plan-card-interactive { min-height: 430px; padding-left: 20px; padding-right: 20px; }
+}
+@media (max-width: 1050px) {
+  .guide-home-page .guide-plan-grid-interactive { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .guide-home-shell { padding-top: 58px; }
+  .guide-brand-wordmark { margin-bottom: 52px; font-size: clamp(60px, 18vw, 110px); }
+  .guide-home-page .guide-plan-grid-interactive { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guide-home-page .guide-plan-card-interactive { min-height: 350px; padding: 22px 18px; }
+  .guide-home-page .guide-plan-card-interactive .guide-plan-title { margin-top: 55px; font-size: 40px; }
+}
+@media (max-width: 460px) {
+  .guide-home-page .guide-plan-grid-interactive { grid-template-columns: 1fr; }
+  .guide-home-page .guide-plan-card-interactive { min-height: 280px; }
+  .guide-home-page .guide-plan-card-interactive .guide-plan-title { margin-top: 32px; font-size: 48px; }
+}

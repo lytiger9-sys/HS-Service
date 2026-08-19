@@ -16,21 +16,8 @@
   </header>
 
   <main class="guide-shell guide-home-shell">
-    <section class="guide-hero guide-home-hero">
-      <div>
-        <p class="guide-kicker">HS SERVICE · PLANS</p>
-        <h1>서버에 맞는<br><em>플랜을 선택하세요</em></h1>
-        <p class="guide-intro">서버의 규모와 운영 방식에 맞는 플랜을 선택하고, 카드에서 주요 기능을 확인하세요.</p>
-      </div>
-      <div class="guide-hero-meta">
-        <span class="guide-stat-number"><%= plans.length %></span>
-        <span class="guide-stat-label">서비스 플랜</span>
-        <span class="guide-stat-divider"></span>
-        <span class="guide-stat-label">카드를 선택하면 상세 페이지로 이동합니다.</span>
-      </div>
-    </section>
-
-    <section class="guide-section guide-plan-section" id="plans">
+    <h1 class="guide-brand-wordmark">HS-Service</h1>
+    <section class="guide-plan-section" id="plans" aria-label="서비스 플랜">
       <div class="guide-plan-grid guide-plan-grid-interactive">
         <% plans.forEach((plan) => { %>
           <a class="guide-plan-card guide-plan-card-interactive" href="/guide/<%= plan.slug %>">
@@ -41,10 +28,6 @@
             <span class="guide-plan-title"><%= plan.label %></span>
             <span class="guide-plan-price"><%= plan.price %></span>
             <span class="guide-plan-audience"><%= plan.audience %></span>
-            <span class="guide-plan-major">
-              <span class="guide-plan-body-label">주요 추가 기능</span>
-              <span class="guide-plan-major-list"><% plan.addedFeatures.forEach((feature, index) => { %><span><%= feature.label %></span><% if (index < plan.addedFeatures.length - 1) { %><b>·</b><% } %><% }) %></span>
-            </span>
             <span class="guide-plan-card-hint">플랜 상세 보기</span>
           </a>
         <% }) %>
