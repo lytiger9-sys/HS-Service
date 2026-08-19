@@ -4358,3 +4358,24 @@ input[type="reset"] {
     transform: rotate(-4deg);
   }
 }
+
+.guide-commands-page .guide-plan-native-select {
+  appearance: auto;
+  -webkit-appearance: menulist;
+  display: block;
+  width: 190px;
+  min-height: 42px;
+  border: 1px solid #cbd4d7;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1b2427;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
+  font-size: .84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.guide-commands-page .guide-plan-native-select option {
+  background: #ffffff;
+  color: #1b2427;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
+}

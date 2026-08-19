@@ -27,10 +27,12 @@
         </div>
         <label class="guide-plan-select-wrap" for="command-plan-select">
           <span>플랜 선택</span>
-          <select id="command-plan-select" name="plan">
-            <% planOptions.forEach((plan) => { const planValue = plan.slug || 'enterprise'; const planLabel = String(plan.label || 'Enterprise').toUpperCase(); %>
-              <option value="<%= planValue %>"<% if (planValue === 'enterprise') { %> selected<% } %>><%= planLabel %></option>
-            <% }) %>
+          <select id="command-plan-select" class="guide-plan-native-select" name="plan" aria-label="명령어 플랜 선택">
+            <option value="free">FREE</option>
+            <option value="basic">BASIC</option>
+            <option value="standard">STANDARD</option>
+            <option value="pro">PRO</option>
+            <option value="enterprise" selected>ENTERPRISE</option>
           </select>
         </label>
       </div>
