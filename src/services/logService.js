@@ -68,6 +68,14 @@ export function createLogService(context, guildState) {
     return message?.edit(payload).catch(() => null) || null;
   }
 
+  async function sendServerNotice(guildId, payload) {
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    if (!guild) return null;
+    const settings = await getSettings(guildId);
+    const channel = await resolveTextChannel(guild, settings.logs?.serverChannelId);
+    return send(channel, payload);
+  }
+
   async function sendWelcomeError(guildId, payload) {
     const settings = await getSettings(guildId);
     if (settings.logs?.enabled === false) return null;
@@ -82,6 +90,7 @@ export function createLogService(context, guildState) {
 
   return {
     sendConfigured,
+    sendServerNotice,
     sendLogByKey,
     editLogByKey,
     sendWelcomeError,

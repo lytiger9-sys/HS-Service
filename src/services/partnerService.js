@@ -57,6 +57,19 @@ function conditionComponents(settings) {
   return { flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
+function promoFailureComponents(partner, reason) {
+  const container = new ContainerBuilder()
+    .setAccentColor(0xc05640)
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent("## 파트너 홍보 메시지 전송 실패"))
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(
+      `파트너 **${partner.affiliateName || "알 수 없음"}**의 홍보 웹훅으로 메시지를 보내지 못했습니다.\n` +
+      `실패 사유: ${text(reason, "알 수 없는 오류", 500)}\n` +
+      "웹훅 정보와 해당 파트너 채널을 정리했습니다."
+    ));
+  return { flags: MessageFlags.IsComponentsV2, components: [container], allowedMentions: { parse: [] } };
+}
+
 function bannerComponents(settings, details = null) {
   const container = new ContainerBuilder()
     .setAccentColor(colorNumber(settings.embedColor, 0xb89968))
@@ -288,9 +301,20 @@ export function createPartnerService(context) {
     }
   }
 
-  async function invalidatePartner(guildId, partnerId) {
+  async function notifyPromoFailure(guildId, partner, reason) {
+    const guild = await context.client.guilds.fetch(guildId).catch(() => null);
+    if (!guild) return;
+    const payload = promoFailureComponents(partner, reason);
+    const members = await guild.members.fetch().catch(() => guild.members.cache);
+    const administrators = [...members.values()].filter((member) => !member.user.bot && member.permissions?.has(PermissionFlagsBits.Administrator));
+    await Promise.all(administrators.map((member) => member.user.send(payload).catch(() => null)));
+    await context.services.logs?.sendServerNotice(guildId, payload).catch(() => null);
+  }
+
+  async function invalidatePartner(guildId, partnerId, reason) {
     const partner = (state(guildId).partners || []).find((item) => item.id === partnerId);
     if (!partner) return;
+    await notifyPromoFailure(guildId, partner, reason);
     await deletePartner(guildId, partnerId).catch(() => null);
   }
 
@@ -299,7 +323,7 @@ export function createPartnerService(context) {
     const promoMessage = partner.promoMessage;
     if (!promoMessage) return { sent: false, skipped: true };
     if (!webhookUrl) {
-      await invalidatePartner(guildId, partner.id);
+      await invalidatePartner(guildId, partner.id, "저장된 웹훅 URL이 유효하지 않습니다.");
       return { sent: false, skipped: false, invalidated: true };
     }
     const payload = {
@@ -316,7 +340,7 @@ export function createPartnerService(context) {
       return { sent: true, skipped: false };
     } catch (error) {
       console.error(`[partner] promo webhook failed for ${guildId}/${partner.id}:`, error?.message || error);
-      await invalidatePartner(guildId, partner.id);
+      await invalidatePartner(guildId, partner.id, error?.message || "Discord 웹훅 전송 요청이 실패했습니다.");
       return { sent: false, skipped: false, invalidated: true };
     }
   }
