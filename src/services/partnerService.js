@@ -12,6 +12,7 @@ import {
   TextDisplayBuilder,
   WebhookClient
 } from "discord.js";
+import { kstDateKey } from "../shared/time.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const STALE_MS = 7 * DAY_MS;
@@ -57,7 +58,8 @@ function conditionComponents(settings) {
   return { flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
-function promoFailureComponents(partner, reason) {
+function promoFailureComponents(partner, reason, failureCount) {
+  const finalFailure = failureCount >= 3;
   const container = new ContainerBuilder()
     .setAccentColor(0xc05640)
     .addTextDisplayComponents(new TextDisplayBuilder().setContent("## 파트너 홍보 메시지 전송 실패"))
@@ -65,7 +67,8 @@ function promoFailureComponents(partner, reason) {
     .addTextDisplayComponents(new TextDisplayBuilder().setContent(
       `파트너 **${partner.affiliateName || "알 수 없음"}**의 홍보 웹훅으로 메시지를 보내지 못했습니다.\n` +
       `실패 사유: ${text(reason, "알 수 없는 오류", 500)}\n` +
-      "웹훅 정보와 해당 파트너 채널을 정리했습니다."
+      `연속 실패 횟수: ${failureCount}/3\n` +
+      (finalFailure ? "3일 연속 실패하여 웹훅 정보와 해당 파트너 채널을 정리했습니다." : "3일 연속 실패하면 웹훅 정보와 해당 파트너 채널을 정리합니다.")
     ));
   return { flags: MessageFlags.IsComponentsV2, components: [container], allowedMentions: { parse: [] } };
 }
@@ -301,21 +304,56 @@ export function createPartnerService(context) {
     }
   }
 
-  async function notifyPromoFailure(guildId, partner, reason) {
+  async function recordPromoFailure(guildId, partnerId, reason) {
+    const today = kstDateKey();
+    let failureCount = 1;
+    await patch(guildId, (draft) => {
+      const item = (draft.partners || []).find((entry) => entry.id === partnerId);
+      if (!item) return;
+      const previousDate = item.promoFailureDate;
+      const previousCount = Number(item.promoFailureCount) || 0;
+      if (previousDate === today) {
+        failureCount = Math.max(previousCount, 1);
+      } else if (previousDate) {
+        const previousDay = new Date(`${previousDate}T00:00:00+09:00`).getTime();
+        const currentDay = new Date(`${today}T00:00:00+09:00`).getTime();
+        failureCount = currentDay - previousDay === DAY_MS ? previousCount + 1 : 1;
+      }
+      item.promoFailureDate = today;
+      item.promoFailureCount = failureCount;
+      item.promoLastFailureReason = text(reason, "알 수 없는 오류", 500);
+    });
+    return failureCount;
+  }
+
+  async function recordPromoSuccess(guildId, partnerId) {
+    await patch(guildId, (draft) => {
+      const item = (draft.partners || []).find((entry) => entry.id === partnerId);
+      if (!item) return;
+      item.promoFailureDate = "";
+      item.promoFailureCount = 0;
+      item.promoLastFailureReason = "";
+      item.promoLastSentAt = nowIso();
+    });
+  }
+
+  async function notifyPromoFailure(guildId, partner, reason, failureCount) {
     const guild = await context.client.guilds.fetch(guildId).catch(() => null);
     if (!guild) return;
-    const payload = promoFailureComponents(partner, reason);
+    const payload = promoFailureComponents(partner, reason, failureCount);
     const members = await guild.members.fetch().catch(() => guild.members.cache);
     const administrators = [...members.values()].filter((member) => !member.user.bot && member.permissions?.has(PermissionFlagsBits.Administrator));
     await Promise.all(administrators.map((member) => member.user.send(payload).catch(() => null)));
     await context.services.logs?.sendServerNotice(guildId, payload).catch(() => null);
   }
 
-  async function invalidatePartner(guildId, partnerId, reason) {
-    const partner = (state(guildId).partners || []).find((item) => item.id === partnerId);
-    if (!partner) return;
-    await notifyPromoFailure(guildId, partner, reason);
-    await deletePartner(guildId, partnerId).catch(() => null);
+  async function handlePromoFailure(guildId, partner, reason) {
+    const failureCount = await recordPromoFailure(guildId, partner.id, reason);
+    const latestPartner = (state(guildId).partners || []).find((item) => item.id === partner.id) || partner;
+    await notifyPromoFailure(guildId, latestPartner, reason, failureCount);
+    if (failureCount < 3) return { sent: false, skipped: false, invalidated: false, failureCount };
+    await deletePartner(guildId, partner.id).catch(() => null);
+    return { sent: false, skipped: false, invalidated: true, failureCount };
   }
 
   async function sendPartnerMessage(guildId, partner) {
@@ -323,8 +361,7 @@ export function createPartnerService(context) {
     const promoMessage = partner.promoMessage;
     if (!promoMessage) return { sent: false, skipped: true };
     if (!webhookUrl) {
-      await invalidatePartner(guildId, partner.id, "저장된 웹훅 URL이 유효하지 않습니다.");
-      return { sent: false, skipped: false, invalidated: true };
+      return handlePromoFailure(guildId, partner, "저장된 웹훅 URL이 유효하지 않습니다.");
     }
     const payload = {
       content: promoMessage.content || undefined,
@@ -337,11 +374,11 @@ export function createPartnerService(context) {
       const webhook = new WebhookClient({ url: webhookUrl });
       await webhook.send(payload);
       webhook.destroy();
-      return { sent: true, skipped: false };
+      await recordPromoSuccess(guildId, partner.id);
+      return { sent: true, skipped: false, failureCount: 0 };
     } catch (error) {
       console.error(`[partner] promo webhook failed for ${guildId}/${partner.id}:`, error?.message || error);
-      await invalidatePartner(guildId, partner.id, error?.message || "Discord 웹훅 전송 요청이 실패했습니다.");
-      return { sent: false, skipped: false, invalidated: true };
+      return handlePromoFailure(guildId, partner, error?.message || "Discord 웹훅 전송 요청이 실패했습니다.");
     }
   }
 
