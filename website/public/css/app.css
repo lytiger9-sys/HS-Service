@@ -4055,3 +4055,62 @@ input[type="reset"] {
   .guide-plan-copy-hero h1 { font-size: clamp(65px, 23vw, 118px); }
   .guide-plan-copy-description { font-size: 15px; }
 }
+
+/* Guide header logo asset and baseline alignment */
+.guide-page .guide-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 13px;
+  background: #e8e9e8;
+}
+.guide-page .guide-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.guide-home-page .guide-nav-links {
+  align-items: flex-end;
+}
+.guide-home-page .guide-home-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-end;
+  gap: 7px;
+  height: 38px;
+  margin: 0;
+  padding-bottom: 0;
+  white-space: nowrap;
+}
+.guide-home-page .guide-home-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 38px;
+}
+.guide-home-page .guide-home-icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+.guide-home-page .guide-server-search form {
+  display: flex;
+  flex-direction: column;
+}
+.guide-home-page .guide-server-search-control { height: 38px; }
+.guide-home-page .guide-server-search-error { margin-bottom: -16px; }
+@media (max-width: 720px) {
+  .guide-home-page .guide-home-link { height: 38px; }
+  .guide-home-page .guide-home-link > span:last-child { display: none; }
+}
