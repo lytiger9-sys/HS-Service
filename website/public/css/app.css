@@ -4114,3 +4114,29 @@ input[type="reset"] {
   .guide-home-page .guide-home-link { height: 38px; }
   .guide-home-page .guide-home-link > span:last-child { display: none; }
 }
+
+/* Prevent accidental drag and selection on Guide presentation UI */
+.guide-page {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.guide-page img,
+.guide-page svg,
+.guide-page .guide-brand,
+.guide-page .guide-plan-card,
+.guide-page .guide-nav,
+.guide-page .guide-shell,
+.guide-page a,
+.guide-page button {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+.guide-page input,
+.guide-page textarea,
+.guide-page select,
+.guide-page [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-user-drag: auto;
+  user-drag: auto;
+}
