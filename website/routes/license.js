@@ -8,6 +8,7 @@ import {
   verifyLicenseAdmin
 } from "../lib/licenseAuth.js";
 import { PLAN_TAB_LABELS } from "../../src/config/plans.js";
+import XLSX from "xlsx";
 
 function toBoolean(value, fallback = false) {
   if (Array.isArray(value)) return value.some((entry) => toBoolean(entry, false));
@@ -17,6 +18,35 @@ function toBoolean(value, fallback = false) {
   if (["true", "1", "on", "yes", "enabled"].includes(normalized)) return true;
   if (["false", "0", "off", "no", "disabled", ""].includes(normalized)) return false;
   return fallback;
+}
+
+function normalizeLicenseFilters(source = {}) {
+  return {
+    q: String(source.q || "").trim().toLowerCase(),
+    plan: String(source.plan || "").trim().toLowerCase(),
+    period: String(source.period || "").trim().toLowerCase(),
+    status: String(source.status || "").trim().toLowerCase()
+  };
+}
+
+function filterLicenses(licenses, filters) {
+  return licenses.filter((license) => {
+    const searchable = [license.key, license.keyLast4, license.assignedGuildId, license.plan, license.status]
+      .filter(Boolean).join(" ").toLowerCase();
+    if (filters.q && !searchable.includes(filters.q)) return false;
+    if (filters.plan && license.plan !== filters.plan) return false;
+    if (filters.status && license.status !== filters.status) return false;
+    const days = Number(license.durationDays) || 0;
+    if (filters.period === "under7" && days > 7) return false;
+    if (filters.period === "8to30" && (days < 8 || days > 30)) return false;
+    if (filters.period === "31to90" && (days < 31 || days > 90)) return false;
+    if (filters.period === "over90" && days <= 90) return false;
+    return true;
+  });
+}
+
+function licenseDate(value) {
+  return value ? new Date(value).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }) : "-";
 }
 
 function wantsJson(req) {
@@ -72,15 +102,47 @@ export function createLicenseRouter(context) {
 
   router.use(requireLicenseAdmin);
 
+  router.get("/licenses.xlsx", async (req, res, next) => {
+    try {
+      const allLicenses = (await context.services.licenses.list()).filter((license) => license.kind !== "banner");
+      const filters = normalizeLicenseFilters(req.query);
+      const licenses = filterLicenses(allLicenses, filters);
+      const rows = licenses.map((license) => ({
+        "라이선스 키": license.key || `HS-••••-••••-${license.keyLast4 || ""}`,
+        "플랜": license.plan || "-",
+        "사용 기간(일)": license.durationDays || 0,
+        "상태": license.status || "-",
+        "연결 서버 ID": license.assignedGuildId || "-",
+        "발급일": license.createdAt ? licenseDate(license.createdAt) : "-",
+        "활성화일": license.activatedAt ? licenseDate(license.activatedAt) : "-",
+        "만료일": licenseDate(license.expiresAt)
+      }));
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      worksheet["!cols"] = [{ wch: 28 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 24 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
+      XLSX.utils.book_append_sheet(workbook, worksheet, "라이선스 목록");
+      const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename="hs-service-licenses-${new Date().toISOString().slice(0, 10)}.xlsx"`);
+      return res.send(buffer);
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   router.get("/dashboard", async (req, res, next) => {
     try {
-      const licenses = await context.services.licenses.list();
+      const allLicenses = await context.services.licenses.list();
+      const filters = normalizeLicenseFilters(req.query);
+      const licenses = filterLicenses(allLicenses.filter((license) => license.kind !== "banner"), filters);
       const control = await context.services.adminControl.get();
       const featureControls = Object.entries(PLAN_TAB_LABELS).filter(([id]) => id !== "overview").map(([id, label]) => ({ id, label, banned: toBoolean(control.featureBans?.[id]) }));
       return res.render("license-dashboard", {
         title: "라이선스 관리",
         botName: context.config.botName,
-        licenses: licenses.filter((license) => license.kind !== "banner"),
+        licenses,
+        licenseTotal: allLicenses.filter((license) => license.kind !== "banner").length,
+        licenseFilters: filters,
         issuedKeys: req.query.keys ? String(req.query.keys).split("\n").filter(Boolean) : [],
         featureControls,
         otherCommandsEnabled: control.otherCommandsEnabled,

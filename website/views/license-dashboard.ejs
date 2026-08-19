@@ -77,14 +77,55 @@
             <p class="eyebrow">Inventory</p>
             <h2>라이선스 목록</h2>
           </div>
-          <span class="muted"><%= licenses.length %>개</span>
+          <span class="muted"><%= licenses.length %> / <%= licenseTotal %>개</span>
         </div>
+        <form class="license-filter-bar" id="license-filter-form" method="get" action="/license/dashboard">
+          <label class="field license-filter-search">
+            <span>라이선스 검색</span>
+            <input type="search" name="q" value="<%= licenseFilters.q %>" placeholder="키, 서버 ID, 플랜, 상태 검색" />
+          </label>
+          <label class="field">
+            <span>플랜</span>
+            <select name="plan">
+              <option value="">전체 플랜</option>
+              <option value="free" <%= licenseFilters.plan === 'free' ? 'selected' : '' %>>Free</option>
+              <option value="basic" <%= licenseFilters.plan === 'basic' ? 'selected' : '' %>>Basic</option>
+              <option value="standard" <%= licenseFilters.plan === 'standard' ? 'selected' : '' %>>Standard</option>
+              <option value="pro" <%= licenseFilters.plan === 'pro' ? 'selected' : '' %>>Pro</option>
+              <option value="enterprise" <%= licenseFilters.plan === 'enterprise' ? 'selected' : '' %>>Enterprise</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>기간</span>
+            <select name="period">
+              <option value="">전체 기간</option>
+              <option value="under7" <%= licenseFilters.period === 'under7' ? 'selected' : '' %>>7일 이하</option>
+              <option value="8to30" <%= licenseFilters.period === '8to30' ? 'selected' : '' %>>8~30일</option>
+              <option value="31to90" <%= licenseFilters.period === '31to90' ? 'selected' : '' %>>31~90일</option>
+              <option value="over90" <%= licenseFilters.period === 'over90' ? 'selected' : '' %>>91일 이상</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>상태</span>
+            <select name="status">
+              <option value="">전체 상태</option>
+              <option value="available" <%= licenseFilters.status === 'available' ? 'selected' : '' %>>available</option>
+              <option value="active" <%= licenseFilters.status === 'active' ? 'selected' : '' %>>active</option>
+              <option value="expired" <%= licenseFilters.status === 'expired' ? 'selected' : '' %>>expired</option>
+              <option value="revoked" <%= licenseFilters.status === 'revoked' ? 'selected' : '' %>>revoked</option>
+            </select>
+          </label>
+          <div class="license-filter-actions">
+            <button class="primary" type="submit">검색</button>
+            <button class="ghost" type="button" data-license-export>엑셀로 다운로드</button>
+          </div>
+        </form>
         <div class="table-wrap">
           <table>
             <thead><tr><th>키</th><th>플랜</th><th>기간</th><th>상태</th><th>서버</th><th>만료일</th><th>작업</th></tr></thead>
             <tbody>
               <% if (!licenses.length) { %>
-                <tr><td colspan="7" class="muted">발급된 라이선스가 없습니다.</td></tr>
+                <tr><td colspan="7" class="muted"><%= licenseTotal ? '검색 조건에 맞는 라이선스가 없습니다.' : '발급된 라이선스가 없습니다.' %></td></tr>
               <% } %>
               <% licenses.forEach((license) => { %>
                 <tr>
@@ -110,5 +151,16 @@
         </div>
       </section>
   </main>
+  <script>
+    (() => {
+      const form = document.querySelector('#license-filter-form');
+      const exportButton = document.querySelector('[data-license-export]');
+      if (!form || !exportButton) return;
+      exportButton.addEventListener('click', () => {
+        const params = new URLSearchParams(new FormData(form));
+        window.location.href = `/license/licenses.xlsx?${params.toString()}`;
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -2975,3 +2975,81 @@ input[type="reset"] {
   .dashboard-page .field.poll-result-field,
   .dashboard-page .field.poll-free-toggle { grid-column: 1; }
 }
+
+/* License inventory search and XLSX export controls */
+.license-page .license-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.6fr) repeat(3, minmax(130px, .8fr)) auto;
+  align-items: end;
+  gap: 14px;
+  margin: 22px 0;
+  padding: 16px;
+  border: 1px solid rgba(31, 35, 39, .12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .42);
+}
+.license-page .license-filter-bar .field {
+  margin: 0;
+  min-width: 0;
+}
+.license-page .license-filter-bar .field input,
+.license-page .license-filter-bar .field select {
+  width: 100%;
+  min-width: 0;
+}
+.license-page .license-filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.license-page .license-filter-actions button {
+  min-height: 44px;
+  margin: 0;
+}
+.license-page .license-filter-actions .ghost {
+  color: var(--ink);
+  background: transparent;
+  border-color: rgba(31, 35, 39, .28);
+}
+.license-page .license-filter-actions .ghost:hover,
+.license-page .license-filter-actions .ghost:focus-visible {
+  color: var(--ink);
+  background: rgba(184, 153, 104, .14);
+  border-color: var(--accent-warm);
+}
+@media (max-width: 1040px) {
+  .license-page .license-filter-bar {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+  .license-page .license-filter-search,
+  .license-page .license-filter-actions {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 620px) {
+  .license-page .license-filter-bar {
+    grid-template-columns: 1fr;
+  }
+  .license-page .license-filter-search,
+  .license-page .license-filter-actions {
+    grid-column: auto;
+  }
+  .license-page .license-filter-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .license-page .license-filter-actions button {
+    width: 100%;
+  }
+}
+.license-page .license-filter-bar,
+.license-page .license-filter-bar button,
+.license-page .license-filter-bar input,
+.license-page .license-filter-bar select {
+  font-family: var(--pretendard) !important;
+}
+.license-page .license-filter-bar button {
+  font-weight: 700;
+  letter-spacing: 0;
+}
