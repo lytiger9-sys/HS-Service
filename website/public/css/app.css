@@ -4309,49 +4309,26 @@ input[type="reset"] {
 .guide-feature-title-line {
   display: flex;
   align-items: flex-end;
-  gap: 19px;
+  flex-direction: row;
+  gap: 18px;
 }
 .guide-feature-title-line > div { min-width: 0; }
 .guide-early-access {
   display: inline-block;
+  align-self: flex-end;
   flex: 0 0 auto;
-  margin-bottom: 12px;
+  margin: 0;
+  padding-bottom: .08em;
   color: #a1824e;
-  font-family: "Great Vibes Local", "Great Vibes", "Brush Script MT", "Segoe Script", cursive !important;
-  font-size: clamp(1.08rem, 1.8vw, 1.55rem);
-  font-weight: 400;
-  letter-spacing: .01em;
-  line-height: 1;
-  transform: rotate(-7deg);
-  transform-origin: right bottom;
-  white-space: nowrap;
-}
-@media (max-width: 720px) {
-  .guide-feature-title-line {
-    align-items: flex-start;
-    flex-direction: column-reverse;
-    gap: 3px;
-  }
-  .guide-early-access {
-    margin: 0 0 7px 5px;
-    transform: rotate(-5deg);
-  }
-}
-
-/* Keep the feature title in place and place the Enterprise accent on its right */
-.guide-feature-title-line {
-  align-items: flex-end;
-  flex-direction: row;
-  gap: 18px;
-}
-.guide-early-access {
-  margin-bottom: 11px;
-  font-family: "Great Vibes", "Brush Script MT", "Segoe Script", cursive !important;
-  font-size: clamp(1.2rem, 2vw, 1.72rem);
+  font-family: "Great Vibes Local", cursive !important;
+  font-size: clamp(.68rem, 1vw, .86rem);
   font-style: normal;
   font-weight: 400;
-  letter-spacing: .015em;
-  transform: rotate(-6deg);
+  letter-spacing: .01em;
+  line-height: .9;
+  white-space: nowrap;
+  transform: rotate(-6deg) translateY(.16em);
+  transform-origin: right bottom;
 }
 @media (max-width: 720px) {
   .guide-feature-title-line {
@@ -4360,8 +4337,10 @@ input[type="reset"] {
     gap: 4px;
   }
   .guide-early-access {
+    align-self: flex-start;
     margin: 0 0 8px 6px;
-    transform: rotate(-4deg);
+    font-size: .78rem;
+    transform: rotate(-4deg) translateY(0);
   }
 }
 
@@ -4384,21 +4363,4 @@ input[type="reset"] {
   background: #ffffff;
   color: #1b2427;
   font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
-}
-
-/* Enterprise accent: half-size and bottom-aligned with the feature title */
-.guide-early-access {
-  align-self: flex-end;
-  margin-bottom: 0;
-  font-size: clamp(.62rem, 1vw, .86rem);
-  line-height: 1.1;
-  transform: rotate(-6deg) translateY(0);
-}
-@media (max-width: 720px) {
-  .guide-early-access {
-    align-self: flex-start;
-    margin: 0 0 8px 6px;
-    font-size: .78rem;
-    transform: rotate(-4deg);
-  }
 }
