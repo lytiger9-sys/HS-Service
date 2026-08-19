@@ -4385,3 +4385,20 @@ input[type="reset"] {
   color: #1b2427;
   font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
 }
+
+/* Enterprise accent: half-size and bottom-aligned with the feature title */
+.guide-early-access {
+  align-self: flex-end;
+  margin-bottom: 0;
+  font-size: clamp(.62rem, 1vw, .86rem);
+  line-height: 1.1;
+  transform: rotate(-6deg) translateY(0);
+}
+@media (max-width: 720px) {
+  .guide-early-access {
+    align-self: flex-start;
+    margin: 0 0 8px 6px;
+    font-size: .78rem;
+    transform: rotate(-4deg);
+  }
+}
