@@ -4476,7 +4476,10 @@ input[type="reset"] {
 
 /* Unified background for all plan-related Guide pages */
 :root {
-  --guide-bg: #f4f6f4;
+  --guide-bg:
+    radial-gradient(circle at 8% 8%, rgba(255,255,255,.94), transparent 32%),
+    radial-gradient(circle at 92% 70%, rgba(143,180,181,.13), transparent 34%),
+    #f4f6f4;
 }
 .guide-page,
 .guide-page.guide-home-page {
