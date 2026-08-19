@@ -1,0 +1,33 @@
+<%- include('partials/head', { title }) %>
+<body class="guide-page guide-plan-detail-page">
+  <header class="guide-nav">
+    <a class="guide-brand" href="/guide"><span class="guide-brand-mark">HS</span><span><%= botName %> 가이드</span></a>
+    <nav class="guide-nav-links" aria-label="주요 메뉴"><a href="/guide">플랜 보기</a><a href="/">메인으로</a></nav>
+  </header>
+  <main class="guide-shell guide-plan-detail-shell guide-server-detail-shell">
+    <a class="guide-back-link" href="/guide">← 플랜 목록으로</a>
+    <section class="guide-plan-detail-hero">
+      <div>
+        <p class="guide-kicker">SERVER GUIDE · <%= guildId %></p>
+        <h1><%= plan.label %></h1>
+        <p class="guide-plan-detail-description">이 서버의 활성 라이선스에 따라 현재 사용할 수 있는 대시보드 기능과 Discord 명령어입니다.</p>
+      </div>
+      <div class="guide-plan-detail-count"><strong><%= plan.tabLabels.length %></strong><span>해금된 기능</span><strong><%= planCommands.length %></strong><span>사용 가능 명령어</span></div>
+    </section>
+    <section class="guide-detail-section">
+      <div class="guide-server-license-strip"><span>ACTIVE LICENSE</span><strong><%= plan.label %></strong><small>서버 ID <%= guildId %></small></div>
+    </section>
+    <section class="guide-detail-section">
+      <div class="guide-section-heading"><div><p class="guide-kicker">DASHBOARD ACCESS</p><h2>사용 가능한 대시보드 기능</h2></div><p>라이선스 플랜에 포함되어 현재 서버에서 설정할 수 있는 기능입니다.</p></div>
+      <div class="guide-detail-feature-list">
+        <% plan.tabLabels.forEach((label) => { %><article class="guide-detail-feature"><span class="guide-detail-feature-dot">·</span><div><h3><%= label %></h3><p><%= (plan.addedFeatures.find((feature) => feature.label === label)?.description) || `${label} 관련 서버 관리 기능을 사용할 수 있습니다.` %></p></div></article><% }) %>
+      </div>
+    </section>
+    <section class="guide-detail-section" id="commands">
+      <div class="guide-section-heading"><div><p class="guide-kicker">COMMANDS</p><h2>사용 가능한 명령어</h2></div><p>명령어별 Discord 권한과 기능 점검 상태에 따라 실제 사용 여부가 달라질 수 있습니다.</p></div>
+      <div class="guide-plan-command-list"><% planCommands.forEach((command) => { %><article class="guide-plan-command-item"><div><code>/<%= command.name %></code><span class="guide-feature-tag"><%= command.feature %></span></div><p><%= command.description %></p><small><%= command.permission %></small></article><% }) %></div>
+    </section>
+  </main>
+  <%- include('partials/footer') %>
+</body>
+</html>

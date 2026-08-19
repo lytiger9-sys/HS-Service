@@ -105,21 +105,48 @@ export function createIndexRouter(context) {
     });
   });
 
-  router.get("/guide/:planSlug", (req, res) => {
-    const guide = buildGuideData();
-    const plan = guide.plans.find((item) => item.slug === String(req.params.planSlug || "").toLowerCase());
-    if (!plan) return res.status(404).render("404", { title: "페이지를 찾을 수 없습니다", botName: context.config.botName });
-    const previousPlan = guide.plans[plan.order - 2] || null;
-    const nextPlan = guide.plans[plan.order] || null;
-    return res.render("guide-plan", {
-      title: `${plan.label} 플랜 가이드 · ${context.config.botName}`,
-      botName: context.config.botName,
-      currentUser: req.user || null,
-      plan,
-      planCommands: guide.commands.filter((command) => command.plans.includes(plan.label)),
-      previousPlan,
-      nextPlan
-    });
+  router.get("/guide/:planSlug", async (req, res, next) => {
+    try {
+      const guide = buildGuideData();
+      const slug = String(req.params.planSlug || "").toLowerCase();
+      const plan = guide.plans.find((item) => item.slug === slug);
+      if (plan) {
+        const previousPlan = guide.plans[plan.order - 2] || null;
+        const nextPlan = guide.plans[plan.order] || null;
+        return res.render("guide-plan", {
+          title: `${plan.label} 플랜 가이드 · ${context.config.botName}`,
+          botName: context.config.botName,
+          currentUser: req.user || null,
+          plan,
+          planCommands: guide.commands.filter((command) => command.plans.includes(plan.label)),
+          previousPlan,
+          nextPlan
+        });
+      }
+      if (!/^\d{17,20}$/.test(slug)) return res.status(404).render("404", { title: "페이지를 찾을 수 없습니다", botName: context.config.botName });
+      const license = await context.services.licenses.getActiveByGuild(slug);
+      if (!license) {
+        return res.status(404).render("guide-server-unavailable", {
+          title: "활성 라이선스를 찾을 수 없습니다",
+          botName: context.config.botName,
+          guildId: slug,
+          currentUser: req.user || null
+        });
+      }
+      const serverPlan = guide.plans.find((item) => item.slug === String(license.plan || "free").toLowerCase()) || guide.plans[0];
+      if (String(req.query.plan || "").toLowerCase() !== serverPlan.slug) return res.redirect(`/guide/${slug}?plan=${serverPlan.slug}`);
+      return res.render("guide-server", {
+        title: `${serverPlan.label} 서버 가이드 · ${context.config.botName}`,
+        botName: context.config.botName,
+        currentUser: req.user || null,
+        guildId: slug,
+        license,
+        plan: serverPlan,
+        planCommands: guide.commands.filter((command) => command.plans.includes(serverPlan.label))
+      });
+    } catch (error) {
+      return next(error);
+    }
   });
 
   router.get("/", async (req, res, next) => {

@@ -3688,3 +3688,30 @@ input[type="reset"] {
   .guide-home-page .guide-plan-card-interactive { min-height: 280px; }
   .guide-home-page .guide-plan-card-interactive .guide-plan-title { margin-top: 32px; font-size: 48px; }
 }
+
+/* Server ID guide lookup */
+.guide-server-search { position: absolute; top: 26px; right: clamp(24px, 5vw, 72px); z-index: 2; }
+.guide-server-search form { width: 286px; }
+.guide-server-search label { display: block; margin: 0 0 7px 12px; color: #8d7044; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.guide-server-search-control { display: flex; align-items: center; overflow: hidden; border: 1px solid rgba(13,13,13,.18); border-radius: 999px; background: rgba(255,255,255,.82); }
+.guide-server-search-control input { min-width: 0; flex: 1; height: 38px; padding: 0 14px 0 17px; border: 0; outline: 0; background: transparent; color: #202526; font-family: "Pretendard", "Noto Sans KR", sans-serif; font-size: 12px; font-weight: 600; }
+.guide-server-search-control button { height: 30px; margin-right: 4px; padding: 0 14px; border: 0; border-radius: 999px; background: #17191a; color: #fff; font-family: "Pretendard", "Noto Sans KR", sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; }
+.guide-server-search-error { display: block; margin: 7px 12px 0; color: #a64a3e; font-size: 11px; font-weight: 600; }
+.guide-server-detail-shell .guide-plan-detail-hero { padding-bottom: 52px; }
+.guide-server-license-strip { display: flex; align-items: baseline; gap: 16px; padding: 18px 22px; border: 1px solid rgba(141,112,68,.4); border-radius: 16px; background: rgba(239,229,210,.5); }
+.guide-server-license-strip span { color: #8d7044; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.guide-server-license-strip strong { color: #242829; font-size: 20px; font-weight: 800; }
+.guide-server-license-strip small { margin-left: auto; color: #7b8385; font-size: 11px; font-family: "JetBrains Mono", monospace; }
+.guide-unavailable-shell { max-width: 760px; padding-top: 150px; }
+.guide-unavailable-shell h1 { margin: 0 0 24px; color: #17191a; font-size: clamp(52px, 9vw, 110px); font-weight: 800; letter-spacing: -.11em; line-height: .9; }
+.guide-unavailable-shell h1 em { color: #8d7044; font-style: normal; }
+.guide-unavailable-shell > p:not(.guide-kicker) { max-width: 480px; margin: 0 0 18px; color: #727a7c; font-size: 15px; line-height: 1.8; }
+.guide-unavailable-shell > code { display: inline-block; margin-bottom: 30px; color: #7e5b2d; font-family: "JetBrains Mono", monospace; font-size: 12px; }
+.guide-unavailable-button { display: inline-flex; text-decoration: none; }
+@media (max-width: 760px) {
+  .guide-server-search { position: static; width: min(100% - 34px, 600px); margin: 25px auto 0; }
+  .guide-server-search form { width: 100%; }
+  .guide-home-shell { padding-top: 42px; }
+  .guide-server-license-strip { flex-wrap: wrap; gap: 8px 14px; }
+  .guide-server-license-strip small { width: 100%; margin-left: 0; }
+}
