@@ -53,50 +53,45 @@
           <p class="guide-kicker">ACCESS LEVELS</p>
           <h2>플랜별 기능 범위</h2>
         </div>
-        <p>상위 플랜은 하위 플랜의 기능을 포함하며, 서버에 활성 라이선스가 있어야 사용할 수 있습니다.</p>
+        <p>플랜 카드를 눌러 해당 플랜에서 사용할 수 있는 전체 기능과 주요 명령어를 확인하세요.</p>
       </div>
-      <div class="guide-plan-grid">
+      <div class="guide-plan-grid guide-plan-grid-interactive">
         <% plans.forEach((plan) => { %>
-          <article class="guide-plan-card">
-            <div class="guide-plan-topline">
+          <details class="guide-plan-card guide-plan-card-interactive" data-guide-search-item data-search="<%= plan.searchText %>">
+            <summary>
               <span class="guide-plan-order">0<%= plan.order %></span>
-              <span class="guide-plan-label"><%= plan.label %></span>
+              <span class="guide-plan-title"><%= plan.label %></span>
+              <span class="guide-plan-arrow" aria-hidden="true">+</span>
+            </summary>
+            <div class="guide-plan-card-body">
+              <p class="guide-plan-description"><%= plan.description %></p>
+              <p class="guide-plan-count"><strong><%= plan.tabLabels.length %></strong>개 기능 영역</p>
+              <div class="guide-plan-major">
+                <span class="guide-plan-body-label">주요 추가 기능</span>
+                <p>
+                  <% plan.addedFeatures.forEach((feature, index) => { %><span><%= feature.label %></span><% if (index < plan.addedFeatures.length - 1) { %><b>·</b><% } %><% }) %>
+                </p>
+              </div>
+              <div class="guide-plan-expanded-grid">
+                <div>
+                  <span class="guide-plan-body-label">전체 대시보드 기능</span>
+                  <div class="guide-chip-list">
+                    <% plan.tabLabels.forEach((label) => { %>
+                      <span class="guide-chip"><%= label %></span>
+                    <% }) %>
+                  </div>
+                </div>
+                <div>
+                  <span class="guide-plan-body-label">관련 명령어</span>
+                  <% if (plan.addedCommands.length) { %>
+                    <p class="guide-plan-commands"><%= plan.addedCommands.join(" · ") %></p>
+                  <% } else { %>
+                    <p class="guide-plan-commands is-empty">관련 명령어 없음</p>
+                  <% } %>
+                </div>
+              </div>
             </div>
-            <h3><%= plan.description %></h3>
-            <p class="guide-plan-count"><strong><%= plan.tabLabels.length %></strong>개 기능 영역</p>
-            <div class="guide-chip-list">
-              <% plan.tabLabels.forEach((label) => { %>
-                <span class="guide-chip"><%= label %></span>
-              <% }) %>
-            </div>
-          </article>
-        <% }) %>
-      </div>
-    </section>
-
-    <section class="guide-section" id="dashboard-features">
-      <div class="guide-section-heading">
-        <div>
-          <p class="guide-kicker">DASHBOARD FEATURES</p>
-          <h2>대시보드 해금 기능</h2>
-        </div>
-        <p>각 플랜에서 열리는 웹 대시보드 탭과 실제로 관리할 수 있는 기능을 확인하세요.</p>
-      </div>
-      <div class="guide-feature-grid">
-        <% dashboardFeatures.forEach((feature) => { %>
-          <article class="guide-feature-card" data-guide-search-item data-search="<%= [feature.label, feature.description, ...feature.plans].join(' ').toLowerCase() %>">
-            <div class="guide-feature-card-topline">
-              <span class="guide-feature-index"><%= String(feature.id).slice(0, 2).toUpperCase() %></span>
-              <span class="guide-feature-plans"><%= feature.plans.join(' · ') %></span>
-            </div>
-            <h3><%= feature.label %></h3>
-            <p><%= feature.description %></p>
-            <div class="guide-chip-list">
-              <% feature.plans.forEach((plan) => { %>
-                <span class="guide-chip"><%= plan %></span>
-              <% }) %>
-            </div>
-          </article>
+          </details>
         <% }) %>
       </div>
     </section>

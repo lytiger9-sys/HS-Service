@@ -51,7 +51,8 @@ export function createIndexRouter(context) {
       ["logs", "로그", "서버 변경·메시지·채널·역할 지급·제재 등 서버 로그를 통합 채널과 항목별로 설정합니다."],
       ["partner", "파트너", "파트너 신청·승인 채널, 파트너 채널, 홍보 웹훅과 상단배너 라이선스를 관리합니다."],
       ["nickname", "닉네임", "역할별 닉네임 접두사·접미사 규칙과 역할 획득 시 적용되는 닉네임 기능을 설정합니다."],
-      ["shop", "상점", "캐시 보상, 상품 재고·구매, 도박, 상점 임베드와 생일 보상을 관리합니다."]
+      ["shop", "상점", "캐시 보상, 상품 재고·구매, 도박, 상점 임베드와 생일 보상을 관리합니다."],
+      ["events", "이벤트", "환율과 외부 정보 조회처럼 서버 운영에 필요한 부가 기능을 제공합니다."]
     ].map(([id, label, description]) => ({
       id,
       label,
@@ -69,13 +70,26 @@ export function createIndexRouter(context) {
         plans: PLAN_DEFINITIONS.filter((plan) => !feature || plan.tabs.includes(feature)).map((plan) => plan.label)
       };
     });
+    const planCards = PLAN_DEFINITIONS.map((plan, index) => {
+      const previousTabs = new Set(PLAN_DEFINITIONS[index - 1]?.tabs || []);
+      const addedFeatures = dashboardFeatureDetails.filter((feature) => plan.tabs.includes(feature.id) && !previousTabs.has(feature.id));
+      const addedFeatureLabels = new Set(addedFeatures.map((feature) => feature.label));
+      const addedCommands = commands.filter((command) => addedFeatureLabels.has(command.feature)).map((command) => `/${command.name}`);
+      return {
+        ...plan,
+        tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab),
+        addedFeatures,
+        addedCommands,
+        searchText: [plan.label, plan.description, ...plan.tabs, ...addedFeatures.map((feature) => `${feature.label} ${feature.description}`), ...addedCommands].join(" ").toLowerCase()
+      };
+    });
     return res.render("guide", {
       title: `${context.config.botName} 가이드`,
       botName: context.config.botName,
       currentUser: req.user || null,
       commands,
       dashboardFeatures: dashboardFeatureDetails,
-      plans: PLAN_DEFINITIONS.map((plan) => ({ ...plan, tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab) }))
+      plans: planCards
     });
   });
 
