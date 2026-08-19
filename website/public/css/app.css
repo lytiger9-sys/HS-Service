@@ -4296,3 +4296,38 @@ input[type="reset"] {
 .guide-plan-copy-description span + span {
   margin-top: 5px;
 }
+
+@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
+
+/* Enterprise early-access accent */
+.guide-feature-title-line {
+  display: flex;
+  align-items: flex-end;
+  gap: 19px;
+}
+.guide-feature-title-line > div { min-width: 0; }
+.guide-early-access {
+  display: inline-block;
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+  color: #a1824e;
+  font-family: "Great Vibes", "Brush Script MT", cursive !important;
+  font-size: clamp(1.08rem, 1.8vw, 1.55rem);
+  font-weight: 400;
+  letter-spacing: .01em;
+  line-height: 1;
+  transform: rotate(-7deg);
+  transform-origin: right bottom;
+  white-space: nowrap;
+}
+@media (max-width: 720px) {
+  .guide-feature-title-line {
+    align-items: flex-start;
+    flex-direction: column-reverse;
+    gap: 3px;
+  }
+  .guide-early-access {
+    margin: 0 0 7px 5px;
+    transform: rotate(-5deg);
+  }
+}
