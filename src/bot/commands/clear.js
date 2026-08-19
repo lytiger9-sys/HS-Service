@@ -70,10 +70,6 @@ export default {
         { name: "general · 메시지 개수 삭제", value: "general" },
         { name: "hard · 채널 재생성", value: "hard" }
       ))
-    .addBooleanOption((option) => option
-      .setName("확인")
-      .setDescription("메시지 삭제 또는 채널 재생성을 확인합니다.")
-      .setRequired(true))
     .addIntegerOption((option) => option
       .setName("count")
       .setDescription("general 모드에서 삭제할 개수. 비우면 가능한 만큼 삭제")
@@ -82,9 +78,6 @@ export default {
   async execute(interaction) {
     if (!isAdministrator(interaction.member)) {
       return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
-    }
-    if (!interaction.options.getBoolean("확인", true)) {
-      return interaction.reply({ content: "삭제 또는 채널 재생성을 진행하려면 확인을 true로 설정해야 합니다.", ephemeral: true });
     }
     const channel = interaction.channel;
     if (!channel || ![ChannelType.GuildText, ChannelType.GuildAnnouncement].includes(channel.type)) {

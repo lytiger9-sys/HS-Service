@@ -8,8 +8,10 @@ function option(commandName, optionName) {
   return commandMap.get(commandName)?.data.toJSON().options?.find((item) => item.name === optionName);
 }
 
-test("일괄 변경·삭제 명령어는 확인 옵션을 요구한다", () => {
-  for (const commandName of ["clear", "복제", "카테고리삭제", "nickrandom", "nickinit", "이모지삭제", "사운드삭제"]) {
+test("일괄 변경·삭제 명령어는 확인 옵션을 요구하고 clear는 mode를 요구한다", () => {
+  assert.equal(option("clear", "mode")?.required, true, "clear mode 옵션 누락");
+  assert.equal(option("clear", "확인"), undefined, "clear 확인 옵션이 남아 있음");
+  for (const commandName of ["복제", "카테고리삭제", "nickrandom", "nickinit", "이모지삭제", "사운드삭제"]) {
     assert.equal(option(commandName, "확인")?.required, true, `${commandName} 확인 옵션 누락`);
   }
 });
