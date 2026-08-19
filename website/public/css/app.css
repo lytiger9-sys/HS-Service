@@ -4297,7 +4297,13 @@ input[type="reset"] {
   margin-top: 5px;
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
+@font-face {
+  font-family: "Great Vibes Local";
+  src: url("/fonts/GreatVibes-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
 /* Enterprise early-access accent */
 .guide-feature-title-line {
@@ -4311,7 +4317,7 @@ input[type="reset"] {
   flex: 0 0 auto;
   margin-bottom: 12px;
   color: #a1824e;
-  font-family: "Great Vibes", "Brush Script MT", cursive !important;
+  font-family: "Great Vibes Local", "Great Vibes", "Brush Script MT", "Segoe Script", cursive !important;
   font-size: clamp(1.08rem, 1.8vw, 1.55rem);
   font-weight: 400;
   letter-spacing: .01em;
