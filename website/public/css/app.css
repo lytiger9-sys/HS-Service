@@ -4286,3 +4286,13 @@ input[type="reset"] {
   .guide-plan-select-wrap { min-width: 0; }
   .guide-command-result-summary { margin-top: 0; }
 }
+
+.guide-plan-copy-description span {
+  display: block;
+}
+.guide-plan-copy-description span + br {
+  display: none;
+}
+.guide-plan-copy-description span + span {
+  margin-top: 5px;
+}
