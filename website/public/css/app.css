@@ -2950,16 +2950,17 @@ input[type="reset"] {
 
 /* Center the free-text poll toggle inside its existing left-column divider. */
 .dashboard-page .field.poll-free-toggle {
-  grid-column: 1;
+  grid-column: 2;
   align-self: center;
   display: flex !important;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 12px;
-  min-height: 0;
+  min-height: 52px;
   margin: 0;
-  padding: 8px 0;
-  border: 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
 }
 .dashboard-page .field.poll-free-toggle > input[type="checkbox"] {
   flex: 0 0 44px;
@@ -2968,5 +2969,9 @@ input[type="reset"] {
   flex: 0 0 auto;
 }
 .dashboard-page .field.poll-result-field {
-  grid-column: 2;
+  grid-column: 1;
+}
+@media (max-width: 900px) {
+  .dashboard-page .field.poll-result-field,
+  .dashboard-page .field.poll-free-toggle { grid-column: 1; }
 }
