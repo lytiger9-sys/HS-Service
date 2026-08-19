@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -18,6 +18,9 @@ export default {
       .setRequired(false)),
 
   async execute(interaction, context) {
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
+    }
     await interaction.deferReply({ ephemeral: true });
     const name = interaction.options.getString("name") ?? "";
     const userLimit = interaction.options.getInteger("limit");
