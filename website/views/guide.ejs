@@ -6,28 +6,22 @@
       <span><%= botName %></span>
     </a>
     <nav class="guide-nav-links" aria-label="주요 메뉴">
+      <div class="guide-server-search">
+        <form action="/guide" method="get" onsubmit="event.preventDefault(); const value = this.elements.guildId.value.trim(); const error = this.querySelector('.guide-server-search-error'); if (/^\d{17,20}$/.test(value)) { error.hidden = true; window.location.href = `/guide/${value}`; } else { error.hidden = false; this.elements.guildId.focus(); }">
+          <label for="guide-guild-id">SERVER ID</label>
+          <div class="guide-server-search-control">
+            <input id="guide-guild-id" name="guildId" inputmode="numeric" pattern="[0-9]{17,20}" maxlength="20" placeholder="자신의 서버 ID를 입력하세요" autocomplete="off" />
+            <button type="submit">확인</button>
+          </div>
+          <small class="guide-server-search-error" hidden>17~20자리 Discord 서버 ID를 입력하세요.</small>
+        </form>
+      </div>
       <a href="/">메인으로</a>
-      <% if (currentUser) { %>
-        <a class="guide-nav-button" href="/">대시보드</a>
-      <% } else { %>
-        <a class="guide-nav-button" href="/auth/discord">Discord 로그인</a>
-      <% } %>
     </nav>
   </header>
 
-  <div class="guide-server-search">
-    <form action="/guide" method="get" onsubmit="event.preventDefault(); const value = this.elements.guildId.value.trim(); if (/^\d{17,20}$/.test(value)) window.location.href = `/guide/${value}`; else this.querySelector('.guide-server-search-error').hidden = false;">
-      <label for="guide-guild-id">SERVER ID</label>
-      <div class="guide-server-search-control">
-        <input id="guide-guild-id" name="guildId" inputmode="numeric" pattern="[0-9]{17,20}" maxlength="20" placeholder="서버 ID 입력" autocomplete="off" />
-        <button type="submit">확인</button>
-      </div>
-      <small class="guide-server-search-error" hidden>17~20자리 Discord 서버 ID를 입력하세요.</small>
-    </form>
-  </div>
-
   <main class="guide-shell guide-home-shell">
-    <h1 class="guide-brand-wordmark">HS-Service</h1>
+    <h1 class="guide-brand-wordmark"><span>HS-Service</span><small>최고의 성능, 최고의 퀄리티</small></h1>
     <section class="guide-plan-section" id="plans" aria-label="서비스 플랜">
       <div class="guide-plan-grid guide-plan-grid-interactive">
         <% plans.forEach((plan) => { %>

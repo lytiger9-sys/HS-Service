@@ -3877,3 +3877,26 @@ input[type="reset"] {
   .guide-home-page .guide-plan-card-interactive:hover,
   .guide-home-page .guide-plan-card-interactive:focus-visible { transform: translateY(-4px); }
 }
+
+/* Guide navigation without Discord login */
+.guide-home-page .guide-nav-links {
+  margin-left: auto;
+  justify-content: flex-end;
+  gap: 18px;
+}
+.guide-home-page .guide-nav-links .guide-server-search {
+  position: static;
+  top: auto;
+  right: auto;
+  margin: 0;
+}
+.guide-home-page .guide-nav-links .guide-server-search form { width: 286px; }
+@media (max-width: 720px) {
+  .guide-home-page .guide-nav-links { width: auto; gap: 10px; }
+  .guide-home-page .guide-nav-links .guide-server-search form { width: min(55vw, 250px); }
+  .guide-home-page .guide-nav-links .guide-server-search label { display: none; }
+}
+@media (max-width: 460px) {
+  .guide-home-page .guide-nav-links .guide-server-search form { width: min(58vw, 220px); }
+  .guide-home-page .guide-nav-links { gap: 8px; }
+}
