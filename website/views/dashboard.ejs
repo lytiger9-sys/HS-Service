@@ -323,16 +323,16 @@
                 <span>항목(한 줄에 하나, 자유 입력을 켜면 별도 항목이 추가됩니다)</span>
                 <textarea name="pollOptions" rows="5" data-poll-preview="options"></textarea>
               </label>
-              <label class="field toggle poll-free-toggle">
-                <input type="checkbox" name="pollFreeText" checked data-poll-preview="freeText" />
-                <span>자유 입력 항목 추가</span>
-              </label>
               <label class="field">
                 <span>결과 표시</span>
                 <select name="pollResultVisibility">
                   <option value="public" <%= (settings.polls.resultVisibility || 'public') !== 'private' ? 'selected' : '' %>>공개 결과</option>
                   <option value="private" <%= settings.polls.resultVisibility === 'private' ? 'selected' : '' %>>비공개 결과</option>
                 </select>
+              </label>
+              <label class="field toggle poll-free-toggle">
+                <input type="checkbox" name="pollFreeText" checked data-poll-preview="freeText" />
+                <span>자유 입력 항목 추가</span>
               </label>
             </div>
           </form>
