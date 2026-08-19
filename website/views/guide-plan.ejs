@@ -8,37 +8,25 @@
     <nav class="guide-nav-links" aria-label="주요 메뉴">
       <a href="/guide">전체 가이드</a>
       <a href="/">메인으로</a>
-      <% if (currentUser) { %>
-        <a class="guide-nav-button" href="/">대시보드</a>
-      <% } else { %>
-        <a class="guide-nav-button" href="/auth/discord">Discord 로그인</a>
-      <% } %>
     </nav>
   </header>
 
-  <main class="guide-shell guide-plan-detail-shell">
+  <main class="guide-shell guide-plan-detail-shell guide-plan-copy-shell">
     <a class="guide-back-link" href="/guide">← 전체 플랜 보기</a>
-    <section class="guide-plan-detail-hero">
-      <div>
-        <p class="guide-kicker">PLAN <%= String(plan.order).padStart(2, "0") %> · ACCESS LEVEL</p>
-        <h1><%= plan.label %></h1>
-        <p class="guide-plan-detail-description"><%= plan.description %>. 이 플랜에서 사용할 수 있는 대시보드 기능과 Discord 명령어를 한곳에서 확인하세요.</p>
-      </div>
-      <div class="guide-plan-detail-count">
-        <strong><%= plan.tabLabels.length %></strong>
-        <span>대시보드 기능</span>
-        <strong><%= planCommands.length %></strong>
-        <span>관련 명령어</span>
-      </div>
+    <section class="guide-plan-copy-hero">
+      <p class="guide-kicker">PLAN <%= String(plan.order).padStart(2, "0") %> · HS-SERVICE</p>
+      <h1><%= plan.label %></h1>
+      <h2><%= plan.subtitle %></h2>
+      <p class="guide-plan-copy-description"><%= plan.guideDescription %></p>
     </section>
 
     <section class="guide-detail-section">
       <div class="guide-section-heading">
         <div>
-          <p class="guide-kicker">WHAT YOU GET</p>
-          <h2>이 플랜의 주요 특징</h2>
+          <p class="guide-kicker">WHAT THIS PLAN ADDS</p>
+          <h2>이 플랜에서 제공하는 기능</h2>
         </div>
-        <p>상위 플랜은 이전 플랜의 기능을 포함합니다. 이 카드에서는 현재 플랜에서 새롭게 추가되는 기능을 먼저 보여줍니다.</p>
+        <p>서버 규모와 운영 방식에 맞춰 필요한 기능을 확인하세요.</p>
       </div>
       <div class="guide-detail-feature-list">
         <% plan.addedFeatures.forEach((feature) => { %>
@@ -50,50 +38,29 @@
             </div>
           </article>
         <% }) %>
+        <% if (!plan.addedFeatures.length) { %>
+          <article class="guide-detail-feature guide-detail-feature-empty">
+            <span class="guide-detail-feature-dot">·</span>
+            <div>
+              <h3>기본 운영 시작</h3>
+              <p>서버 운영에 필요한 기본 기능을 한곳에서 시작할 수 있습니다.</p>
+            </div>
+          </article>
+        <% } %>
       </div>
     </section>
 
     <section class="guide-detail-section">
-      <div class="guide-detail-columns">
-        <article class="guide-detail-panel">
-          <p class="guide-kicker">DASHBOARD</p>
-          <h2>해금되는 대시보드</h2>
-          <p class="guide-detail-panel-intro">웹 대시보드에서 설정할 수 있는 전체 기능 영역입니다.</p>
-          <div class="guide-detail-chip-list">
-            <% plan.tabLabels.forEach((label) => { %>
-              <span><%= label %></span>
-            <% }) %>
-          </div>
-        </article>
-        <article class="guide-detail-panel guide-detail-panel-dark">
-          <p class="guide-kicker">PERMISSION</p>
-          <h2>사용 전 확인</h2>
-          <p class="guide-detail-panel-intro">플랜에 포함되어도 명령어별 Discord 권한과 활성 라이선스가 추가로 필요할 수 있습니다.</p>
-          <p class="guide-detail-note">Administrator, 서버 관리, 채널 관리, 표현식 관리 등 각 명령어의 권한 조건을 확인하세요.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="guide-detail-section" id="commands">
-      <div class="guide-section-heading">
-        <div>
-          <p class="guide-kicker">COMMANDS</p>
-          <h2><%= plan.label %>에서 사용 가능한 명령어</h2>
+      <article class="guide-detail-panel guide-plan-access-panel">
+        <p class="guide-kicker">DASHBOARD ACCESS</p>
+        <h2>사용 가능한 대시보드 영역</h2>
+        <p class="guide-detail-panel-intro">이 플랜에서 설정할 수 있는 서버 관리 영역입니다.</p>
+        <div class="guide-detail-chip-list">
+          <% plan.tabLabels.forEach((label) => { %>
+            <span><%= label %></span>
+          <% }) %>
         </div>
-        <p>명령어 사용 시 서버에 활성 라이선스가 있고 관련 기능이 점검 중이 아니어야 합니다.</p>
-      </div>
-      <div class="guide-plan-command-list">
-        <% planCommands.forEach((command) => { %>
-          <article class="guide-plan-command-item">
-            <div>
-              <code>/<%= command.name %></code>
-              <span class="guide-feature-tag"><%= command.feature %></span>
-            </div>
-            <p><%= command.description %></p>
-            <small><%= command.permission %></small>
-          </article>
-        <% }) %>
-      </div>
+      </article>
     </section>
 
     <nav class="guide-plan-pager" aria-label="플랜 이동">

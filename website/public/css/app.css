@@ -4007,3 +4007,51 @@ input[type="reset"] {
   line-height: 1;
   white-space: nowrap;
 }
+
+/* Plan detail copy-first layout */
+.guide-page,
+.guide-page * {
+  font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
+}
+.guide-plan-copy-shell { max-width: 1120px; }
+.guide-plan-copy-hero {
+  max-width: 900px;
+  padding: 42px 0 76px;
+  border-bottom: 1px solid rgba(13,13,13,.13);
+}
+.guide-plan-copy-hero h1 {
+  margin: 0;
+  color: #1b2427;
+  font-size: clamp(68px, 12vw, 154px);
+  font-weight: 700;
+  letter-spacing: -.1em;
+  line-height: .88;
+}
+.guide-plan-copy-hero h2 {
+  margin: 28px 0 0;
+  color: #8d7044;
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 700;
+  letter-spacing: -.065em;
+  line-height: 1.15;
+}
+.guide-plan-copy-description {
+  max-width: 760px;
+  margin: 25px 0 0;
+  color: #687678;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -.025em;
+  line-height: 1.85;
+}
+.guide-plan-access-panel {
+  max-width: none;
+  border-radius: 22px;
+  background: rgba(255,255,255,.74);
+}
+.guide-detail-feature-empty { grid-column: 1 / -1; }
+@media (max-width: 720px) {
+  .guide-plan-copy-hero { padding: 22px 0 52px; }
+  .guide-plan-copy-hero h1 { font-size: clamp(65px, 23vw, 118px); }
+  .guide-plan-copy-description { font-size: 15px; }
+}

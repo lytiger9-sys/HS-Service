@@ -70,11 +70,36 @@ export function createIndexRouter(context) {
       };
     });
     const planMeta = {
-      free: { price: "가격 미정", audience: "서버를 처음 시작하고 기본 운영을 원하는 분들을 위한 플랜" },
-      basic: { price: "가격 미정", audience: "서버를 간단하고 체계적으로 관리하려는 분들을 위한 플랜" },
-      standard: { price: "가격 미정", audience: "보안과 자동화를 더해 성장하는 서버를 운영하는 분들을 위한 플랜" },
-      pro: { price: "가격 미정", audience: "파트너십과 고급 운영 기능이 필요한 서버를 위한 플랜" },
-      enterprise: { price: "가격 미정", audience: "서버의 모든 기능과 확장 운영을 원하는 분들을 위한 플랜" }
+      free: {
+        price: "가격 미정",
+        audience: "서버를 처음 시작하고 기본 운영을 원하는 분들을 위한 플랜",
+        subtitle: "기본 서버 기능을 갖추는 단계",
+        guideDescription: "Free는 소규모 서버가 기본적인 운영을 시작하기 위한 플랜입니다. 관리자와 역할을 관리하고, 음성채널·임베드·투표·허니팟 같은 핵심 기능을 사용할 수 있습니다. 다만 자동화보다는 필요할 때 직접 실행하는 기본 도구 모음에 가깝습니다."
+      },
+      basic: {
+        price: "가격 미정",
+        audience: "서버를 간단하고 체계적으로 관리하려는 분들을 위한 플랜",
+        subtitle: "반복적인 서버 관리 업무를 자동화하는 단계",
+        guideDescription: "Basic은 서버 운영자가 반복적으로 처리하던 업무를 자동화하기 위한 플랜입니다. 환영 메시지, 티켓, 통합 로그와 닉네임 관리로 신규 유저 응대와 문의·관리 업무를 체계화할 수 있습니다."
+      },
+      standard: {
+        price: "가격 미정",
+        audience: "보안과 자동화를 더해 성장하는 서버를 운영하는 분들을 위한 플랜",
+        subtitle: "서버의 안전성과 운영 통제력을 강화하는 단계",
+        guideDescription: "Standard는 서버가 성장하면서 필요한 보안과 운영 통제력을 더하는 플랜입니다. 레이드 방지, 초대 링크 제어, 제재 관련 관리와 이벤트 기능을 통해 서버를 안정적으로 운영할 수 있습니다."
+      },
+      pro: {
+        price: "가격 미정",
+        audience: "파트너십과 고급 운영 기능이 필요한 서버를 위한 플랜",
+        subtitle: "파트너와 홍보를 통해 서버 운영 범위를 확장하는 단계",
+        guideDescription: "Pro는 한 서버의 관리를 넘어 다른 서버와 협력하고 홍보를 자동화하기 위한 플랜입니다. 파트너 웹훅, 홍보 메시지 자동 전송과 상단 배너 운영을 통해 서버 간 제휴와 확장 운영을 시작할 수 있습니다."
+      },
+      enterprise: {
+        price: "가격 미정",
+        audience: "서버의 모든 기능과 확장 운영을 원하는 분들을 위한 플랜",
+        subtitle: "커뮤니티 운영과 보상·상점을 통합하는 단계",
+        guideDescription: "Enterprise는 Discord 서버 운영에 필요한 기능을 하나의 운영 플랫폼으로 통합하는 플랜입니다. 상점 임베드, 상품, 캐시 지급, 출석 보상과 생일 보상으로 유저 활동을 보상하고 커뮤니티 운영을 확장할 수 있습니다."
+      }
     };
     const planCards = PLAN_DEFINITIONS.map((plan, index) => {
       const previousTabs = new Set(PLAN_DEFINITIONS[index - 1]?.tabs || []);
@@ -86,6 +111,8 @@ export function createIndexRouter(context) {
         slug: plan.id,
         price: planMeta[plan.id]?.price || "가격 미정",
         audience: planMeta[plan.id]?.audience || "서버 운영을 위한 플랜",
+        subtitle: planMeta[plan.id]?.subtitle || plan.description,
+        guideDescription: planMeta[plan.id]?.guideDescription || plan.description,
         tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab),
         addedFeatures,
         addedCommands,
@@ -118,7 +145,6 @@ export function createIndexRouter(context) {
           botName: context.config.botName,
           currentUser: req.user || null,
           plan,
-          planCommands: guide.commands.filter((command) => command.plans.includes(plan.label)),
           previousPlan,
           nextPlan
         });
