@@ -15,17 +15,25 @@
     <section class="guide-commands-hero">
       <p class="guide-kicker">COMMAND REFERENCE · HS-SERVICE</p>
       <h1>명령어 안내</h1>
-      <p>HS-Service에서 사용할 수 있는 Discord 명령어와 기능, 필요 권한, 사용 가능한 플랜을 확인하세요.</p>
+      <p>플랜을 선택하면 해당 플랜에서 사용할 수 있는 명령어와 기능 설명을 확인할 수 있습니다.</p>
     </section>
 
     <section class="guide-detail-section guide-commands-table-section">
-      <div class="guide-section-heading">
+      <div class="guide-section-heading guide-commands-heading">
         <div>
-          <p class="guide-kicker">ALL COMMANDS</p>
-          <h2>전체 명령어 목록</h2>
+          <p class="guide-kicker">PLAN COMMANDS</p>
+          <h2><span id="selected-plan-label">ENTERPRISE</span> 명령어</h2>
         </div>
-        <p><strong><%= commands.length %>개</strong> 명령어를 기능과 플랜별로 정리했습니다.</p>
+        <label class="guide-plan-select-wrap" for="command-plan-select">
+          <span>플랜 선택</span>
+          <select id="command-plan-select" name="plan">
+            <% plans.forEach((plan) => { %>
+              <option value="<%= plan.slug %>"<%= plan.slug === "enterprise" ? " selected" : ""><%= plan.label.toUpperCase() %></option>
+            <% }) %>
+          </select>
+        </label>
       </div>
+      <p class="guide-command-result-summary"><strong id="visible-command-count">0</strong>개 명령어와 해당 플랜의 기능을 보여줍니다.</p>
       <div class="guide-command-table-wrap">
         <table class="guide-command-table">
           <thead>
@@ -34,24 +42,48 @@
               <th scope="col">기능</th>
               <th scope="col">설명</th>
               <th scope="col">필요 권한</th>
-              <th scope="col">사용 가능 플랜</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="command-table-body">
             <% commands.forEach((command) => { %>
-              <tr>
+              <tr data-plan-ids="<%= command.planIds.join(',') %>">
                 <td><code>/<%= command.name %></code></td>
                 <td><span class="guide-feature-tag"><%= command.feature %></span></td>
                 <td><%= command.description %></td>
                 <td><%= command.permission %></td>
-                <td><div class="guide-command-plan-list"><% command.plans.forEach((plan) => { %><span><%= plan %></span><% }) %></div></td>
               </tr>
             <% }) %>
           </tbody>
         </table>
+        <p class="guide-command-empty" id="command-empty-state" hidden>선택한 플랜에서 사용할 수 있는 명령어가 없습니다.</p>
       </div>
     </section>
   </main>
+
+  <script>
+    (() => {
+      const select = document.getElementById("command-plan-select");
+      const label = document.getElementById("selected-plan-label");
+      const count = document.getElementById("visible-command-count");
+      const empty = document.getElementById("command-empty-state");
+      const rows = [...document.querySelectorAll("#command-table-body tr")];
+      const update = () => {
+        const selectedId = select.value;
+        const selectedLabel = select.options[select.selectedIndex].textContent;
+        let visible = 0;
+        rows.forEach((row) => {
+          const matches = row.dataset.planIds.split(",").includes(selectedId);
+          row.hidden = !matches;
+          if (matches) visible += 1;
+        });
+        label.textContent = selectedLabel;
+        count.textContent = visible;
+        empty.hidden = visible !== 0;
+      };
+      select.addEventListener("change", update);
+      update();
+    })();
+  </script>
 
   <%- include('partials/footer') %>
 </body>

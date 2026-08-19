@@ -4241,3 +4241,48 @@ input[type="reset"] {
     top: 38px;
   }
 }
+
+/* Plan-filtered commands reference */
+.guide-commands-heading { align-items: end; }
+.guide-plan-select-wrap {
+  display: grid;
+  gap: 7px;
+  min-width: 190px;
+  color: #7e6c4f;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.guide-plan-select-wrap select {
+  min-height: 42px;
+  padding: 9px 34px 9px 13px;
+  border: 1px solid #cbd4d7;
+  border-radius: 10px;
+  background: rgba(255,255,255,.78);
+  color: #1b2427;
+  font: 700 .84rem/1.2 "Pretendard", "Noto Sans KR", sans-serif;
+  cursor: pointer;
+}
+.guide-plan-select-wrap select:focus-visible {
+  outline: 3px solid rgba(126, 89, 45, .18);
+  border-color: #8d7044;
+}
+.guide-command-result-summary {
+  margin: -22px 0 14px;
+  color: #687678;
+  font-size: .82rem;
+}
+.guide-command-result-summary strong { color: #8d7044; }
+.guide-command-table tbody tr[hidden] { display: none; }
+.guide-command-empty {
+  margin: 0;
+  padding: 36px 20px;
+  color: #687678;
+  text-align: center;
+}
+@media (max-width: 720px) {
+  .guide-commands-heading { align-items: stretch; gap: 20px; }
+  .guide-plan-select-wrap { min-width: 0; }
+  .guide-command-result-summary { margin-top: 0; }
+}

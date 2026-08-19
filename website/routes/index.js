@@ -66,6 +66,7 @@ export function createIndexRouter(context) {
         description: command.data.toJSON().description || "서버 기능을 실행합니다.",
         feature: feature ? (PLAN_TAB_LABELS[feature] || feature) : "공통",
         permission: permissionLabels[permissions[name] || "public"],
+        planIds: PLAN_DEFINITIONS.filter((plan) => !feature || plan.tabs.includes(feature)).map((plan) => plan.id),
         plans: PLAN_DEFINITIONS.filter((plan) => !feature || plan.tabs.includes(feature)).map((plan) => plan.label)
       };
     });
@@ -139,7 +140,8 @@ export function createIndexRouter(context) {
       title: `명령어 안내 · ${context.config.botName}`,
       botName: context.config.botName,
       currentUser: req.user || null,
-      commands: guide.commands
+      commands: guide.commands,
+      plans: guide.plans
     });
   });
 
