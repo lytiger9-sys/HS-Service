@@ -2,7 +2,8 @@ import express from "express";
 import { buildDashboardViewModel } from "../lib/dashboardData.js";
 import { getAccessMessage, getAllowedGuild, resolveDashboardAccess } from "../lib/dashboardAccess.js";
 import { getPlanDefinition, PLAN_DEFINITIONS, PLAN_LABELS, PLAN_TAB_LABELS } from "../../src/config/plans.js";
-import { commandMap, commandFeature } from "../../src/bot/commands/index.js";
+import { commandMap } from "../../src/bot/commands/index.js";
+import { commandFeature } from "../../src/bot/interactions/slash.js";
 
 function getActiveLicenseId(req) {
   return req.session?.activeLicenseId || "";
