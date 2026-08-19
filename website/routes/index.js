@@ -21,7 +21,7 @@ function renderActivation(res, context, message = "") {
 export function createIndexRouter(context) {
   const router = express.Router();
 
-  router.get("/guide", (req, res) => {
+  const buildGuideData = () => {
     const permissionLabels = {
       administrator: "Administrator",
       manageGuild: "서버 관리 또는 Administrator",
@@ -59,7 +59,6 @@ export function createIndexRouter(context) {
       description,
       plans: PLAN_DEFINITIONS.filter((plan) => plan.tabs.includes(id)).map((plan) => plan.label)
     }));
-
     const commands = [...commandMap.entries()].map(([name, command]) => {
       const feature = commandFeature(name);
       return {
@@ -77,19 +76,40 @@ export function createIndexRouter(context) {
       const addedCommands = commands.filter((command) => addedFeatureLabels.has(command.feature)).map((command) => `/${command.name}`);
       return {
         ...plan,
+        slug: plan.id,
         tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab),
         addedFeatures,
         addedCommands,
         searchText: [plan.label, plan.description, ...plan.tabs, ...addedFeatures.map((feature) => `${feature.label} ${feature.description}`), ...addedCommands].join(" ").toLowerCase()
       };
     });
+    return { commands, dashboardFeatures: dashboardFeatureDetails, plans: planCards };
+  };
+
+  router.get("/guide", (req, res) => {
+    const guide = buildGuideData();
     return res.render("guide", {
       title: `${context.config.botName} 가이드`,
       botName: context.config.botName,
       currentUser: req.user || null,
-      commands,
-      dashboardFeatures: dashboardFeatureDetails,
-      plans: planCards
+      ...guide
+    });
+  });
+
+  router.get("/guide/:planSlug", (req, res) => {
+    const guide = buildGuideData();
+    const plan = guide.plans.find((item) => item.slug === String(req.params.planSlug || "").toLowerCase());
+    if (!plan) return res.status(404).render("404", { title: "페이지를 찾을 수 없습니다", botName: context.config.botName });
+    const previousPlan = guide.plans[plan.order - 2] || null;
+    const nextPlan = guide.plans[plan.order] || null;
+    return res.render("guide-plan", {
+      title: `${plan.label} 플랜 가이드 · ${context.config.botName}`,
+      botName: context.config.botName,
+      currentUser: req.user || null,
+      plan,
+      planCommands: guide.commands.filter((command) => command.plans.includes(plan.label)),
+      previousPlan,
+      nextPlan
     });
   });
 

@@ -57,41 +57,19 @@
       </div>
       <div class="guide-plan-grid guide-plan-grid-interactive">
         <% plans.forEach((plan) => { %>
-          <details class="guide-plan-card guide-plan-card-interactive" data-guide-search-item data-search="<%= plan.searchText %>">
-            <summary>
+          <a class="guide-plan-card guide-plan-card-interactive" href="/guide/<%= plan.slug %>" data-guide-search-item data-search="<%= plan.searchText %>">
+            <span class="guide-plan-card-topline">
               <span class="guide-plan-order">0<%= plan.order %></span>
-              <span class="guide-plan-title"><%= plan.label %></span>
-              <span class="guide-plan-arrow" aria-hidden="true">+</span>
-            </summary>
-            <div class="guide-plan-card-body">
-              <p class="guide-plan-description"><%= plan.description %></p>
-              <p class="guide-plan-count"><strong><%= plan.tabLabels.length %></strong>개 기능 영역</p>
-              <div class="guide-plan-major">
-                <span class="guide-plan-body-label">주요 추가 기능</span>
-                <p>
-                  <% plan.addedFeatures.forEach((feature, index) => { %><span><%= feature.label %></span><% if (index < plan.addedFeatures.length - 1) { %><b>·</b><% } %><% }) %>
-                </p>
-              </div>
-              <div class="guide-plan-expanded-grid">
-                <div>
-                  <span class="guide-plan-body-label">전체 대시보드 기능</span>
-                  <div class="guide-chip-list">
-                    <% plan.tabLabels.forEach((label) => { %>
-                      <span class="guide-chip"><%= label %></span>
-                    <% }) %>
-                  </div>
-                </div>
-                <div>
-                  <span class="guide-plan-body-label">관련 명령어</span>
-                  <% if (plan.addedCommands.length) { %>
-                    <p class="guide-plan-commands"><%= plan.addedCommands.join(" · ") %></p>
-                  <% } else { %>
-                    <p class="guide-plan-commands is-empty">관련 명령어 없음</p>
-                  <% } %>
-                </div>
-              </div>
-            </div>
-          </details>
+              <span class="guide-plan-arrow" aria-hidden="true">↗</span>
+            </span>
+            <span class="guide-plan-title"><%= plan.label %></span>
+            <span class="guide-plan-description"><%= plan.description %></span>
+            <span class="guide-plan-major">
+              <span class="guide-plan-body-label">주요 추가 기능</span>
+              <span class="guide-plan-major-list"><% plan.addedFeatures.forEach((feature, index) => { %><span><%= feature.label %></span><% if (index < plan.addedFeatures.length - 1) { %><b>·</b><% } %><% }) %></span>
+            </span>
+            <span class="guide-plan-card-hint">자세히 보기</span>
+          </a>
         <% }) %>
       </div>
     </section>

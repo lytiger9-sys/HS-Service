@@ -3530,3 +3530,85 @@ input[type="reset"] {
   .guide-plan-card-interactive summary { min-height: 110px; }
   .guide-plan-title { writing-mode: horizontal-tb; font-size: 26px; }
 }
+
+/* Plan detail pages and linked plan cards */
+.guide-plan-card-interactive {
+  display: flex;
+  min-height: 285px;
+  padding: 22px 20px 20px;
+  color: inherit;
+  text-decoration: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  cursor: pointer;
+  transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.guide-plan-card-interactive:hover {
+  border-color: rgba(141,112,68,.6);
+  background: #fff;
+  box-shadow: 0 16px 32px rgba(36,50,56,.1);
+  transform: translateY(-4px);
+}
+.guide-plan-card-topline { display: flex; align-items: center; justify-content: space-between; }
+.guide-plan-card-interactive .guide-plan-arrow { align-self: auto; width: auto; height: auto; border: 0; color: #9b7545; font-size: 22px; }
+.guide-plan-card-interactive .guide-plan-title { display: block; margin: 34px 0 14px; writing-mode: horizontal-tb; color: #17191a; font-size: clamp(29px, 3vw, 42px); font-weight: 800; letter-spacing: -.085em; line-height: .95; }
+.guide-plan-card-interactive .guide-plan-description { display: block; margin: 0 0 27px; color: #727a7c; font-size: 13px; font-weight: 600; line-height: 1.65; }
+.guide-plan-card-interactive .guide-plan-major { display: block; margin-top: auto; padding: 15px 0 0; border-top: 1px solid rgba(13,13,13,.12); }
+.guide-plan-card-interactive .guide-plan-body-label { display: block; margin-bottom: 8px; }
+.guide-plan-major-list { display: flex; flex-wrap: wrap; gap: 4px 7px; color: #303638; font-size: 13px; font-weight: 700; line-height: 1.7; }
+.guide-plan-major-list b { color: #a68a5d; font-weight: 500; }
+.guide-plan-card-hint { display: block; margin-top: 16px; color: #979e9f; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.guide-plan-detail-shell { max-width: 1020px; }
+.guide-back-link { display: inline-block; margin-bottom: 42px; color: #7a8183; font-size: 12px; font-weight: 700; text-decoration: none; }
+.guide-back-link:hover { color: #8d7044; }
+.guide-plan-detail-hero { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 48px; align-items: end; padding-bottom: 68px; border-bottom: 1px solid rgba(13,13,13,.13); }
+.guide-plan-detail-hero h1 { margin: 0; color: #17191a; font-size: clamp(70px, 12vw, 150px); font-weight: 800; letter-spacing: -.12em; line-height: .82; }
+.guide-plan-detail-description { max-width: 580px; margin: 28px 0 0; color: #727a7c; font-size: 15px; font-weight: 500; line-height: 1.8; }
+.guide-plan-detail-count { display: grid; grid-template-columns: auto 1fr; align-items: baseline; column-gap: 12px; row-gap: 5px; padding-left: 20px; border-left: 1px solid rgba(13,13,13,.2); }
+.guide-plan-detail-count strong { color: #17191a; font-size: 28px; font-weight: 800; line-height: 1; }
+.guide-plan-detail-count span { color: #7b8385; font-size: 11px; font-weight: 700; }
+.guide-detail-section { padding-top: 64px; }
+.guide-detail-feature-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; border-top: 1px solid rgba(13,13,13,.13); background: rgba(13,13,13,.13); }
+.guide-detail-feature { display: grid; grid-template-columns: 26px 1fr; gap: 9px; padding: 22px 20px; background: rgba(255,255,255,.78); }
+.guide-detail-feature-dot { color: #9b7545; font-size: 28px; line-height: .65; }
+.guide-detail-feature h3 { margin: 0 0 7px; font-size: 17px; font-weight: 800; letter-spacing: -.04em; }
+.guide-detail-feature p { margin: 0; color: #727a7c; font-size: 13px; font-weight: 500; line-height: 1.7; }
+.guide-detail-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.guide-detail-panel { min-height: 230px; padding: 28px; border: 1px solid rgba(13,13,13,.13); border-radius: 18px; background: rgba(255,255,255,.78); }
+.guide-detail-panel h2 { margin: 0 0 12px; font-size: 25px; font-weight: 800; letter-spacing: -.06em; }
+.guide-detail-panel-intro { max-width: 390px; margin: 0 0 21px; color: #727a7c; font-size: 13px; line-height: 1.7; }
+.guide-detail-chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.guide-detail-chip-list span { padding: 7px 10px; border-radius: 999px; background: #e9edef; color: #657073; font-size: 11px; font-weight: 700; }
+.guide-detail-panel-dark { border-color: #17191a; background: #17191a; color: #f5f7f7; }
+.guide-detail-panel-dark .guide-kicker { color: #c6a36c; }
+.guide-detail-panel-dark .guide-detail-panel-intro { color: #c3cacc; }
+.guide-detail-note { margin: 25px 0 0; padding-top: 15px; border-top: 1px solid rgba(255,255,255,.2); color: #d8dddd; font-size: 12px; line-height: 1.7; }
+.guide-plan-command-list { border-top: 1px solid rgba(13,13,13,.13); }
+.guide-plan-command-item { display: grid; grid-template-columns: 250px 1fr 180px; align-items: center; gap: 20px; padding: 18px 4px; border-bottom: 1px solid rgba(13,13,13,.13); }
+.guide-plan-command-item > div { display: flex; align-items: center; gap: 10px; }
+.guide-plan-command-item code { color: #7e5b2d; font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700; }
+.guide-plan-command-item p { margin: 0; color: #697174; font-size: 13px; line-height: 1.6; }
+.guide-plan-command-item small { color: #8b9294; font-size: 11px; font-weight: 600; text-align: right; }
+.guide-plan-pager { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; padding-top: 58px; }
+.guide-plan-pager a { color: #727a7c; font-size: 12px; font-weight: 700; text-decoration: none; }
+.guide-plan-pager a:last-child { text-align: right; }
+.guide-plan-pager a:hover { color: #8d7044; }
+.guide-plan-pager-center { color: #17191a !important; }
+@media (max-width: 1050px) { .guide-plan-grid-interactive { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 720px) {
+  .guide-plan-grid-interactive { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guide-plan-card-interactive { min-height: 245px; }
+  .guide-plan-card-interactive .guide-plan-title { font-size: 32px; }
+  .guide-plan-detail-hero { grid-template-columns: 1fr; gap: 34px; padding-bottom: 46px; }
+  .guide-plan-detail-hero h1 { font-size: clamp(72px, 23vw, 130px); }
+  .guide-plan-detail-count { width: max-content; }
+  .guide-detail-feature-list, .guide-detail-columns { grid-template-columns: 1fr; }
+  .guide-plan-command-item { grid-template-columns: 1fr; gap: 8px; }
+  .guide-plan-command-item small { text-align: left; }
+}
+@media (max-width: 460px) {
+  .guide-plan-grid-interactive { grid-template-columns: 1fr; }
+  .guide-plan-card-interactive { min-height: 215px; }
+  .guide-plan-card-interactive .guide-plan-title { margin-top: 25px; font-size: 36px; }
+}
