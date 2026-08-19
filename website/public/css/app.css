@@ -2950,7 +2950,8 @@ input[type="reset"] {
 
 /* Center the free-text poll toggle inside its existing left-column divider. */
 .dashboard-page .field.poll-free-toggle {
-  grid-column: auto;
+  grid-column: 1;
+  align-self: center;
   display: flex !important;
   align-items: center;
   justify-content: center;
@@ -2965,4 +2966,7 @@ input[type="reset"] {
 }
 .dashboard-page .field.poll-free-toggle > span {
   flex: 0 0 auto;
+}
+.dashboard-page .field.poll-result-field {
+  grid-column: 2;
 }
