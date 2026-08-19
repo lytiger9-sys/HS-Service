@@ -4331,3 +4331,30 @@ input[type="reset"] {
     transform: rotate(-5deg);
   }
 }
+
+/* Keep the feature title in place and place the Enterprise accent on its right */
+.guide-feature-title-line {
+  align-items: flex-end;
+  flex-direction: row;
+  gap: 18px;
+}
+.guide-early-access {
+  margin-bottom: 11px;
+  font-family: "Great Vibes", "Brush Script MT", "Segoe Script", cursive !important;
+  font-size: clamp(1.2rem, 2vw, 1.72rem);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: .015em;
+  transform: rotate(-6deg);
+}
+@media (max-width: 720px) {
+  .guide-feature-title-line {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .guide-early-access {
+    margin: 0 0 8px 6px;
+    transform: rotate(-4deg);
+  }
+}
