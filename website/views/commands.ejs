@@ -1,4 +1,5 @@
 <%- include('partials/head', { title }) %>
+<% const commandRows = Array.isArray(commands) ? commands : []; const planOptions = Array.isArray(plans) ? plans : []; %>
 <body class="guide-page guide-commands-page">
   <header class="guide-nav">
     <a class="guide-brand" href="/guide">
@@ -27,8 +28,8 @@
         <label class="guide-plan-select-wrap" for="command-plan-select">
           <span>플랜 선택</span>
           <select id="command-plan-select" name="plan">
-            <% plans.forEach((plan) => { %>
-              <option value="<%= plan.slug %>"<%= plan.slug === "enterprise" ? " selected" : ""><%= plan.label.toUpperCase() %></option>
+            <% planOptions.forEach((plan) => { %>
+              <option value="<%= plan.slug || "enterprise" %>"<%= (plan.slug || "enterprise") === "enterprise" ? " selected" : ""><%= String(plan.label || "Enterprise").toUpperCase() %></option>
             <% }) %>
           </select>
         </label>
@@ -45,8 +46,8 @@
             </tr>
           </thead>
           <tbody id="command-table-body">
-            <% commands.forEach((command) => { %>
-              <tr data-plan-ids="<%= command.planIds.join(',') %>">
+            <% commandRows.forEach((command) => { %>
+              <tr data-plan-ids="<%= Array.isArray(command.planIds) ? command.planIds.join(',') : "" %>">
                 <td><code>/<%= command.name %></code></td>
                 <td><span class="guide-feature-tag"><%= command.feature %></span></td>
                 <td><%= command.description %></td>
