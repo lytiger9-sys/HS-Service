@@ -3071,3 +3071,12 @@ input[type="reset"] {
   padding: 8px 14px;
   border-radius: 13px;
 }
+
+/* Explicit Pretendard lock for all license inventory search text. */
+.license-page .license-filter-bar,
+.license-page .license-filter-bar *,
+.license-page .license-filter-bar input,
+.license-page .license-filter-bar select,
+.license-page .license-filter-bar button {
+  font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif !important;
+}
