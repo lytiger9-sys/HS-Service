@@ -77,9 +77,9 @@
             <p class="eyebrow">Inventory</p>
             <h2>라이선스 목록</h2>
           </div>
-          <span class="muted"><%= licenses.length %> / <%= licenseTotal %>개</span>
+          <span class="muted" data-license-count data-count="<%= licenses.length %>" data-total="<%= licenseTotal %>"><%= licenses.length %> / <%= licenseTotal %>개</span>
         </div>
-        <form class="license-filter-bar" id="license-filter-form" method="get" action="/license/dashboard">
+        <form class="license-filter-bar" id="license-filter-form" method="get" action="/license/dashboard" data-license-search>
           <label class="field license-filter-search">
             <span>라이선스 검색</span>
             <input type="search" name="q" value="<%= licenseFilters.q %>" placeholder="키, 서버 ID, 플랜, 상태 검색" />
@@ -123,7 +123,7 @@
         <div class="table-wrap">
           <table>
             <thead><tr><th>키</th><th>플랜</th><th>기간</th><th>상태</th><th>서버</th><th>만료일</th><th>작업</th></tr></thead>
-            <tbody>
+            <tbody data-license-tbody>
               <% if (!licenses.length) { %>
                 <tr><td colspan="7" class="muted"><%= licenseTotal ? '검색 조건에 맞는 라이선스가 없습니다.' : '발급된 라이선스가 없습니다.' %></td></tr>
               <% } %>
@@ -153,9 +153,55 @@
   </main>
   <script>
     (() => {
-      const form = document.querySelector('#license-filter-form');
+      const form = document.querySelector('[data-license-search]');
       const exportButton = document.querySelector('[data-license-export]');
-      if (!form || !exportButton) return;
+      const tbody = document.querySelector('[data-license-tbody]');
+      const count = document.querySelector('[data-license-count]');
+      const searchButton = form?.querySelector('button[type="submit"]');
+      if (!form || !exportButton || !tbody || !count || !searchButton) return;
+
+      const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[character]));
+      const formatDate = (value) => value ? new Date(value).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-';
+      const renderRows = (licenses) => {
+        if (!licenses.length) return `<tr><td colspan="7" class="muted">검색 조건에 맞는 라이선스가 없습니다.</td></tr>`;
+        return licenses.map((license) => `
+          <tr>
+            <td><code class="license-plain-key">${escapeHtml(license.key)}</code></td>
+            <td>${escapeHtml(license.plan)}</td>
+            <td>${escapeHtml(license.durationDays)}일</td>
+            <td><span class="status-badge status-${escapeHtml(license.status)}">${escapeHtml(license.status)}</span></td>
+            <td>${escapeHtml(license.assignedGuildId)}</td>
+            <td>${escapeHtml(formatDate(license.expiresAt))}</td>
+            <td>${license.canRevoke ? `<form method="post" action="/license/${encodeURIComponent(license.id)}/revoke"><button class="ghost danger" type="submit">폐기</button></form>` : '-'}</td>
+          </tr>`).join('');
+      };
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const params = new URLSearchParams(new FormData(form));
+        searchButton.disabled = true;
+        searchButton.classList.add('is-loading');
+        searchButton.dataset.originalLabel = searchButton.textContent;
+        searchButton.textContent = '검색 중';
+        try {
+          const response = await fetch(`/license/licenses.json?${params.toString()}`, { headers: { Accept: 'application/json' } });
+          const result = await response.json();
+          if (!response.ok || !result.ok) throw new Error(result.message || '검색에 실패했습니다.');
+          tbody.innerHTML = renderRows(result.licenses);
+          count.textContent = `${result.count} / ${result.total}개`;
+          count.dataset.count = result.count;
+          count.dataset.total = result.total;
+        } catch (error) {
+          window.showSiteToast?.(error.message || '검색에 실패했습니다.', 'error');
+        } finally {
+          searchButton.disabled = false;
+          searchButton.classList.remove('is-loading');
+          searchButton.textContent = searchButton.dataset.originalLabel || '검색';
+        }
+      });
+
       exportButton.addEventListener('click', () => {
         const params = new URLSearchParams(new FormData(form));
         window.location.href = `/license/licenses.xlsx?${params.toString()}`;

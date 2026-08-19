@@ -3080,3 +3080,57 @@ input[type="reset"] {
 .license-page .license-filter-bar button {
   font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif !important;
 }
+
+/* Async license search button motion */
+.license-page .license-filter-actions .primary {
+  position: relative;
+  overflow: hidden;
+  color: var(--paper);
+  background: var(--ink);
+  border-color: var(--control-border-strong);
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.license-page .license-filter-actions .primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.18) 50%, transparent 80%);
+  transform: translateX(-120%);
+  transition: transform .55s ease;
+  pointer-events: none;
+}
+.license-page .license-filter-actions .primary:hover,
+.license-page .license-filter-actions .primary:focus-visible {
+  color: var(--paper);
+  background: #242a30;
+  border-color: var(--accent-warm);
+  box-shadow: 0 5px 16px rgba(17, 19, 22, .15);
+  transform: translateY(-1px);
+}
+.license-page .license-filter-actions .primary:hover::before,
+.license-page .license-filter-actions .primary:focus-visible::before {
+  transform: translateX(120%);
+}
+.license-page .license-filter-actions .primary:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+.license-page .license-filter-actions .primary.is-loading {
+  cursor: wait;
+  opacity: .8;
+}
+.license-page .license-filter-actions .primary.is-loading::after {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 8px;
+  vertical-align: -1px;
+  border: 2px solid rgba(248,249,250,.38);
+  border-top-color: var(--paper);
+  border-radius: 50%;
+  animation: license-search-spin .7s linear infinite;
+}
+@keyframes license-search-spin {
+  to { transform: rotate(360deg); }
+}

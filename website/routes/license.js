@@ -102,6 +102,31 @@ export function createLicenseRouter(context) {
 
   router.use(requireLicenseAdmin);
 
+  router.get("/licenses.json", async (req, res, next) => {
+    try {
+      const allLicenses = (await context.services.licenses.list()).filter((license) => license.kind !== "banner");
+      const filters = normalizeLicenseFilters(req.query);
+      const licenses = filterLicenses(allLicenses, filters);
+      return res.json({
+        ok: true,
+        total: allLicenses.length,
+        count: licenses.length,
+        licenses: licenses.map((license) => ({
+          id: String(license._id),
+          key: license.key || `HS-••••-••••-${license.keyLast4 || ""}`,
+          plan: license.plan || "-",
+          durationDays: license.durationDays || 0,
+          status: license.status || "-",
+          assignedGuildId: license.assignedGuildId || "-",
+          expiresAt: license.expiresAt || null,
+          canRevoke: ["available", "active"].includes(license.status)
+        }))
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   router.get("/licenses.xlsx", async (req, res, next) => {
     try {
       const allLicenses = (await context.services.licenses.list()).filter((license) => license.kind !== "banner");
