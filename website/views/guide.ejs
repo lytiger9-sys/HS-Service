@@ -1,5 +1,5 @@
 <%- include('partials/head', { title }) %>
-<body class="guide-page">
+<body class="guide-page guide-home-page">
   <header class="guide-nav">
     <a class="guide-brand" href="/">
       <span class="guide-brand-mark">HS</span>
@@ -15,152 +15,43 @@
     </nav>
   </header>
 
-  <main class="guide-shell">
-    <section class="guide-hero">
+  <main class="guide-shell guide-home-shell">
+    <section class="guide-hero guide-home-hero">
       <div>
-        <p class="guide-kicker">HS SERVICE · COMMAND GUIDE</p>
-        <h1>서버 운영을 위한<br><em>한눈에 보는 가이드</em></h1>
-        <p class="guide-intro">명령어 사용법과 권한, 플랜별 기능 범위를 한곳에서 확인하세요. 모든 명령어는 서버 라이선스와 기능 점검 상태에 따라 추가로 제한될 수 있습니다.</p>
+        <p class="guide-kicker">HS SERVICE · PLANS</p>
+        <h1>서버에 맞는<br><em>플랜을 선택하세요</em></h1>
+        <p class="guide-intro">서버의 규모와 운영 방식에 맞는 플랜을 선택하고, 카드에서 주요 기능을 확인하세요.</p>
       </div>
       <div class="guide-hero-meta">
-        <span class="guide-stat-number"><%= commands.length %></span>
-        <span class="guide-stat-label">등록된 명령어</span>
-        <span class="guide-stat-divider"></span>
         <span class="guide-stat-number"><%= plans.length %></span>
         <span class="guide-stat-label">서비스 플랜</span>
+        <span class="guide-stat-divider"></span>
+        <span class="guide-stat-label">카드를 선택하면 상세 페이지로 이동합니다.</span>
       </div>
     </section>
 
-    <nav class="guide-quick-links" aria-label="가이드 섹션 바로가기">
-      <a href="#plans">플랜</a>
-      <a href="#dashboard-features">대시보드 기능</a>
-      <a href="#commands">명령어</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-
-    <div class="guide-search-bar guide-search-bar-top">
-      <label class="guide-search-label" for="guide-search">GUIDE SEARCH</label>
-      <div class="guide-search-control">
-        <input id="guide-search" type="search" placeholder="명령어, 기능, 플랜, 권한으로 검색" autocomplete="off" />
-        <button id="guide-search-clear" type="button" aria-label="검색어 지우기">초기화</button>
-      </div>
-      <p id="guide-search-status" class="guide-search-status"><%= commands.length %>개 명령어 · <%= dashboardFeatures.length %>개 대시보드 기능이 표시되고 있습니다.</p>
-    </div>
-
-    <section class="guide-section" id="plans">
-      <div class="guide-section-heading">
-        <div>
-          <p class="guide-kicker">ACCESS LEVELS</p>
-          <h2>플랜별 기능 범위</h2>
-        </div>
-        <p>플랜 카드를 눌러 해당 플랜에서 사용할 수 있는 전체 기능과 주요 명령어를 확인하세요.</p>
-      </div>
+    <section class="guide-section guide-plan-section" id="plans">
       <div class="guide-plan-grid guide-plan-grid-interactive">
         <% plans.forEach((plan) => { %>
-          <a class="guide-plan-card guide-plan-card-interactive" href="/guide/<%= plan.slug %>" data-guide-search-item data-search="<%= plan.searchText %>">
+          <a class="guide-plan-card guide-plan-card-interactive" href="/guide/<%= plan.slug %>">
             <span class="guide-plan-card-topline">
               <span class="guide-plan-order">0<%= plan.order %></span>
               <span class="guide-plan-arrow" aria-hidden="true">↗</span>
             </span>
             <span class="guide-plan-title"><%= plan.label %></span>
-            <span class="guide-plan-description"><%= plan.description %></span>
+            <span class="guide-plan-price"><%= plan.price %></span>
+            <span class="guide-plan-audience"><%= plan.audience %></span>
             <span class="guide-plan-major">
               <span class="guide-plan-body-label">주요 추가 기능</span>
               <span class="guide-plan-major-list"><% plan.addedFeatures.forEach((feature, index) => { %><span><%= feature.label %></span><% if (index < plan.addedFeatures.length - 1) { %><b>·</b><% } %><% }) %></span>
             </span>
-            <span class="guide-plan-card-hint">자세히 보기</span>
+            <span class="guide-plan-card-hint">플랜 상세 보기</span>
           </a>
         <% }) %>
       </div>
     </section>
-
-    <section class="guide-section" id="commands">
-      <div class="guide-section-heading guide-command-heading">
-        <div>
-          <p class="guide-kicker">SLASH COMMANDS</p>
-          <h2>명령어 목록</h2>
-        </div>
-        <p>명령어를 사용하려면 해당 플랜의 기능 범위와 아래 권한 조건을 모두 충족해야 합니다.</p>
-      </div>
-      <div class="guide-command-table-wrap">
-        <table class="guide-command-table">
-          <thead>
-            <tr>
-              <th>명령어</th>
-              <th>기능 영역</th>
-              <th>필요 권한</th>
-              <th>사용 가능 플랜</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% commands.forEach((command) => { %>
-              <tr data-guide-command data-guide-search-item data-search="<%= [command.name, command.description, command.feature, command.permission, ...command.plans].join(' ').toLowerCase() %>">
-                <td><code>/<%= command.name %></code></td>
-                <td><span class="guide-feature-tag"><%= command.feature %></span></td>
-                <td><%= command.permission %></td>
-                <td>
-                  <div class="guide-plan-tags">
-                    <% command.plans.forEach((plan) => { %>
-                      <span><%= plan %></span>
-                    <% }) %>
-                  </div>
-                </td>
-                <td><%= command.description %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="guide-section guide-faq-section" id="faq">
-      <div class="guide-section-heading">
-        <div>
-          <p class="guide-kicker">QUESTIONS & ANSWERS</p>
-          <h2>자주 묻는 질문</h2>
-        </div>
-        <p>자주 확인하는 라이선스, 권한, 명령어 사용 방법을 정리했습니다.</p>
-      </div>
-      <div class="guide-faq-list">
-        <details class="guide-faq-item" open>
-          <summary>명령어가 보이지 않거나 사용할 수 없다고 나와요.</summary>
-          <p>봇이 서버에 참여하고 있고 활성 라이선스가 등록되어 있는지 먼저 확인하세요. 이후 해당 명령어가 서버 플랜에 포함되어 있는지, 기능 점검 모드에서 꺼져 있지 않은지 확인해야 합니다. Discord 명령어 동기화에는 봇 재시작이 필요할 수 있습니다.</p>
-        </details>
-        <details class="guide-faq-item">
-          <summary>플랜에 포함된 기능인데도 실행되지 않아요.</summary>
-          <p>플랜 사용 가능 여부와 Discord 권한은 별도로 확인됩니다. 예를 들어 Administrator, 채널 관리, 서버 관리 또는 표현식 관리 권한이 필요한 명령어가 있습니다. 서버 내 역할 권한과 봇의 권한을 함께 확인하세요.</p>
-        </details>
-        <details class="guide-faq-item">
-          <summary>관리자 점검 모드는 무엇인가요?</summary>
-          <p>관리자가 특정 기능 탭이나 기타 명령어를 일시 중지하는 기능입니다. 플랜에 포함된 명령어라도 관련 기능이 점검 모드로 꺼져 있으면 실행되지 않습니다.</p>
-        </details>
-        <details class="guide-faq-item">
-          <summary>계좌 정보는 어떻게 설정하고 공개하나요?</summary>
-          <p>Administrator 권한으로 <code>/계좌설정</code>을 실행해 은행·계좌번호·예금주를 저장한 뒤, <code>/계좌</code>를 실행하면 해당 채널의 모든 사용자에게 공개됩니다.</p>
-        </details>
-        <details class="guide-faq-item">
-          <summary>파트너 홍보 메시지는 어떻게 보내나요?</summary>
-          <p>파트너 채널에서 관리자가 홍보 문구를 작성한 다음 <code>/partnermsg</code>를 실행합니다. 저장된 메시지는 등록된 상대 서버 웹훅으로 한국시간 매일 오후 5시에 자동 전송됩니다.</p>
-        </details>
-      </div>
-    </section>
-
-    <section class="guide-notice-grid">
-      <article class="guide-notice-card">
-        <p class="guide-kicker">BEFORE YOU START</p>
-        <h2>사용 전 확인사항</h2>
-        <p>봇이 서버에 참여하고 있어야 하며, 활성 라이선스가 등록되어야 합니다. 플랜 기능이 켜져 있어도 관리자 점검 모드에서 해당 기능이 중지되어 있으면 명령어를 사용할 수 없습니다.</p>
-      </article>
-      <article class="guide-notice-card guide-notice-dark">
-        <p class="guide-kicker">ADMIN ACCESS</p>
-        <h2>관리자 명령어</h2>
-        <p>서버 설정 변경, 채널 삭제·복제, 닉네임 일괄 변경, 계좌 정보 설정과 같은 명령어는 Discord Administrator 또는 해당 관리 권한이 필요합니다.</p>
-      </article>
-    </section>
   </main>
 
   <%- include('partials/footer') %>
-  <script src="/js/guide.js?v=<%= assetVersion %>" defer></script>
 </body>
 </html>

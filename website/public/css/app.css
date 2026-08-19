@@ -3612,3 +3612,34 @@ input[type="reset"] {
   .guide-plan-card-interactive { min-height: 215px; }
   .guide-plan-card-interactive .guide-plan-title { margin-top: 25px; font-size: 36px; }
 }
+
+/* Guide plan landing page */
+.guide-home-shell { max-width: 1320px; }
+.guide-home-hero { padding-bottom: 62px; }
+.guide-plan-section { padding-top: 0; }
+.guide-plan-grid-interactive { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.guide-home-page .guide-plan-card-interactive { min-height: 390px; padding: 25px 22px 22px; border-radius: 22px; }
+.guide-home-page .guide-plan-card-interactive .guide-plan-title { margin: 52px 0 13px; font-size: clamp(30px, 3.2vw, 46px); }
+.guide-plan-price { display: block; margin-bottom: 17px; color: #17191a; font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+.guide-plan-audience { display: block; min-height: 47px; color: #747c7e; font-size: 13px; font-weight: 600; line-height: 1.65; }
+.guide-home-page .guide-plan-card-interactive .guide-plan-major { margin-top: auto; }
+.guide-home-page .guide-plan-card-hint { margin-top: 18px; }
+@media (max-width: 1200px) {
+  .guide-home-shell { width: min(100% - 48px, 1120px); }
+  .guide-plan-grid-interactive { gap: 11px; }
+  .guide-home-page .guide-plan-card-interactive { padding-left: 17px; padding-right: 17px; }
+}
+@media (max-width: 1050px) {
+  .guide-home-page .guide-plan-grid-interactive { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .guide-home-shell { width: min(100% - 34px, 600px); }
+  .guide-home-page .guide-plan-grid-interactive { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guide-home-page .guide-plan-card-interactive { min-height: 310px; padding: 20px 17px 18px; }
+  .guide-home-page .guide-plan-card-interactive .guide-plan-title { margin-top: 35px; font-size: 34px; }
+}
+@media (max-width: 460px) {
+  .guide-home-page .guide-plan-grid-interactive { grid-template-columns: 1fr; }
+  .guide-home-page .guide-plan-card-interactive { min-height: 250px; }
+  .guide-home-page .guide-plan-card-interactive .guide-plan-title { margin-top: 28px; }
+}

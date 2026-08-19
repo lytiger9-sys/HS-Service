@@ -69,6 +69,13 @@ export function createIndexRouter(context) {
         plans: PLAN_DEFINITIONS.filter((plan) => !feature || plan.tabs.includes(feature)).map((plan) => plan.label)
       };
     });
+    const planMeta = {
+      free: { price: "가격 미정", audience: "서버를 처음 시작하고 기본 운영을 원하는 분들을 위한 플랜" },
+      basic: { price: "가격 미정", audience: "서버를 간단하고 체계적으로 관리하려는 분들을 위한 플랜" },
+      standard: { price: "가격 미정", audience: "보안과 자동화를 더해 성장하는 서버를 운영하는 분들을 위한 플랜" },
+      pro: { price: "가격 미정", audience: "파트너십과 고급 운영 기능이 필요한 서버를 위한 플랜" },
+      enterprise: { price: "가격 미정", audience: "서버의 모든 기능과 확장 운영을 원하는 분들을 위한 플랜" }
+    };
     const planCards = PLAN_DEFINITIONS.map((plan, index) => {
       const previousTabs = new Set(PLAN_DEFINITIONS[index - 1]?.tabs || []);
       const addedFeatures = dashboardFeatureDetails.filter((feature) => plan.tabs.includes(feature.id) && !previousTabs.has(feature.id));
@@ -77,6 +84,8 @@ export function createIndexRouter(context) {
       return {
         ...plan,
         slug: plan.id,
+        price: planMeta[plan.id]?.price || "가격 미정",
+        audience: planMeta[plan.id]?.audience || "서버 운영을 위한 플랜",
         tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab),
         addedFeatures,
         addedCommands,
