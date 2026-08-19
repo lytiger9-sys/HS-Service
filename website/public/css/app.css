@@ -4208,3 +4208,26 @@ input[type="reset"] {
   }
   .activation-quick-links a { font-size: .68rem; }
 }
+
+/* Stack activation quick links vertically in the card corner */
+.activation-quick-links {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  max-width: 180px;
+}
+.activation-quick-links a {
+  justify-content: flex-end;
+}
+@media (max-width: 600px) {
+  .activation-card { padding-top: 126px; }
+  .activation-quick-links {
+    right: 22px;
+    left: auto;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: calc(100% - 44px);
+    overflow: visible;
+    padding-bottom: 0;
+  }
+}
