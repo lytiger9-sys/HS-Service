@@ -22,13 +22,13 @@
     <section class="guide-detail-section">
       <div class="guide-section-heading">
         <div>
-          <p class="guide-kicker">WHAT THIS PLAN ADDS</p>
-          <h2>이 플랜에서 제공하는 기능</h2>
+          <p class="guide-kicker">AVAILABLE FEATURES</p>
+          <h2>이 플랜에서 사용할 수 있는 전체 기능</h2>
         </div>
         <p>서버 규모와 운영 방식에 맞춰 필요한 기능을 확인하세요.</p>
       </div>
       <div class="guide-detail-feature-list">
-        <% plan.addedFeatures.forEach((feature) => { %>
+        <% plan.availableFeatures.forEach((feature) => { %>
           <article class="guide-detail-feature">
             <span class="guide-detail-feature-dot">·</span>
             <div>
@@ -37,7 +37,7 @@
             </div>
           </article>
         <% }) %>
-        <% if (!plan.addedFeatures.length) { %>
+        <% if (!plan.availableFeatures.length) { %>
           <article class="guide-detail-feature guide-detail-feature-empty">
             <span class="guide-detail-feature-dot">·</span>
             <div>
@@ -49,18 +49,6 @@
       </div>
     </section>
 
-    <section class="guide-detail-section">
-      <article class="guide-detail-panel guide-plan-access-panel">
-        <p class="guide-kicker">DASHBOARD ACCESS</p>
-        <h2>사용 가능한 대시보드 영역</h2>
-        <p class="guide-detail-panel-intro">이 플랜에서 설정할 수 있는 서버 관리 영역입니다.</p>
-        <div class="guide-detail-chip-list">
-          <% plan.tabLabels.forEach((label) => { %>
-            <span><%= label %></span>
-          <% }) %>
-        </div>
-      </article>
-    </section>
 
   </main>
 

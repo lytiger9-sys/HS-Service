@@ -114,6 +114,7 @@ export function createIndexRouter(context) {
         subtitle: planMeta[plan.id]?.subtitle || plan.description,
         guideDescription: planMeta[plan.id]?.guideDescription || plan.description,
         tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab),
+        availableFeatures: dashboardFeatureDetails.filter((feature) => plan.tabs.includes(feature.id)),
         addedFeatures,
         addedCommands,
         searchText: [plan.label, plan.description, ...plan.tabs, ...addedFeatures.map((feature) => `${feature.label} ${feature.description}`), ...addedCommands].join(" ").toLowerCase()
