@@ -4463,3 +4463,13 @@ input[type="reset"] {
     font-size: 1.014rem;
   }
 }
+
+/* Enterprise early-access accent: additional size refinement */
+.guide-early-access {
+  font-size: clamp(1.016rem, 1.5vw, 1.286rem);
+}
+@media (max-width: 720px) {
+  .guide-early-access {
+    font-size: 1.166rem;
+  }
+}
