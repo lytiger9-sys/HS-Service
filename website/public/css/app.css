@@ -2951,7 +2951,7 @@ input[type="reset"] {
 /* Center the free-text poll toggle inside its existing left-column divider. */
 .dashboard-page .field.poll-free-toggle {
   grid-column: 2;
-  align-self: center;
+  align-self: end;
   display: flex !important;
   align-items: center;
   justify-content: flex-start;
