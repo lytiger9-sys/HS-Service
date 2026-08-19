@@ -63,11 +63,6 @@
       </article>
     </section>
 
-    <nav class="guide-plan-pager" aria-label="플랜 이동">
-      <% if (previousPlan) { %><a href="/guide/<%= previousPlan.slug %>">← <%= previousPlan.label %></a><% } else { %><span></span><% } %>
-      <a class="guide-plan-pager-center" href="/guide">전체 플랜</a>
-      <% if (nextPlan) { %><a href="/guide/<%= nextPlan.slug %>"><%= nextPlan.label %> →</a><% } else { %><span></span><% } %>
-    </nav>
   </main>
 
   <%- include('partials/footer') %>

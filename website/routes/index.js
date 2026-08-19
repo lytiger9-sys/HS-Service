@@ -138,15 +138,11 @@ export function createIndexRouter(context) {
       const slug = String(req.params.planSlug || "").toLowerCase();
       const plan = guide.plans.find((item) => item.slug === slug);
       if (plan) {
-        const previousPlan = guide.plans[plan.order - 2] || null;
-        const nextPlan = guide.plans[plan.order] || null;
         return res.render("guide-plan", {
           title: `${plan.label} 플랜 가이드 · ${context.config.botName}`,
           botName: context.config.botName,
           currentUser: req.user || null,
-          plan,
-          previousPlan,
-          nextPlan
+          plan
         });
       }
       if (!/^\d{17,20}$/.test(slug)) return res.status(404).render("404", { title: "페이지를 찾을 수 없습니다", botName: context.config.botName });
