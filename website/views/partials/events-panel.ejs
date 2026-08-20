@@ -10,9 +10,6 @@
           <input type="checkbox" form="events-settings-form" name="eventsEnabled" <%= settings.events?.enabled !== false ? 'checked' : '' %> />
           <span>이벤트 기능 활성화</span>
         </label>
-        <form method="post" action="/api/<%= guild.id %>/events/publish" data-async-form>
-          <button class="primary" type="submit">이벤트 임베드 게시</button>
-        </form>
       </div>
     </div>
     <p class="muted">이벤트 임베드를 게시하고 참가자를 추첨해 같은 채널에 결과를 안내합니다. 당첨자에게는 상품이 DM으로 전송됩니다.</p>
@@ -52,8 +49,12 @@
           <input type="number" name="eventsDurationHours" min="1" max="720" value="<%= settings.events?.durationHours || 24 %>" required />
         </label>
       </div>
-      <button class="primary" type="submit">설정 저장</button>
+      <div class="form-actions">
+        <button class="primary" type="submit">설정 저장</button>
+        <button class="primary" type="submit" form="event-publish-form">이벤트 임베드 게시</button>
+      </div>
     </form>
+    <form id="event-publish-form" method="post" action="/api/<%= guild.id %>/events/publish" data-async-form></form>
   </article>
 
   <% if (events?.length) { %>
