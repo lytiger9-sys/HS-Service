@@ -5060,3 +5060,11 @@ html[data-theme="dark"] .dashboard-page .security-info-hover:focus-visible {
   border-color: #FFFFFF;
   color: #FFFFFF;
 }
+
+
+html[data-theme="dark"] .dashboard-page .brand h1,
+html[data-theme="dark"] .dashboard-page .brand p,
+html[data-theme="dark"] .dashboard-page .sidebar-user-copy strong,
+html[data-theme="dark"] .dashboard-page .sidebar-user-copy > span:not(.sidebar-user-kicker) {
+  color: #FFFFFF !important;
+}
