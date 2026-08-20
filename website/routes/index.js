@@ -298,6 +298,7 @@ export function createIndexRouter(context) {
       return res.render("dashboard", {
         ...viewModel,
         currentUser: req.user,
+        managedGuilds: [],
         activeSection,
         saved: req.query.saved || "",
         issuedBannerKey: req.query.bannerKey || "",
