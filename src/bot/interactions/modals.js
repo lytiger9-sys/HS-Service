@@ -99,12 +99,12 @@ export async function handleModalInteraction(interaction, context) {
     const result = await context.services.tickets.openTicketFromModal(interaction, categoryId);
     if (result.existing) {
       return interaction.editReply({
-        content: "이미 열려 있는 티켓이 있습니다.",
+        content: `이미 열려 있는 티켓입니다. <#${result.channel.id}>`,
       });
     }
 
     return interaction.editReply({
-      content: "티켓이 생성되었습니다.",
+      content: `티켓이 생성되었습니다. <#${result.channel.id}>`,
     });
   }
 

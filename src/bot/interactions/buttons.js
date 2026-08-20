@@ -138,7 +138,7 @@ export async function handleButtonInteraction(interaction, context) {
         answers: [],
         requestedBy: interaction.member
       });
-      return interaction.editReply({ content: result.existing ? "이미 열려 있는 티켓이 있습니다." : "티켓을 열었습니다." });
+      return interaction.editReply({ content: result.existing ? `이미 열려 있는 티켓입니다. <#${result.channel.id}>` : `티켓이 생성되었습니다. <#${result.channel.id}>` });
     }
     const payload = await context.services.tickets.buildCategoryMenu(interaction.guildId);
     return interaction.reply(payload);
@@ -168,7 +168,7 @@ export async function handleButtonInteraction(interaction, context) {
     }
     if (action === "delete") {
       await context.services.tickets.deleteTicket({ guild: interaction.guild, channel: interaction.channel, deletedBy: interaction.member });
-      return interaction.reply({ content: "티켓을 삭제했습니다.", ephemeral: true });
+      return interaction.reply({ content: "티켓이 10초 후에 삭제됩니다.", ephemeral: true });
     }
     const notes = await context.services.tickets.listTicketNotes(interaction.guildId, interaction.channelId);
     const content = notes.length
