@@ -5048,3 +5048,15 @@ html[data-theme="dark"] .dashboard-page .ticket-question-card select {
   border-color: rgba(243,240,232,.22);
   color: #F3F0E8;
 }
+
+
+html[data-theme="dark"] .dashboard-page .security-info-hover {
+  border-color: rgba(243,240,232,.72);
+  color: #F3F0E8;
+}
+html[data-theme="dark"] .dashboard-page .security-info-hover:hover,
+html[data-theme="dark"] .dashboard-page .security-info-hover:focus,
+html[data-theme="dark"] .dashboard-page .security-info-hover:focus-visible {
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+}
