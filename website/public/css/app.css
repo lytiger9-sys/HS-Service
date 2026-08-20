@@ -5218,3 +5218,12 @@ html[data-theme="dark"] .primary:active > span {
 html[data-theme="dark"] .primary::before {
   background: #FFFDF7;
 }
+
+
+/* Keep native select menus readable in dark mode. */
+html[data-theme="dark"] .dashboard-page select option,
+html[data-theme="dark"] .dashboard-page select optgroup {
+  background: #F8F9FA !important;
+  color: #111315 !important;
+  -webkit-text-fill-color: #111315;
+}
