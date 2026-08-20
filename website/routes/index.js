@@ -355,8 +355,6 @@ export function createIndexRouter(context) {
     }
   };
   router.post("/license/switch", clearLicenseSession("/"));
-  router.post("/license/logout", clearLicenseSession("/license/login"));
-  router.get("/license/logout", clearLicenseSession("/license/login"));
 
   return router;
 }
