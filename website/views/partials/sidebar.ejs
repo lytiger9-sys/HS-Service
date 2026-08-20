@@ -7,6 +7,17 @@
 
   <% if (currentUser) { %>
     <%- include('sidebar-user', { currentUser }) %>
+  <% } else if (licenseSession) { %>
+    <div class="sidebar-user">
+      <div class="sidebar-user-copy license-session-user">
+        <span class="sidebar-user-kicker">License session</span>
+        <strong>서버 라이선스 연결됨</strong>
+        <span>라이선스로 접속 중</span>
+      </div>
+      <form method="post" action="/license/switch">
+        <button class="sidebar-logout" type="submit">로그아웃</button>
+      </form>
+    </div>
   <% } %>
 
   <div class="sidebar-search">
