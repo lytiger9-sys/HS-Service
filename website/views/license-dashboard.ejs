@@ -206,6 +206,10 @@
         const params = new URLSearchParams(new FormData(form));
         window.location.href = `/license/licenses.xlsx?${params.toString()}`;
       });
+
+      window.addEventListener('license:changed', () => {
+        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      });
     })();
   </script>
 </body>

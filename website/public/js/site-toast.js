@@ -112,6 +112,10 @@
           return;
         }
       }
+      const requestPath = new URL(action, window.location.origin).pathname;
+      if (requestPath === "/license/issue" || /^\/license\/[^/]+\/revoke$/.test(requestPath)) {
+        window.dispatchEvent(new CustomEvent("license:changed", { detail: payload }));
+      }
       showSiteToast(payload.message || "저장되었습니다.", "success");
       if (payload.redirect) window.setTimeout(() => { window.location.assign(payload.redirect); }, 350);
     } catch (error) {
