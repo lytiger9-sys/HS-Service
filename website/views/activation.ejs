@@ -32,14 +32,15 @@
         <p class="license-notice license-notice-danger"><%= message %></p>
       <% } %>
 
-      <% if (currentUser && managedGuilds.length) { %>
+      <% const registeredManagedGuilds = (managedGuilds || []).filter((managedGuild) => managedGuild.botPresent && managedGuild.licenseActive); %>
+      <% if (currentUser && registeredManagedGuilds.length) { %>
         <div class="managed-guilds" aria-label="관리자 서버 목록">
           <div class="activation-section-heading">
             <span class="eyebrow">Managed servers</span>
             <strong>관리자로 있는 서버</strong>
           </div>
           <div class="managed-guild-list">
-            <% managedGuilds.forEach((managedGuild) => { %>
+            <% registeredManagedGuilds.forEach((managedGuild) => { %>
               <a class="managed-guild-card <%= selectedGuildId === managedGuild.id ? 'is-selected' : '' %> <%= managedGuild.botPresent ? '' : 'is-unavailable' %>" href="/?guildId=<%= managedGuild.id %>">
                 <img src="<%= managedGuild.iconUrl %>" alt="" draggable="false" />
                 <span class="managed-guild-copy">
@@ -55,9 +56,8 @@
         <p class="license-notice license-notice-danger">Discord에서 관리자 권한이 있는 서버를 찾지 못했습니다.</p>
       <% } %>
 
-      <% const selectedGuild = managedGuilds.find((managedGuild) => managedGuild.id === selectedGuildId); %>
-      <% if (selectedGuild || !currentUser) { %>
-        <form method="post" action="/activate" class="license-form">
+      <% const selectedGuild = registeredManagedGuilds.find((managedGuild) => managedGuild.id === selectedGuildId); %>
+      <form method="post" action="/activate" class="license-form">
           <label <%= selectedGuild ? 'class="selected-guild-label"' : '' %>>
             <span>Discord 서버 ID</span>
             <input type="text" name="guildId" inputmode="numeric" pattern="[0-9]{15,22}" placeholder="서버 설정 → 고급 → 개발자 모드에서 복사" value="<%= selectedGuild?.id || selectedGuildId %>" <%= selectedGuild ? 'readonly' : '' %> required />
@@ -72,10 +72,6 @@
           <div class="activation-divider"><span>또는 Discord로 로그인</span></div>
           <a class="license-admin-login activation-discord-login" href="/auth/discord"><span>Discord로 로그인</span><span aria-hidden="true">→</span></a>
         <% } %>
-      <% } else { %>
-        <p class="activation-selection-hint">위 목록에서 연결할 서버를 선택하세요.</p>
-      <% } %>
-
 
     </section>
   </main>

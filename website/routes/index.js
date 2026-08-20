@@ -50,13 +50,16 @@ async function getManagedGuilds(req, context) {
     })
     .map(async (guild) => {
       const botGuild = await context.client.guilds.fetch(String(guild.id)).catch(() => null);
+      const botPresent = Boolean(botGuild);
+      const license = botPresent ? await context.services.licenses.getActiveByGuild(String(guild.id)).catch(() => null) : null;
       return {
         id: String(guild.id),
         name: guild.name || "이름 없는 서버",
         iconUrl: guild.icon
           ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${String(guild.icon).startsWith("a_") ? "gif" : "png"}?size=128`
           : "https://cdn.discordapp.com/embed/avatars/0.png",
-        botPresent: Boolean(botGuild)
+        botPresent,
+        licenseActive: Boolean(license)
       };
     }));
 }
@@ -230,6 +233,17 @@ export function createIndexRouter(context) {
   router.get("/", async (req, res, next) => {
     try {
       if (res.locals.isAuthenticated) {
+        const requestedGuildId = typeof req.query.guildId === "string" ? req.query.guildId.trim() : "";
+        if (requestedGuildId && req.user?.id && requestedGuildId !== String(req.session?.activeGuildId || "")) {
+          const targetLicense = await context.services.licenses.getActiveByGuild(requestedGuildId).catch(() => null);
+          const targetAccess = targetLicense ? await resolveDashboardAccess(context, req.user.id, requestedGuildId) : null;
+          if (targetLicense && targetAccess?.allowed) {
+            req.session.activeLicenseId = String(targetLicense._id);
+            req.session.activeGuildId = requestedGuildId;
+            await saveSession(req);
+            return res.redirect("/");
+          }
+        }
         const sessionLicense = req.session?.activeLicenseId && req.session?.activeGuildId
           ? await context.services.licenses.getActiveById(req.session.activeLicenseId, req.session.activeGuildId)
           : null;

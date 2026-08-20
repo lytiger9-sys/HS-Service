@@ -1,66 +1,31 @@
-<div class="sidebar-user discord-sidebar-user">
-  <div class="sidebar-user-row">
-    <img class="user-avatar" src="<%= currentUser.avatarUrl %>" alt="<%= currentUser.displayName %>" draggable="false" />
-    <div class="sidebar-user-copy">
-      <span class="sidebar-user-kicker">Signed in</span>
-      <strong><%= currentUser.displayName %></strong>
-      <span><%= currentUser.tag %></span>
-    </div>
+<% const selectableGuilds = (managedGuilds || []).filter((managedGuild) => managedGuild.botPresent && managedGuild.licenseActive); %>
+<div class="sidebar-user-row">
+  <img class="user-avatar" src="<%= currentUser.avatarUrl %>" alt="<%= currentUser.displayName %>" draggable="false" />
+  <div class="sidebar-user-copy">
+    <span class="sidebar-user-kicker">Signed in</span>
+    <strong><%= currentUser.displayName %></strong>
+    <span><%= currentUser.tag %></span>
   </div>
-
-  <a class="sidebar-logout" href="/auth/logout">로그아웃</a>
-
-  <label class="sidebar-server-picker">
-    <span>관리 서버 선택</span>
-    <select data-server-picker aria-label="관리 서버 선택">
-      <option value="">서버를 선택하세요</option>
-      <% (managedGuilds || []).filter((managedGuild) => managedGuild.botPresent).forEach((managedGuild) => { %>
-        <option value="<%= managedGuild.id %>" data-server-name="<%= managedGuild.name %>" <%= currentGuildId === managedGuild.id ? 'selected' : '' %>><%= managedGuild.name %></option>
-      <% }) %>
-    </select>
-  </label>
 </div>
 
-<dialog class="server-license-modal" data-server-license-modal>
-  <form method="post" action="/activate" class="server-license-modal-form">
-    <button class="server-license-modal-close" type="button" data-server-license-close aria-label="닫기">×</button>
-    <span class="sidebar-user-kicker">Server access</span>
-    <h2>라이센스 연결</h2>
-    <p>선택한 서버에 연결할 라이센스 키를 입력하세요.</p>
-    <strong class="server-license-selected-name" data-server-license-name></strong>
-    <label class="server-license-field">
-      <span>라이센스 키</span>
-      <input type="hidden" name="guildId" data-server-license-guild />
-      <input type="text" name="licenseKey" placeholder="HS-XXXXXX-XXXXXX-XXXXXX" autocomplete="off" required />
-    </label>
-    <div class="server-license-modal-actions">
-      <button type="button" class="ghost" data-server-license-close>취소</button>
-      <button type="submit" class="primary">서버 연결 <span aria-hidden="true">→</span></button>
-    </div>
-  </form>
-</dialog>
+<a class="sidebar-logout" href="/auth/logout">로그아웃</a>
+
+<label class="sidebar-server-picker">
+  <span>등록 서버 선택</span>
+  <select data-server-picker aria-label="등록 서버 선택">
+    <option value="">서버를 선택하세요</option>
+    <% selectableGuilds.forEach((managedGuild) => { %>
+      <option value="<%= managedGuild.id %>" <%= currentGuildId === managedGuild.id ? 'selected' : '' %>><%= managedGuild.name %></option>
+    <% }) %>
+  </select>
+</label>
 
 <script>
   (() => {
     const picker = document.querySelector('[data-server-picker]');
-    const modal = document.querySelector('[data-server-license-modal]');
-    if (!picker || !modal) return;
-    const name = modal.querySelector('[data-server-license-name]');
-    const guild = modal.querySelector('[data-server-license-guild]');
-    const close = () => {
-      if (typeof modal.close === 'function') modal.close();
-      else modal.removeAttribute('open');
-      picker.value = '<%= currentGuildId %>';
-    };
+    if (!picker) return;
     picker.addEventListener('change', () => {
-      const option = picker.selectedOptions[0];
-      if (!picker.value) return;
-      guild.value = picker.value;
-      name.textContent = option?.dataset.serverName || option?.textContent || '';
-      if (typeof modal.showModal === 'function') modal.showModal();
-      else modal.setAttribute('open', '');
+      if (picker.value) window.location.href = `/?guildId=${encodeURIComponent(picker.value)}`;
     });
-    modal.querySelectorAll('[data-server-license-close]').forEach((button) => button.addEventListener('click', close));
-    modal.addEventListener('cancel', close);
   })();
 </script>
