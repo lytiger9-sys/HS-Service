@@ -4951,3 +4951,27 @@ html[data-theme="dark"] body:not(.dashboard-page):not(.license-auth-page) .card 
 html[data-theme="dark"] body:not(.dashboard-page):not(.license-auth-page) .muted {
   color: rgba(13,13,13,.72);
 }
+
+
+/* Dark activation page contrast fixes. */
+html[data-theme="dark"] .license-auth-page .activation-heading .eyebrow {
+  color: #F7F4EC;
+}
+html[data-theme="dark"] .license-auth-page .activation-heading .eyebrow::before {
+  background: #F7F4EC;
+}
+html[data-theme="dark"] .license-auth-page .license-login-button,
+html[data-theme="dark"] .license-auth-page .license-login-button span {
+  background: #F8F6EF !important;
+  color: #111315 !important;
+}
+html[data-theme="dark"] .license-auth-page .license-login-button::before {
+  background: #FFFDF7;
+}
+html[data-theme="dark"] .license-auth-page .license-login-button:hover,
+html[data-theme="dark"] .license-auth-page .license-login-button:hover span,
+html[data-theme="dark"] .license-auth-page .license-login-button:focus-visible,
+html[data-theme="dark"] .license-auth-page .license-login-button:focus-visible span {
+  background: #FFFDF7 !important;
+  color: #111315 !important;
+}
