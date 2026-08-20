@@ -150,7 +150,14 @@ export function createLicenseService() {
 
     async activate(key, guildId) {
       const license = await this.findByKey(key);
-      if (!license || license.kind !== "service" || license.status !== "available") return null;
+      if (!license || license.kind !== "service") return null;
+      const requestedGuildId = String(guildId);
+      if (license.status === "active") {
+        // A license is consumed once, but the same server may reconnect with it.
+        if (String(license.assignedGuildId || "") !== requestedGuildId) return null;
+        return license.toObject();
+      }
+      if (license.status !== "available") return null;
       const now = new Date();
       license.status = "active";
       license.assignedGuildId = String(guildId);
