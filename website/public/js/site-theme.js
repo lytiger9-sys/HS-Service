@@ -20,7 +20,7 @@
   }
 
   function mountToggle() {
-    const themeEnabled = document.body.matches(".dashboard-page, .license-auth-page");
+    const themeEnabled = document.body.matches(".dashboard-page, .activation-page");
     if (!themeEnabled) {
       root.dataset.theme = "light";
       return;
