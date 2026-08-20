@@ -5153,3 +5153,12 @@ html[data-theme="dark"] .dashboard-page .sidebar-logout:hover,
 html[data-theme="dark"] .dashboard-page .sidebar-logout:focus-visible {
   color: #FFFFFF !important;
 }
+
+
+html[data-theme="dark"] .dashboard-page .sidebar-server-picker select {
+  color: #111315 !important;
+}
+html[data-theme="dark"] .dashboard-page .sidebar-server-picker select option {
+  background: #F3F0E8;
+  color: #111315 !important;
+}
