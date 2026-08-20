@@ -5088,3 +5088,61 @@ html[data-theme="light"] .dashboard-page .sidebar-search-input::placeholder {
   color: rgba(13,13,13,.82) !important;
   opacity: 1;
 }
+
+
+/* Final dark-mode readability pass for dashboard controls. */
+html[data-theme="dark"] .dashboard-page .sidebar-search-input,
+html[data-theme="dark"] .dashboard-page input:not([type="checkbox"]):not([type="color"]),
+html[data-theme="dark"] .dashboard-page select,
+html[data-theme="dark"] .dashboard-page textarea {
+  background: #24282A;
+  color: #F3F0E8;
+  border-color: rgba(243,240,232,.24);
+}
+html[data-theme="dark"] .dashboard-page input::placeholder,
+html[data-theme="dark"] .dashboard-page textarea::placeholder,
+html[data-theme="dark"] .dashboard-page .sidebar-search-input::placeholder {
+  color: rgba(243,240,232,.68) !important;
+  opacity: 1;
+}
+html[data-theme="dark"] .dashboard-page input:not([type="checkbox"]):not([type="color"]):focus,
+html[data-theme="dark"] .dashboard-page select:focus,
+html[data-theme="dark"] .dashboard-page textarea:focus,
+html[data-theme="dark"] .dashboard-page .sidebar-search-input:focus {
+  background: #2B2F31;
+  color: #FFFFFF;
+  border-color: #C6A875;
+  box-shadow: 0 0 0 3px rgba(198,168,117,.16);
+}
+html[data-theme="dark"] .dashboard-page select option {
+  background: #24282A;
+  color: #F3F0E8;
+}
+html[data-theme="dark"] .dashboard-page .muted,
+html[data-theme="dark"] .dashboard-page .form-help,
+html[data-theme="dark"] .dashboard-page .field > span,
+html[data-theme="dark"] .dashboard-page .table-wrap th,
+html[data-theme="dark"] .dashboard-page .table-wrap td {
+  color: rgba(243,240,232,.78) !important;
+}
+html[data-theme="dark"] .dashboard-page .component-tools,
+html[data-theme="dark"] .dashboard-page .component-tool-list,
+html[data-theme="dark"] .dashboard-page .data-list-row,
+html[data-theme="dark"] .dashboard-page .table-wrap {
+  border-color: rgba(243,240,232,.16);
+  background: #1B1E20;
+}
+html[data-theme="dark"] .dashboard-page .component-tool-list button,
+html[data-theme="dark"] .dashboard-page .component-tool-list select,
+html[data-theme="dark"] .dashboard-page .ghost {
+  background: #24282A;
+  color: #F3F0E8;
+  border-color: rgba(243,240,232,.28);
+}
+html[data-theme="dark"] .dashboard-page .component-tool-list button:hover,
+html[data-theme="dark"] .dashboard-page .component-tool-list select:focus,
+html[data-theme="dark"] .dashboard-page .ghost:hover {
+  background: #2B2F31;
+  color: #FFFFFF;
+  border-color: #C6A875;
+}
