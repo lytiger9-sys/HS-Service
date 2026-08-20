@@ -342,22 +342,21 @@ export function createIndexRouter(context) {
     }
   });
 
-  const clearLicenseSession = async (req, res, next) => {
+    const clearLicenseSession = (redirectPath = "/") => async (req, res, next) => {
     try {
       if (req.session) {
         delete req.session.activeLicenseId;
         delete req.session.activeGuildId;
       }
       await saveSession(req);
-      return res.redirect("/");
+      return res.redirect(redirectPath);
     } catch (error) {
       return next(error);
     }
   };
-
-  router.post("/license/switch", clearLicenseSession);
-  router.post("/license/logout", clearLicenseSession);
-  router.get("/license/logout", clearLicenseSession);
+  router.post("/license/switch", clearLicenseSession("/"));
+  router.post("/license/logout", clearLicenseSession("/license/login"));
+  router.get("/license/logout", clearLicenseSession("/license/login"));
 
   return router;
 }
