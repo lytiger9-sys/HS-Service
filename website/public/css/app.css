@@ -4697,3 +4697,19 @@ input[type="reset"] {
     line-height: 1.9;
   }
 }
+
+/* Replace the feature-section helper copy with the command reference shortcut */
+.guide-feature-command-link {
+  align-self: end;
+  flex: 0 0 auto;
+  max-width: 260px;
+  margin: 0 0 2px;
+  text-align: right;
+}
+@media (max-width: 720px) {
+  .guide-feature-command-link {
+    display: inline-block;
+    margin-top: 16px;
+    text-align: left;
+  }
+}
