@@ -232,19 +232,32 @@ export function createIndexRouter(context) {
         return renderActivation(res, context, req.query.error || "");
       }
 
+      if (!res.locals.isAuthenticated) {
+        return res.redirect("/auth/discord");
+      }
+
+      const access = await resolveDashboardAccess(context, req.user?.id, req.session.activeGuildId);
+      if (!access.allowed) {
+        if (access.status === 401) return res.redirect("/auth/discord");
+        return res.status(access.status || 403).render("error", {
+          title: "대시보드에 접근할 수 없습니다.",
+          message: getAccessMessage(access)
+        });
+      }
+
       const plan = getPlanDefinition(activeLicense.plan);
-      const tabs = plan.tabs.filter((id) => id !== "honeypot").map((id) => ({ id, label: PLAN_TAB_LABELS[id] || id }));
-      const requestedTab = typeof req.query.tab === "string" ? req.query.tab : "overview";
-      const activeTab = tabs.some((tab) => tab.id === requestedTab) ? requestedTab : "overview";
-      return res.render("plan-dashboard", {
-        title: `${plan.label} 플랜 대시보드`,
-        botName: context.config.botName,
-        currentUser: req.user || null,
-        license: activeLicense,
-        plan,
-        tabs,
-        activeTab,
-        planLabels: PLAN_LABELS
+      const viewModel = await buildDashboardViewModel(context, access.guild, plan.id);
+      const requestedSection = typeof req.query.section === "string" ? req.query.section : "";
+      const activeSection = viewModel.sections.some((section) => section.id === requestedSection)
+        ? requestedSection
+        : "overview";
+      return res.render("dashboard", {
+        ...viewModel,
+        currentUser: req.user,
+        activeSection,
+        saved: req.query.saved || "",
+        issuedBannerKey: req.query.bannerKey || "",
+        bannerError: req.query.bannerError || ""
       });
     } catch (error) {
       next(error);
