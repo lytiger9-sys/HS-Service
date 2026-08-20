@@ -9,6 +9,13 @@ function getActiveLicenseId(req) {
   return req.session?.activeLicenseId || "";
 }
 
+function saveSession(req) {
+  return new Promise((resolve, reject) => {
+    if (!req.session || typeof req.session.save !== "function") return resolve();
+    req.session.save((error) => (error ? reject(error) : resolve()));
+  });
+}
+
 function renderActivation(res, context, message = "", extra = {}) {
   return res.render("activation", {
     title: "HS Service 시작하기",
@@ -333,15 +340,22 @@ export function createIndexRouter(context) {
     }
   });
 
-  router.post("/license/switch", async (req, res, next) => {
+  const clearLicenseSession = async (req, res, next) => {
     try {
-      delete req.session.activeLicenseId;
-      delete req.session.activeGuildId;
+      if (req.session) {
+        delete req.session.activeLicenseId;
+        delete req.session.activeGuildId;
+      }
+      await saveSession(req);
       return res.redirect("/");
     } catch (error) {
       return next(error);
     }
-  });
+  };
+
+  router.post("/license/switch", clearLicenseSession);
+  router.post("/license/logout", clearLicenseSession);
+  router.get("/license/logout", clearLicenseSession);
 
   return router;
 }
