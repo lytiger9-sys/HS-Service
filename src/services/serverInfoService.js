@@ -23,25 +23,29 @@ function formatAdministrator(member) {
 
 export function createServerInfoService(context, guildState) {
   async function getOverview(guild) {
-    const members = await guild.members.fetch().catch(() => guild.members.cache);
+    const members = await guild.members.fetch({ force: true }).catch(() => guild.members.cache);
+    const allMembers = [...members.values()];
     const memberList = sortMembersByJoinDate(members);
     const selfId = context.client?.user?.id;
-    const countedMembers = memberList.filter((member) => member.id !== selfId);
+    const botMemberPresent = allMembers.some((member) => member.id === selfId);
+    const countedMembers = allMembers.filter((member) => member.id !== selfId);
     const humans = countedMembers.filter((member) => !member.user.bot).length;
     const bots = countedMembers.filter((member) => member.user.bot).length;
-    const administrators = memberList
+    const administrators = allMembers
       .filter((member) => member.permissions.has(PermissionFlagsBits.Administrator))
       .map(formatAdministrator);
+    const channels = await guild.channels.fetch().catch(() => guild.channels.cache);
+    const roles = await guild.roles.fetch().catch(() => guild.roles.cache);
     const owner = await guild.fetchOwner().catch(() => null);
 
     return {
-      totalMembers: countedMembers.length || Math.max(0, Number(guild.memberCount || 0) - (selfId ? 1 : 0)),
+      totalMembers: Math.max(0, Number(guild.memberCount || allMembers.length) - (botMemberPresent ? 1 : 0)),
       humans,
       bots,
       adminCount: administrators.length,
       administrators,
-      channels: guild.channels.cache.size,
-      roles: guild.roles.cache.size,
+      channels: channels.size,
+      roles: roles.size,
       ownerTag: owner?.user?.tag ?? "",
       joinOrder: memberList
     };
@@ -53,7 +57,7 @@ export function createServerInfoService(context, guildState) {
   }
 
   async function getJoinOrder(guild) {
-    const members = await guild.members.fetch().catch(() => guild.members.cache);
+    const members = await guild.members.fetch({ force: true }).catch(() => guild.members.cache);
     return sortMembersByJoinDate(members).map((member, index) => ({
       rank: index + 1,
       user: member.user,
