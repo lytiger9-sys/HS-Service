@@ -12,7 +12,7 @@
         <div class="hero-top">
           <div>
             <p class="eyebrow">Server Control</p>
-            <h2><%= guild.name %></h2>
+            <h2 class="hero-server-name"><%= guild.name %></h2>
           </div>
           <form class="hero-reset" method="post" action="/guild/<%= guild.id %>/reset" data-reset-form data-confirm-reset="true" data-confirm-message="이 서버의 데이터를 기본값으로 초기화할까요?">
             <button class="ghost danger" type="submit">DB 초기화</button>

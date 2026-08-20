@@ -458,6 +458,10 @@ a {
   font-weight: 400;
 }
 
+.hero h2.hero-server-name {
+  font-weight: 700;
+}
+
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
