@@ -9,13 +9,49 @@ function getActiveLicenseId(req) {
   return req.session?.activeLicenseId || "";
 }
 
-function renderActivation(res, context, message = "") {
+function renderActivation(res, context, message = "", extra = {}) {
   return res.render("activation", {
     title: "HS Service 시작하기",
     botName: context.config.botName,
     message,
-    currentUser: res.locals.currentUser
+    currentUser: res.locals.currentUser,
+    managedGuilds: [],
+    selectedGuildId: "",
+    ...extra
   });
+}
+
+async function getManagedGuilds(req, context) {
+  const accessToken = req.user?.accessToken;
+  if (!accessToken) return [];
+
+  const response = await fetch("https://discord.com/api/v10/users/@me/guilds", {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  }).catch(() => null);
+  if (!response?.ok) return [];
+
+  const guilds = await response.json().catch(() => []);
+  if (!Array.isArray(guilds)) return [];
+
+  return Promise.all(guilds
+    .filter((guild) => {
+      try {
+        return guild?.owner || (BigInt(String(guild.permissions || "0")) & 0x8n) === 0x8n;
+      } catch {
+        return false;
+      }
+    })
+    .map(async (guild) => {
+      const botGuild = await context.client.guilds.fetch(String(guild.id)).catch(() => null);
+      return {
+        id: String(guild.id),
+        name: guild.name || "이름 없는 서버",
+        iconUrl: guild.icon
+          ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${String(guild.icon).startsWith("a_") ? "gif" : "png"}?size=128`
+          : "https://cdn.discordapp.com/embed/avatars/0.png",
+        botPresent: Boolean(botGuild)
+      };
+    }));
 }
 
 export function createIndexRouter(context) {
@@ -229,7 +265,11 @@ export function createIndexRouter(context) {
           delete req.session.activeLicenseId;
           delete req.session.activeGuildId;
         }
-        return renderActivation(res, context, req.query.error || "");
+        const managedGuilds = await getManagedGuilds(req, context);
+        return renderActivation(res, context, req.query.error || "", {
+          managedGuilds,
+          selectedGuildId: typeof req.query.guildId === "string" ? req.query.guildId : ""
+        });
       }
 
       const access = await resolveRequestAccess(context, req, req.session.activeGuildId);
@@ -265,15 +305,24 @@ export function createIndexRouter(context) {
       const guildId = String(req.body.guildId || "").trim();
       const licenseKey = String(req.body.licenseKey || "").trim();
       if (!/^\d{15,22}$/.test(guildId)) {
-        return renderActivation(res, context, "올바른 Discord 서버 ID를 입력하세요.");
+        return renderActivation(res, context, "올바른 Discord 서버 ID를 입력하세요.", {
+          managedGuilds: await getManagedGuilds(req, context),
+          selectedGuildId: guildId
+        });
       }
       const guild = await context.client.guilds.fetch(guildId).catch(() => null);
       if (!guild) {
-        return renderActivation(res, context, "봇이 해당 서버에 참여하고 있지 않습니다.");
+        return renderActivation(res, context, "봇이 해당 서버에 참여하고 있지 않습니다.", {
+          managedGuilds: await getManagedGuilds(req, context),
+          selectedGuildId: guildId
+        });
       }
       const license = await context.services.licenses.activate(licenseKey, guildId);
       if (!license) {
-        return renderActivation(res, context, "라이선스 키가 유효하지 않거나 이미 사용·폐기·만료되었습니다.");
+        return renderActivation(res, context, "라이선스 키가 유효하지 않거나 이미 사용·폐기·만료되었습니다.", {
+          managedGuilds: await getManagedGuilds(req, context),
+          selectedGuildId: guildId
+        });
       }
       req.session.activeLicenseId = String(license._id);
       req.session.activeGuildId = guildId;

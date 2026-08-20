@@ -1,5 +1,5 @@
 <%- include('partials/head', { title }) %>
-<body class="license-auth-page">
+<body class="license-auth-page activation-page">
   <main class="license-auth-shell activation-shell">
     <section class="license-auth-card activation-card">
       <nav class="activation-quick-links" aria-label="빠른 이동">
@@ -7,31 +7,103 @@
         <a href="/guide">플랜 설명 보기<span aria-hidden="true">↗</span></a>
         <a href="/commands">명령어 설명 보기<span aria-hidden="true">↗</span></a>
       </nav>
+
       <div class="activation-heading">
-        <a class="activation-mark" href="https://discord.gg/P2GdqRyjPe" target="_blank" rel="noopener noreferrer"><img src="/HS.gif" alt="HS Service Discord 서버 초대" /></a>
+        <a class="activation-mark" href="https://discord.gg/P2GdqRyjPe" target="_blank" rel="noopener noreferrer"><img src="/HS.gif" alt="HS Service Discord 서버 초대" draggable="false" /></a>
         <div>
           <p class="eyebrow">HS Service / Access</p>
           <h1>서버 연결하기</h1>
         </div>
       </div>
-      <p class="muted">Discord 서버 ID와 라이선스 키를 입력하면 해당 플랜에 맞는 기능을 사용할 수 있습니다.</p>
+      <p class="muted">Discord 서버를 선택한 뒤 라이센스 키를 입력하면 해당 서버의 관리 대시보드를 열 수 있습니다.</p>
+
+      <% if (currentUser) { %>
+        <div class="activation-profile">
+          <img src="<%= currentUser.avatarUrl %>" alt="<%= currentUser.displayName %>" draggable="false" />
+          <div>
+            <strong><%= currentUser.displayName %></strong>
+            <span><%= currentUser.tag %></span>
+          </div>
+          <a class="activation-profile-logout" href="/auth/logout">로그아웃</a>
+        </div>
+      <% } %>
+
       <% if (message) { %>
         <p class="license-notice license-notice-danger"><%= message %></p>
       <% } %>
-      <form method="post" action="/activate" class="license-form">
-        <label>
-          <span>Discord 서버 ID</span>
-          <input type="text" name="guildId" inputmode="numeric" pattern="[0-9]{15,22}" placeholder="서버 설정 → 고급 → 개발자 모드에서 복사" required />
-        </label>
-        <label>
-          <span>라이선스 키</span>
-          <input type="text" name="licenseKey" placeholder="HS-XXXXXX-XXXXXX-XXXXXX" autocomplete="off" required />
-        </label>
-        <button class="primary activation-submit license-login-button" type="submit"><span>서버 연결</span><span aria-hidden="true">→</span></button>
-      </form>
-      <div class="activation-divider"><span>관리자라면</span></div>
-      <a class="license-admin-login" href="/auth/discord"><span>Discord 계정으로 관리자 로그인</span></a>
+
+      <% if (currentUser && managedGuilds.length) { %>
+        <div class="managed-guilds" aria-label="관리자 서버 목록">
+          <div class="activation-section-heading">
+            <span class="eyebrow">Managed servers</span>
+            <strong>관리자로 있는 서버</strong>
+          </div>
+          <div class="managed-guild-list">
+            <% managedGuilds.forEach((managedGuild) => { %>
+              <a class="managed-guild-card <%= selectedGuildId === managedGuild.id ? 'is-selected' : '' %> <%= managedGuild.botPresent ? '' : 'is-unavailable' %>" href="/?guildId=<%= managedGuild.id %>">
+                <img src="<%= managedGuild.iconUrl %>" alt="" draggable="false" />
+                <span class="managed-guild-copy">
+                  <strong><%= managedGuild.name %></strong>
+                  <small><%= managedGuild.botPresent ? '라이센스 연결 가능' : '봇이 참여하지 않은 서버' %></small>
+                </span>
+                <span class="managed-guild-arrow" aria-hidden="true">→</span>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } else if (currentUser) { %>
+        <p class="license-notice license-notice-danger">Discord에서 관리자 권한이 있는 서버를 찾지 못했습니다.</p>
+      <% } %>
+
+      <% const selectedGuild = managedGuilds.find((managedGuild) => managedGuild.id === selectedGuildId); %>
+      <% if (selectedGuild || !currentUser) { %>
+        <form method="post" action="/activate" class="license-form">
+          <label <%= selectedGuild ? 'class="selected-guild-label"' : '' %>>
+            <span>Discord 서버 ID</span>
+            <input type="text" name="guildId" inputmode="numeric" pattern="[0-9]{15,22}" placeholder="서버 설정 → 고급 → 개발자 모드에서 복사" value="<%= selectedGuild?.id || selectedGuildId %>" <%= selectedGuild ? 'readonly' : '' %> required />
+          </label>
+          <label>
+            <span>라이센스 키</span>
+            <input type="text" name="licenseKey" placeholder="HS-XXXXXX-XXXXXX-XXXXXX" autocomplete="off" required />
+          </label>
+          <button class="primary activation-submit license-login-button" type="submit"><span><%= selectedGuild ? `${selectedGuild.name} 연결` : '서버 연결' %></span><span aria-hidden="true">→</span></button>
+        </form>
+      <% } else { %>
+        <p class="activation-selection-hint">위 목록에서 연결할 서버를 선택하세요.</p>
+      <% } %>
+
+      <% if (!currentUser) { %>
+        <div class="activation-divider"><span>관리자라면</span></div>
+        <a class="license-admin-login" href="/auth/discord"><span>Discord 계정으로 관리자 로그인</span><span aria-hidden="true">→</span></a>
+      <% } %>
     </section>
   </main>
 </body>
 </html>
+
+<style>
+  .activation-profile { display:flex; align-items:center; gap:12px; margin:22px 0; padding:12px 14px; border:1px solid rgba(48,45,39,.12); border-radius:16px; background:rgba(255,255,255,.5); }
+  .activation-profile img { width:42px; height:42px; border-radius:50%; object-fit:cover; }
+  .activation-profile div { display:grid; gap:2px; min-width:0; flex:1; }
+  .activation-profile strong { font-size:14px; }
+  .activation-profile span { color:#81796f; font-size:12px; }
+  .activation-profile-logout { color:#8d7044; font-size:12px; text-decoration:underline; }
+  .activation-section-heading { display:grid; gap:4px; margin:24px 0 10px; }
+  .activation-section-heading strong { font-size:17px; }
+  .managed-guild-list { display:grid; gap:8px; }
+  .managed-guild-card { display:flex; align-items:center; gap:12px; padding:12px 14px; color:inherit; text-decoration:none; border:1px solid rgba(48,45,39,.12); border-radius:15px; background:rgba(255,255,255,.48); transition:transform .18s ease, border-color .18s ease, background .18s ease; }
+  .managed-guild-card:hover, .managed-guild-card.is-selected { transform:translateX(3px); border-color:#8d7044; background:#fffaf0; }
+  .managed-guild-card.is-unavailable { opacity:.55; }
+  .managed-guild-card img { width:38px; height:38px; border-radius:12px; object-fit:cover; }
+  .managed-guild-copy { display:grid; gap:3px; flex:1; min-width:0; }
+  .managed-guild-copy strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .managed-guild-copy small { color:#81796f; font-size:11px; }
+  .managed-guild-arrow { color:#8d7044; font-size:20px; }
+  .selected-guild-label input[readonly] { color:#8d7044; font-weight:600; }
+  .activation-selection-hint { margin:22px 0 0; color:#81796f; font-size:13px; }
+</style>
+<script>
+  document.querySelectorAll('.activation-page img, .activation-page a, .activation-page button').forEach((element) => {
+    element.setAttribute('draggable', 'false');
+  });
+</script>

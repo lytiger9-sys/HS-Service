@@ -33,7 +33,7 @@ function buildTag(profile) {
   return username;
 }
 
-function mapDiscordProfile(profile) {
+function mapDiscordProfile(profile, accessToken = "", refreshToken = "") {
   return {
     id: profile.id,
     username: profile.username || "discord-user",
@@ -41,7 +41,9 @@ function mapDiscordProfile(profile) {
     tag: buildTag(profile),
     displayName: buildDisplayName(profile),
     avatar: profile.avatar || null,
-    avatarUrl: buildAvatarUrl(profile)
+    avatarUrl: buildAvatarUrl(profile),
+    accessToken,
+    refreshToken
   };
 }
 
@@ -80,12 +82,12 @@ export function configureWebAuth(app, context) {
         clientID: context.config.discordClientId,
         clientSecret: context.config.discordClientSecret,
         callbackURL: context.config.discordCallbackUrl,
-        scope: ["identify"],
+        scope: ["identify", "guilds"],
         state: true
       },
-      (_accessToken, _refreshToken, profile, done) => {
+      (accessToken, refreshToken, profile, done) => {
         try {
-          done(null, mapDiscordProfile(profile));
+          done(null, mapDiscordProfile(profile, accessToken, refreshToken));
         } catch (error) {
           done(error);
         }

@@ -4536,6 +4536,51 @@ input[type="reset"] {
   user-select: text;
 }
 
+/* Dashboard presentation surface: prevent accidental dragging while keeping form controls editable. */
+.dashboard-page,
+.dashboard-page * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+.dashboard-page input,
+.dashboard-page textarea,
+.dashboard-page select,
+.dashboard-page [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-user-drag: auto;
+  user-drag: auto;
+}
+.dashboard-page img,
+.dashboard-page svg,
+.dashboard-page button,
+.dashboard-page a {
+  -webkit-user-drag: none;
+}
+
+.activation-page,
+.activation-page * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+.activation-page input,
+.activation-page textarea,
+.activation-page select {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-user-drag: auto;
+  user-drag: auto;
+}
+.activation-page img,
+.activation-page a,
+.activation-page button {
+  -webkit-user-drag: none;
+}
+
 /* Per-plan command reference shortcut */
 .guide-plan-copy-description-row {
   display: grid;

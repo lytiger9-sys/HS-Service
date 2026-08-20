@@ -35,7 +35,7 @@ export function createAuthRouter() {
       return res.redirect("/");
     }
 
-    return passport.authenticate("discord", { scope: ["identify"] })(req, res, next);
+    return passport.authenticate("discord", { scope: ["identify", "guilds"] })(req, res, next);
   });
 
   router.get(
