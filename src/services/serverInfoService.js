@@ -1,4 +1,4 @@
-import { PermissionFlagsBits } from "discord.js";
+import { ChannelType, PermissionFlagsBits } from "discord.js";
 import { buildServerInfoComponents } from "../shared/embeds.js";
 
 function sortMembersByJoinDate(members) {
@@ -35,6 +35,7 @@ export function createServerInfoService(context, guildState) {
       .filter((member) => member.permissions.has(PermissionFlagsBits.Administrator))
       .map(formatAdministrator);
     const channels = await guild.channels.fetch().catch(() => guild.channels.cache);
+    const countableChannels = [...channels.values()].filter((channel) => channel.type !== ChannelType.GuildCategory && !channel.isThread?.());
     const roles = await guild.roles.fetch().catch(() => guild.roles.cache);
     const owner = await guild.fetchOwner().catch(() => null);
 
@@ -44,7 +45,7 @@ export function createServerInfoService(context, guildState) {
       bots,
       adminCount: administrators.length,
       administrators,
-      channels: channels.size,
+      channels: countableChannels.length,
       roles: roles.size,
       ownerTag: owner?.user?.tag ?? "",
       joinOrder: memberList
