@@ -192,6 +192,16 @@ function buildTicketPreview() {
   });
 
   form.addEventListener("click", (event) => {
+    const toggleCategoryButton = event.target.closest("[data-ticket-toggle-category]");
+    if (toggleCategoryButton) {
+      const card = toggleCategoryButton.closest("[data-ticket-category]");
+      const collapsed = card?.classList.toggle("is-collapsed") || false;
+      toggleCategoryButton.setAttribute("aria-expanded", String(!collapsed));
+      toggleCategoryButton.setAttribute("aria-label", collapsed ? "카테고리 펼치기" : "카테고리 접기");
+      toggleCategoryButton.textContent = collapsed ? "⌄" : "⌃";
+      return;
+    }
+
     const addCategoryButton = event.target.closest("[data-ticket-add-category]");
     if (addCategoryButton) {
       const card = createCategoryCard();

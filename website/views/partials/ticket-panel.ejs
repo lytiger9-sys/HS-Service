@@ -68,6 +68,7 @@
           <article class="ticket-category-card" data-ticket-category>
             <div class="ticket-category-head">
               <span class="ticket-category-label">카테고리 <%= index + 1 %></span>
+              <button type="button" class="ticket-category-collapse" data-ticket-toggle-category aria-expanded="true" aria-label="카테고리 접기">⌄</button>
               <button type="button" class="ghost danger" data-ticket-remove-category>삭제</button>
             </div>
 
@@ -129,6 +130,7 @@
   <article class="ticket-category-card" data-ticket-category>
     <div class="ticket-category-head">
       <span class="ticket-category-label">카테고리</span>
+      <button type="button" class="ticket-category-collapse" data-ticket-toggle-category aria-expanded="true" aria-label="카테고리 접기">⌄</button>
       <button type="button" class="ghost danger" data-ticket-remove-category>삭제</button>
     </div>
 
