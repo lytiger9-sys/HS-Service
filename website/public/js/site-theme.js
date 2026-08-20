@@ -20,6 +20,11 @@
   }
 
   function mountToggle() {
+    const themeEnabled = document.body.matches(".dashboard-page, .license-auth-page");
+    if (!themeEnabled) {
+      root.dataset.theme = "light";
+      return;
+    }
     if (document.querySelector("[data-theme-toggle]")) return;
     const toggle = document.createElement("button");
     toggle.type = "button";

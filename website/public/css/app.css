@@ -4919,3 +4919,35 @@ html[data-theme="dark"] .server-license-modal { border-color: rgba(243,240,232,.
 .activation-discord-login:hover span[aria-hidden="true"] {
   color: #fff !important;
 }
+
+
+/* Only the dashboard and home access page support theme switching. */
+html[data-theme="dark"] body:not(.dashboard-page):not(.license-auth-page) {
+  color-scheme: light;
+  --ink: #0D0D0D;
+  --ink-soft: #161616;
+  --ink-mid: #1C1C1C;
+  --paper: #F8F9FA;
+  --paper-soft: #EFEFEC;
+  --paper-warm: #E9E7E1;
+  --hairline: rgba(13,13,13,.18);
+  --hairline-soft: rgba(13,13,13,.1);
+  --control-border: rgba(13,13,13,.32);
+  --control-border-strong: rgba(13,13,13,.48);
+  --accent: #0D0D0D;
+  --accent-tint: rgba(13,13,13,.05);
+  --accent-warm: #B89968;
+  background: #F8F9FA;
+  color: #0D0D0D;
+}
+html[data-theme="dark"] body:not(.dashboard-page):not(.license-auth-page) .site-theme-toggle {
+  display: none;
+}
+html[data-theme="dark"] body:not(.dashboard-page):not(.license-auth-page) .card {
+  background: #F8F9FA;
+  color: #0D0D0D;
+  border-color: rgba(13,13,13,.18);
+}
+html[data-theme="dark"] body:not(.dashboard-page):not(.license-auth-page) .muted {
+  color: rgba(13,13,13,.72);
+}
