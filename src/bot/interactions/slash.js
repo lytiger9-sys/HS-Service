@@ -10,6 +10,7 @@ export function commandFeature(commandName) {
   if (["도박", "캐시", "캐시지급", "생일"].includes(name)) return "shop";
   if (["booston", "boostoff"].includes(name)) return "logs";
   if (name === "partnermsg") return "partner";
+  if (["securout", "securin"].includes(name)) return "security";
   if (name === "환율") return "events";
   return null;
 }

@@ -82,7 +82,8 @@ export function createIndexRouter(context) {
       exithoneypot: "administrator", nickapply: "administrator", nickrandom: "administrator", nickinit: "administrator",
       booston: "manageGuild", boostoff: "manageGuild", 복제: "manageChannels", 카테고리삭제: "manageChannels",
       이모지스틸: "manageExpressions", 이모지삭제: "manageExpressions", 사운드스틸: "manageExpressions",
-      사운드삭제: "manageExpressions", 캐시지급: "administrator", partnermsg: "administrator", 계좌설정: "administrator"
+      사운드삭제: "manageExpressions", 캐시지급: "administrator", partnermsg: "administrator", 계좌설정: "administrator",
+      securout: "administrator", securin: "administrator"
     };
     const dashboardFeatureDetails = [
       ["overview", "개요", "서버 현황과 전체 인원·봇·관리자·활성 투표·임시 음성채널 상태를 한눈에 확인합니다."],
