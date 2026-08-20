@@ -171,14 +171,12 @@ export function createPartnerService(context) {
       memberCount: text(interaction.fields.getTextInputValue("partner-member-count"), "", 30),
       recoveryKeyUsed: text(interaction.fields.getTextInputValue("partner-recovery-key"), "", 30),
       serverLink: text(interaction.fields.getTextInputValue("partner-server-link"), "", 500),
-      promoWebhook: text(interaction.fields.getTextInputValue("partner-promo-webhook"), "", 500)
+      promoWebhook: normalizePromoWebhook(text(interaction.fields.getTextInputValue("partner-promo-webhook"), "", 500))
     };
     if (!values.affiliateName || !values.serverLink || !values.promoWebhook) throw new Error("제휴명·서버 링크·홍보 웹훅은 필수입니다.");
-    for (const [label, value] of [["서버 링크", values.serverLink], ["홍보 웹훅", values.promoWebhook]]) {
-      let parsed;
-      try { parsed = new URL(value); } catch { parsed = null; }
-      if (!parsed || parsed.protocol !== "https:") throw new Error(`${label}은 https URL이어야 합니다.`);
-    }
+    let serverUrl;
+    try { serverUrl = new URL(values.serverLink); } catch { serverUrl = null; }
+    if (!serverUrl || serverUrl.protocol !== "https:") throw new Error("서버 링크는 https URL이어야 합니다.");
     if ((current.partners || []).some((item) => ["pending", "active"].includes(item.status) && item.requesterId === interaction.user.id)) {
       throw new Error("이미 처리 중인 파트너 신청이 있습니다.");
     }
@@ -303,8 +301,12 @@ export function createPartnerService(context) {
 
   function normalizePromoWebhook(value) {
     try {
-      const url = new URL(String(value || ""));
-      if (url.protocol !== "https:" || !["discord.com", "discordapp.com"].includes(url.hostname) || !/^\/api\/webhooks\/\d+\/[^/]+$/.test(url.pathname)) return "";
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      const normalizedInput = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+      const url = new URL(normalizedInput);
+      const isDiscordHost = ["discord.com", "discordapp.com"].includes(url.hostname.toLowerCase());
+      if (url.protocol !== "https:" || !isDiscordHost || !/^\/api\/webhooks\/\d+\/[^/]+$/.test(url.pathname)) return "";
       return url.toString();
     } catch {
       return "";
