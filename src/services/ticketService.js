@@ -272,18 +272,13 @@ export function createTicketService(context, guildState) {
       ReadMessageHistory: true
     }).catch(() => null);
 
-    await channel.send(buildTicketClosedNoticePayload()).catch(() => null);
+    await channel.send(buildTicketClosedNoticePayload({ channelId: channel.id })).catch(() => null);
 
     const ticketNumber = Number(ticket.ticketNumber);
     const closedName = Number.isInteger(ticketNumber) && ticketNumber > 0
       ? `closed-${String(ticketNumber).padStart(4, "0")}`
       : slugifyDiscordName(`closed-${channel.name.replace(/^ticket-/, "")}`, channel.name);
     await channel.edit({ name: closedName }).catch(() => null);
-
-    setTimeout(async () => {
-      await channel.delete(`티켓 삭제 확정: ${closedBy.user?.tag || closedBy.tag || closedBy.id}`).catch(() => null);
-      await context.services.notes.deleteNotesByTicket(guild.id, channel.id).catch(() => null);
-    }, 10000);
 
     await guildState.patch(guild.id, (guildStateValue) => {
       guildStateValue.tickets[channel.id] = {
@@ -295,6 +290,39 @@ export function createTicketService(context, guildState) {
     });
 
     return ticket;
+  }
+
+  async function reopenTicket({ guild, channel, reopenedBy }) {
+    const ticket = await guildState.ensure(guild.id).then(() => getTicketRecord(guildState, guild.id, channel.id));
+    if (!ticket || ticket.status !== "closed") throw new Error("종료된 봇 티켓이 아닙니다.");
+    if (!reopenedBy?.permissions?.has?.(PermissionFlagsBits.Administrator)) throw new Error("관리자만 티켓을 재개할 수 있습니다.");
+
+    await channel.permissionOverwrites.edit(ticket.userId, {
+      SendMessages: true,
+      ViewChannel: true,
+      ReadMessageHistory: true
+    }).catch(() => null);
+    const number = Number(ticket.ticketNumber);
+    const name = Number.isInteger(number) && number > 0 ? `ticket-${String(number).padStart(4, "0")}` : channel.name.replace(/^closed-/, "ticket-");
+    await channel.edit({ name }).catch(() => null);
+    await guildState.patch(guild.id, (guildStateValue) => {
+      guildStateValue.tickets[channel.id] = { ...guildStateValue.tickets[channel.id], status: "open", closingAt: null, closedAt: null, closedById: null, closedByTag: null };
+      return guildStateValue.tickets[channel.id];
+    });
+    return guildState.snapshot(guild.id).tickets[channel.id];
+  }
+
+  async function deleteTicket({ guild, channel, deletedBy }) {
+    const ticket = await guildState.ensure(guild.id).then(() => getTicketRecord(guildState, guild.id, channel.id));
+    if (!ticket || !["open", "closed"].includes(ticket.status)) throw new Error("삭제할 수 있는 봇 티켓이 아닙니다.");
+    if (!deletedBy?.permissions?.has?.(PermissionFlagsBits.Administrator)) throw new Error("관리자만 티켓을 삭제할 수 있습니다.");
+    await channel.delete(`티켓 삭제: ${deletedBy.user?.tag || deletedBy.tag || deletedBy.id}`).catch(() => null);
+    await context.services.notes.deleteNotesByTicket(guild.id, channel.id).catch(() => null);
+    return true;
+  }
+
+  async function listTicketNotes(guildId, channelId) {
+    return context.services.notes.listNotes(guildId, channelId);
   }
 
   async function cancelClosePrompt() {
@@ -326,14 +354,7 @@ export function createTicketService(context, guildState) {
       return true;
     }
 
-    const prompt = await beginClosePrompt({
-      guild: message.guild,
-      channel: message.channel,
-      requestedBy: message.member,
-      ephemeral: false
-    });
-
-    await message.channel.send(prompt).catch(() => null);
+    await confirmClose({ guild: message.guild, channel: message.channel, closedBy: message.member });
     return true;
   }
 
@@ -387,6 +408,9 @@ export function createTicketService(context, guildState) {
     openTicket,
     beginClosePrompt,
     confirmClose,
+    reopenTicket,
+    deleteTicket,
+    listTicketNotes,
     cancelClosePrompt,
     handleCloseShortcut,
     buildCategoryMenu,

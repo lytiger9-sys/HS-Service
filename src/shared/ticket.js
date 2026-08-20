@@ -336,9 +336,34 @@ export function buildTicketClosePromptPayload({ channelName, requestedByTag }) {
   };
 }
 
-export function buildTicketClosedNoticePayload() {
+export function buildTicketClosedNoticePayload({ channelId }) {
+  const reopen = new ButtonBuilder()
+    .setCustomId(`ticket:reopen:${channelId}`)
+    .setLabel("재개하기")
+    .setStyle(ButtonStyle.Success)
+    .toJSON();
+  const remove = new ButtonBuilder()
+    .setCustomId(`ticket:delete:${channelId}`)
+    .setLabel("삭제하기")
+    .setStyle(ButtonStyle.Danger)
+    .toJSON();
+  const notes = new ButtonBuilder()
+    .setCustomId(`ticket:notes:${channelId}`)
+    .setLabel("저장내용보기")
+    .setStyle(ButtonStyle.Secondary)
+    .toJSON();
+
   return {
-    content: "티켓이 확정되어 10초 후 삭제됩니다."
+    flags: MessageFlags.IsComponentsV2,
+    components: [
+      container([
+        textDisplay("## 티켓이 종료되었습니다"),
+        separator(),
+        { type: 1, components: [reopen, remove, notes] },
+        separator(),
+        textDisplay("Powered by HS-Service")
+      ], palette.graphite)
+    ]
   };
 }
 

@@ -144,44 +144,39 @@ export async function handleButtonInteraction(interaction, context) {
     return interaction.reply(payload);
   }
 
-  if (scope === "ticket" && action === "close") {
+  if (scope === "ticket" && ["close", "close-confirm"].includes(action)) {
     if (!interaction.guild || !interaction.channel) {
       return interaction.reply({ content: "서버 채널에서만 사용할 수 있습니다.", ephemeral: true });
     }
-
     if (!isAdministrator(interaction.member)) {
       return interaction.reply({ content: "관리자만 티켓을 닫을 수 있습니다.", ephemeral: true });
     }
-
-    const payload = await context.services.tickets.beginClosePrompt({
-      guild: interaction.guild,
-      channel: interaction.channel,
-      requestedBy: interaction.member
-    });
-
-    return interaction.reply({ ...payload, ephemeral: true });
+    await context.services.tickets.confirmClose({ guild: interaction.guild, channel: interaction.channel, closedBy: interaction.member });
+    return interaction.reply({ content: "티켓을 종료했습니다.", ephemeral: true });
   }
 
-  if (scope === "ticket" && action === "close-confirm") {
+  if (scope === "ticket" && ["reopen", "delete", "notes"].includes(action)) {
     if (!interaction.guild || !interaction.channel) {
       return interaction.reply({ content: "서버 채널에서만 사용할 수 있습니다.", ephemeral: true });
     }
-
     if (!isAdministrator(interaction.member)) {
-      return interaction.reply({ content: "관리자만 티켓을 닫을 수 있습니다.", ephemeral: true });
+      return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
     }
-
-    await context.services.tickets.confirmClose({
-      guild: interaction.guild,
-      channel: interaction.channel,
-      closedBy: interaction.member
-    });
-
-    return interaction.update({
-      content: "티켓 삭제가 확정되었습니다. 10초 후 삭제됩니다.",
-      components: []
-    });
+    if (action === "reopen") {
+      await context.services.tickets.reopenTicket({ guild: interaction.guild, channel: interaction.channel, reopenedBy: interaction.member });
+      return interaction.reply({ content: "티켓을 재개했습니다.", ephemeral: true });
+    }
+    if (action === "delete") {
+      await context.services.tickets.deleteTicket({ guild: interaction.guild, channel: interaction.channel, deletedBy: interaction.member });
+      return interaction.reply({ content: "티켓을 삭제했습니다.", ephemeral: true });
+    }
+    const notes = await context.services.tickets.listTicketNotes(interaction.guildId, interaction.channelId);
+    const content = notes.length
+      ? notes.map((note, index) => `${index + 1}. **${note.title || "무제"}**\n${note.content || "내용 없음"}`).join("\n\n").slice(0, 1900)
+      : "이 티켓에 저장된 내용이 없습니다.";
+    return interaction.reply({ content: `저장내용\n\n${content}`, ephemeral: true });
   }
+
 
   if (scope === "ticket" && action === "close-cancel") {
     if (!isAdministrator(interaction.member)) {
