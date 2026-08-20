@@ -21,8 +21,10 @@ function eventPayload(event, ended = false) {
   const container = new ContainerBuilder()
     .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${event.name}\n${event.description || ""}\n\n${lines.join("\n")}`))
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addActionRowComponents(eventComponents(event, ended)[0])
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(new TextDisplayBuilder().setContent("Powered by HS-Service"));
-  return { flags: MessageFlags.IsComponentsV2, components: [container, ...eventComponents(event, ended)] };
+  return { flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
 function eventComponents(event, disabled = false) {
