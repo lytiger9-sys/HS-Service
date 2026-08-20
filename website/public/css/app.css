@@ -5167,3 +5167,11 @@ html[data-theme="dark"] .dashboard-page .sidebar-server-picker select option {
 html[data-theme="dark"] .license-auth-page .activation-heading h1 {
   color: #FFFFFF !important;
 }
+
+
+.license-auth-page:not(.activation-page) .license-form input:not([type="checkbox"]):not([type="color"]),
+.license-auth-page:not(.activation-page) input[type="text"],
+.license-auth-page:not(.activation-page) input[type="password"] {
+  color: #111315 !important;
+  -webkit-text-fill-color: #111315;
+}
