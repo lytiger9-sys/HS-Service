@@ -35,13 +35,13 @@ export function createOverviewChannelService(context) {
   }
 
   async function getCounts(guild) {
-    await guild.members.fetch().catch(() => null);
-    const members = [...guild.members.cache.values()];
+    const fetchedMembers = await guild.members.fetch({ force: true }).catch(() => guild.members.cache);
+    const members = [...fetchedMembers.values()];
     const selfId = context.client?.user?.id;
     const countedMembers = members.filter((member) => member.id !== selfId);
-    const botCount = countedMembers.filter((member) => member.user.bot).length;
+    const botCount = members.filter((member) => member.user.bot).length;
     return {
-      members: countedMembers.length - botCount,
+      members: countedMembers.filter((member) => !member.user.bot).length,
       bots: botCount,
       total: countedMembers.length
     };
