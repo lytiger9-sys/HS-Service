@@ -23,6 +23,7 @@ import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 import birthday from "./birthday.js";
 import partnermsg from "./partnermsg.js";
 import { accountSettings, account } from "./account.js";
+import { securout, securin } from "./securityChannel.js";
 
 export const commandList = [
   serverinfo,
@@ -57,7 +58,9 @@ export const commandList = [
   birthday,
   partnermsg,
   accountSettings,
-  account
+  account,
+  securout,
+  securin
 ];
 
 export const commandMap = new Map(commandList.map((command) => [command.data.name, command]));

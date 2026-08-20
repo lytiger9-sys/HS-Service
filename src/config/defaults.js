@@ -75,7 +75,8 @@ export function createDefaultGuildSettings() {
       inviteTimeoutMinutes: 10,
       spamRepeatThreshold: 3,
       profanityWords: [],
-      securityLogChannelId: ""
+      securityLogChannelId: "",
+      exemptChannelIds: []
     },
     assignment: {
       enabled: true,

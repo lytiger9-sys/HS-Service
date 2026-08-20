@@ -116,6 +116,9 @@ export function createModerationService(context, guildState) {
     if (settings.enabled === false) {
       return null;
     }
+    if ((settings.exemptChannelIds || []).includes(message.channelId)) {
+      return null;
+    }
     const triggers = [];
 
     if (settings.massMentionEnabled !== false && message.mentions.everyone) {
