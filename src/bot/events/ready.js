@@ -55,6 +55,9 @@ export default async function handleReady(client, context) {
   await context.services.polls.processExpirations().catch(() => null);
   const pollExpirationTimer = setInterval(() => void context.services.polls.processExpirations().catch(() => null), 60 * 1000);
   pollExpirationTimer.unref?.();
+  await context.services.events.processExpirations().catch(() => null);
+  const eventExpirationTimer = setInterval(() => void context.services.events.processExpirations().catch(() => null), 60 * 1000);
+  eventExpirationTimer.unref?.();
 
   let lastPartnerPromoDate = "";
   const processPartnerPromotions = async () => {

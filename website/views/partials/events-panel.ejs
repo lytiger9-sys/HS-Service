@@ -1,0 +1,72 @@
+<section class="<%= panelClass('events') %>" data-panel="events">
+  <article class="card section-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Events</p>
+        <h3>이벤트 설정</h3>
+      </div>
+      <label class="field toggle section-toggle">
+        <input type="checkbox" form="events-settings-form" name="eventsEnabled" <%= settings.events?.enabled !== false ? 'checked' : '' %> />
+        <span>이벤트 기능 활성화</span>
+      </label>
+    </div>
+    <p class="muted">이벤트 임베드를 게시하고 참가자를 추첨해 같은 채널에 결과를 안내합니다. 당첨자에게는 상품이 DM으로 전송됩니다.</p>
+    <form class="settings-form" id="events-settings-form" method="post" action="/api/<%= guild.id %>/settings/events" data-async-form>
+      <div class="form-grid">
+        <label class="field">
+          <span>게시 채널</span>
+          <select name="eventsChannelId" required>
+            <option value="">채널을 선택하세요</option>
+            <% for (const channel of (channels.text || [])) { %>
+              <option value="<%= channel.id %>" <%= settings.events?.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
+            <% } %>
+          </select>
+        </label>
+        <label class="field">
+          <span>이벤트 이름</span>
+          <input type="text" name="eventsName" maxlength="256" value="<%= settings.events?.name || '' %>" required />
+        </label>
+        <label class="field full">
+          <span>이벤트 상품</span>
+          <input type="text" name="eventsPrize" maxlength="1000" value="<%= settings.events?.prize || '' %>" placeholder="예: 10,000 캐시 또는 특별 역할" required />
+        </label>
+        <label class="field">
+          <span>추첨 인원</span>
+          <input type="number" name="eventsWinnerCount" min="1" max="100" value="<%= settings.events?.winnerCount || 1 %>" required />
+        </label>
+        <label class="field">
+          <span>이벤트 기한(시간)</span>
+          <input type="number" name="eventsDurationHours" min="1" max="720" value="<%= settings.events?.durationHours || 24 %>" required />
+        </label>
+      </div>
+      <button class="primary" type="submit">설정 저장</button>
+    </form>
+  </article>
+
+  <article class="card section-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Publish</p>
+        <h3>이벤트 게시</h3>
+      </div>
+    </div>
+    <p class="muted">저장된 설정으로 새 이벤트 임베드를 선택한 채널에 게시합니다.</p>
+    <form method="post" action="/api/<%= guild.id %>/events/publish" data-async-form>
+      <button class="primary" type="submit">이벤트 임베드 게시</button>
+    </form>
+  </article>
+
+  <% if (events?.length) { %>
+    <article class="card section-panel">
+      <div class="section-head"><div><p class="eyebrow">History</p><h3>이벤트 기록</h3></div></div>
+      <div class="data-list">
+        <% for (const event of events.slice(0, 20)) { %>
+          <div class="data-list-row">
+            <div><strong><%= event.name %></strong><span class="muted"><%= event.ended ? '종료됨' : '진행 중' %> · 참가 <%= Object.keys(event.participants || {}).length %>명</span></div>
+            <span class="muted"><%= event.prize %></span>
+          </div>
+        <% } %>
+      </div>
+    </article>
+  <% } %>
+</section>

@@ -69,6 +69,7 @@ function buildSections() {
     { id: "polls", label: "투표", description: "버튼 투표" },
     { id: "logs", label: "로그", description: "채널 연결" },
     { id: "partner", label: "파트너", description: "제휴 신청 및 채널" },
+    { id: "events", label: "이벤트", description: "이벤트 추첨 및 상품" },
     { id: "nickname", label: "닉네임", description: "역할별 이름 규칙" },
     { id: "shop", label: "상점", description: "캐시 및 상품" }
   ];
@@ -91,7 +92,7 @@ function normalizeStaffSettings(settings = {}) {
 }
 
 export async function buildDashboardViewModel(context, guild, planId = "enterprise") {
-  const [overview, settings, notes, polls, tempChannels, stalePartners, shop, allLicenses] = await Promise.all([
+  const [overview, settings, notes, polls, tempChannels, stalePartners, shop, events, allLicenses] = await Promise.all([
     context.services.serverInfo.getDashboardSnapshot(guild),
     context.services.settings.getSettings(guild.id),
     context.services.notes.listNotes(guild.id),
@@ -99,6 +100,7 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
     context.services.tempChannels.listTempChannels(guild.id),
     context.services.partners.listStale(guild.id),
     context.services.shop.getShop(guild.id),
+    context.services.events.list(guild.id),
     context.services.licenses.list()
   ]);
 
@@ -195,6 +197,7 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
     polls,
     tempChannels,
     stalePartners,
+    events,
     bannerLicenses: allLicenses.filter((license) => license.kind === "banner" && String(license.issuerGuildId || "") === String(guild.id)),
     shop: normalizedSettings.shop,
     staffMembers,

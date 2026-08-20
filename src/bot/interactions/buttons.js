@@ -101,6 +101,11 @@ export async function handleButtonInteraction(interaction, context) {
     return interaction.reply({ content: `현재 보유 캐시: ${balance.toLocaleString()} 캐시`, ephemeral: true });
   }
 
+  if (scope === "event" && action === "join") {
+    const result = await context.services.events.participate(interaction, id);
+    return interaction.reply({ content: result.already ? "이미 이벤트에 참여했습니다." : "이벤트 참여가 완료되었습니다.", ephemeral: true });
+  }
+
   if (interaction.customId === "partner:apply") {
     return interaction.showModal(buildPartnerApplicationModal());
   }

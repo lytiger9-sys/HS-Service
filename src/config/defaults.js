@@ -117,6 +117,14 @@ export function createDefaultGuildSettings() {
       roleChangeEnabled: true,
       moderationActionEnabled: true
     },
+    events: {
+      enabled: true,
+      channelId: "",
+      name: "서버 이벤트",
+      prize: "",
+      winnerCount: 1,
+      durationHours: 24
+    },
     partner: {
       enabled: false,
       conditionsChannelId: "",
@@ -153,6 +161,7 @@ export function createDefaultGuildState() {
     joinOrder: [],
     tickets: {},
     polls: {},
+    events: {},
     tempChannels: {},
     partners: [],
     bannerSlots: [],

@@ -236,6 +236,18 @@ function sectionPayload(section, body) {
       embedBody: readText(body.shopEmbedBody, "상품을 확인하거나 내 캐시 잔액을 확인하세요.", 4000)
     } };
   }
+  if (section === "events") {
+    return {
+      events: {
+        enabled: readOptionalBoolean(body.eventsEnabled),
+        channelId: readDiscordId(body.eventsChannelId),
+        name: readText(body.eventsName, "서버 이벤트", 256),
+        prize: readText(body.eventsPrize, "", 1000),
+        winnerCount: readNumber(body.eventsWinnerCount, 1, 1, 100),
+        durationHours: readNumber(body.eventsDurationHours, 24, 1, 720)
+      }
+    };
+  }
   if (section === "partner") {
     return {
       partner: {
@@ -315,6 +327,20 @@ export function createApiRouter(context) {
       return saveResponse(res, req, { section });
     } catch (error) {
       next(error);
+    }
+  });
+
+  router.post("/:guildId/events/publish", async (req, res, next) => {
+    try {
+      const { guildId } = req.params;
+      const access = await resolveRequestAdministrator(context, req, guildId);
+      if (!access.allowed) return res.status(403).send("서버 관리자만 이벤트를 게시할 수 있습니다.");
+      const featureAccess = await requireFeature(context, guildId, "events");
+      if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
+      const event = await context.services.events.publish(guildId);
+      return wantsJson(req) ? res.json({ ok: true, message: "이벤트를 게시했습니다.", event }) : res.redirect("/?section=events&saved=1");
+    } catch (error) {
+      return wantsJson(req) ? res.status(400).json({ ok: false, message: error.message || "이벤트 게시에 실패했습니다." }) : res.redirect(`/?section=events&error=${encodeURIComponent(error.message)}`);
     }
   });
 
