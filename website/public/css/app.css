@@ -2576,6 +2576,15 @@ body.dashboard-page { background: var(--ink-deep); }
 .dashboard-page .channel-combobox-option,
 .dashboard-page .channel-combobox-empty {
   opacity: 1;
+  color: #111315 !important;
+  -webkit-text-fill-color: #111315;
+}
+.dashboard-page .channel-combobox-option:hover,
+.dashboard-page .channel-combobox-option:focus-visible,
+.dashboard-page .channel-combobox-option[aria-selected="true"],
+.dashboard-page .channel-combobox-option.is-empty:hover {
+  color: #111315 !important;
+  -webkit-text-fill-color: #111315;
 }
 
 /* Shop vending-machine management */
