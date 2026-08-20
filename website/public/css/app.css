@@ -4720,3 +4720,22 @@ input[type="reset"] {
   top: auto;
   right: auto;
 }
+
+/* Enlarge the single command shortcut in the feature-section header */
+.guide-feature-command-link {
+  max-width: 340px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+.guide-feature-command-link span {
+  font-size: 19px;
+}
+@media (max-width: 720px) {
+  .guide-feature-command-link {
+    max-width: 100%;
+    font-size: 17px;
+  }
+  .guide-feature-command-link span {
+    font-size: 18px;
+  }
+}
