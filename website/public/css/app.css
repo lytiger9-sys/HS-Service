@@ -287,6 +287,10 @@ a {
   letter-spacing: 0.02em;
 }
 
+.sidebar-user > form {
+  width: 100%;
+}
+
 .sidebar-logout {
   display: inline-flex;
   align-items: center;
@@ -299,6 +303,7 @@ a {
   font-size: 0.7rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
+  width: 100%;
   transition: background 0.4s var(--ease), border-color 0.4s var(--ease), letter-spacing 0.4s var(--ease);
 }
 
