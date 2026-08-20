@@ -70,12 +70,18 @@ export function createEventService(context, guildState) {
   async function publish(guildId) {
     const guild = await context.client.guilds.fetch(guildId).catch(() => null);
     if (!guild) throw new Error("서버를 찾을 수 없습니다.");
-    const event = await create(guildId, {});
-    const channel = channelFor(guild, event.channelId) || await guild.channels.fetch(event.channelId).catch(() => null);
+    const settings = await context.services.settings.getSettings(guildId);
+    const channel = channelFor(guild, settings.events?.channelId) || await guild.channels.fetch(settings.events?.channelId).catch(() => null);
     if (!channel?.isTextBased?.()) throw new Error("이벤트 게시 채널을 찾을 수 없습니다.");
-    const message = await channel.send(eventPayload(event));
-    await guildState.patch(guildId, (state) => { state.events[event.id].messageId = message.id; return state.events[event.id]; });
-    return event;
+    const event = await create(guildId, {});
+    try {
+      const message = await channel.send(eventPayload(event));
+      await guildState.patch(guildId, (state) => { state.events[event.id].messageId = message.id; return state.events[event.id]; });
+      return event;
+    } catch (error) {
+      await guildState.patch(guildId, (state) => { delete state.events?.[event.id]; return state.events; }).catch(() => null);
+      throw error;
+    }
   }
 
   async function participate(interaction, eventId) {
@@ -92,15 +98,29 @@ export function createEventService(context, guildState) {
     return { already: false };
   }
 
+  const finishing = new Set();
+
   async function finish(guildId, eventId) {
-    const event = await get(guildId, eventId);
+    const lockKey = `${guildId}:${eventId}`;
+    if (finishing.has(lockKey)) return false;
+    finishing.add(lockKey);
+    try {
+      const event = await get(guildId, eventId);
     if (!event || event.ended || new Date(event.expiresAt) > new Date()) return false;
     const ids = Object.keys(event.participants || {});
-    const shuffled = ids.sort(() => Math.random() - 0.5);
+    const shuffled = [...ids];
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+    }
     const winners = shuffled.slice(0, Math.min(event.winnerCount, shuffled.length));
     await guildState.patch(guildId, (state) => { state.events[eventId].ended = true; state.events[eventId].winners = winners; return state.events[eventId]; });
     const guild = await context.client.guilds.fetch(guildId).catch(() => null);
     const channel = guild && (channelFor(guild, event.channelId) || await guild.channels.fetch(event.channelId).catch(() => null));
+    if (channel?.isTextBased?.() && event.messageId) {
+      const original = await channel.messages.fetch(event.messageId).catch(() => null);
+      if (original) await original.edit(eventPayload({ ...event, ended: true }, true)).catch(() => null);
+    }
     const winnerText = winners.length ? winners.map((id) => `<@${id}>`).join(", ") : "참가자가 없어 당첨자가 없습니다.";
     const resultPayload = eventPayload({ ...event, description: `당첨자: ${winnerText}` }, true);
     if (channel?.isTextBased?.()) await channel.send(resultPayload).catch(() => null);
@@ -111,6 +131,9 @@ export function createEventService(context, guildState) {
       await guildState.patch(guildId, (state) => { state.events[eventId].dmResults ??= {}; state.events[eventId].dmResults[userId] = ok ? "sent" : "failed"; return state.events[eventId]; });
     }
     return true;
+    } finally {
+      finishing.delete(lockKey);
+    }
   }
 
   async function processExpirations() {

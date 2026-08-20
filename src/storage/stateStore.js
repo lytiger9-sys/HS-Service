@@ -50,6 +50,7 @@ function normalizeGuildState(doc) {
       ...defaults.polls,
       ...(data.polls || {})
     },
+    events: data.events && typeof data.events === "object" && !Array.isArray(data.events) ? data.events : {},
     tempChannels: {
       ...defaults.tempChannels,
       ...(data.tempChannels || {})
@@ -128,7 +129,7 @@ function normalizeGuildState(doc) {
   };
 
   const booleanDefaults = [
-    ["welcome", "enabled"], ["polls", "enabled"], ["embed", "enabled"], ["notice", "enabled"],
+    ["welcome", "enabled"], ["polls", "enabled"], ["embed", "enabled"], ["notice", "enabled"], ["events", "enabled"],
     ["honeypot", "enabled"], ["security", "enabled"], ["security", "massMentionEnabled"],
     ["security", "spamEnabled"], ["security", "profanityEnabled"], ["security", "inviteEnabled"],
     ["assignment", "enabled"], ["nickname", "enabled"], ["voice", "enabled"], ["staff", "enabled"],
