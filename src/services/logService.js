@@ -1,3 +1,5 @@
+import { convertLegacyPayload } from "../shared/embeds.js";
+
 async function resolveTextChannel(guild, channelId) {
   if (!channelId) {
     return null;
@@ -17,7 +19,7 @@ async function send(channel, payload) {
     return null;
   }
 
-  return channel.send(payload).catch(() => null);
+  return channel.send(convertLegacyPayload(payload)).catch(() => null);
 }
 
 export function createLogService(context, guildState) {
@@ -65,7 +67,7 @@ export function createLogService(context, guildState) {
     const channel = await resolveTextChannel(guild, channelId);
     if (!channel) return null;
     const message = await channel.messages.fetch(messageId).catch(() => null);
-    return message?.edit(payload).catch(() => null) || null;
+    return message?.edit(convertLegacyPayload(payload)).catch(() => null) || null;
   }
 
   async function sendServerNotice(guildId, payload) {

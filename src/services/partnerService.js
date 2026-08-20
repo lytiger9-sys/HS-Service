@@ -12,7 +12,7 @@ import {
   TextDisplayBuilder,
   WebhookClient
 } from "discord.js";
-import { kstDateKey } from "../shared/time.js";
+import { convertLegacyPayload } from "../shared/embeds.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const STALE_MS = 7 * DAY_MS;
@@ -115,6 +115,13 @@ function approvalComponents(id) {
   )];
 }
 
+function applicationPayload(application, title = "새 파트너 신청", buttons = []) {
+  const payload = convertLegacyPayload({ embeds: [applicationEmbed(application).setTitle(title)] });
+  const container = payload.components?.[0];
+  for (const row of buttons) container?.addActionRowComponents(row);
+  return payload;
+}
+
 export function createPartnerService(context) {
   const state = (guildId) => context.services.guildState.snapshot(guildId) || {};
 
@@ -188,7 +195,7 @@ export function createPartnerService(context) {
       createdAt: nowIso(),
       updatedAt: nowIso()
     };
-    const approvalMessage = await approvalChannel.send({ embeds: [applicationEmbed(application)], components: approvalComponents(id) });
+    const approvalMessage = await approvalChannel.send(applicationPayload(application, "새 파트너 신청", approvalComponents(id)));
     application.approvalMessageId = approvalMessage.id;
     await patch(interaction.guildId, (draft) => {
       draft.partners ??= [];
@@ -236,7 +243,7 @@ export function createPartnerService(context) {
     });
     const approvalChannel = await guild.channels.fetch(settings.approvalChannelId).catch(() => null);
     const approvalMessage = application.approvalMessageId ? await approvalChannel?.messages.fetch(application.approvalMessageId).catch(() => null) : null;
-    await approvalMessage?.edit({ embeds: [applicationEmbed(updated).setTitle("파트너 신청 승인")], components: [] }).catch(() => null);
+    await approvalMessage?.edit(applicationPayload(updated, "파트너 신청 승인")).catch(() => null);
     const user = await context.client.users.fetch(application.requesterId).catch(() => null);
     await user?.send(`파트너 신청이 승인되었습니다. 홍보 메시지용 웹훅입니다:\n${webhook.url}`).catch(() => null);
     return updated;
@@ -258,7 +265,7 @@ export function createPartnerService(context) {
       const guild = await context.client.guilds.fetch(guildId).catch(() => null);
       const approvalChannel = await guild?.channels.fetch(state(guildId).settings?.partner?.approvalChannelId).catch(() => null);
       const approvalMessage = rejected.approvalMessageId ? await approvalChannel?.messages.fetch(rejected.approvalMessageId).catch(() => null) : null;
-      await approvalMessage?.edit({ embeds: [applicationEmbed(rejected).setTitle("파트너 신청 거절")], components: [] }).catch(() => null);
+      await approvalMessage?.edit(applicationPayload(rejected, "파트너 신청 거절")).catch(() => null);
       const user = await context.client.users.fetch(rejected.requesterId).catch(() => null);
       await user?.send("파트너 신청이 거절되었습니다.").catch(() => null);
     }

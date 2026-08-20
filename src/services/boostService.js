@@ -1,4 +1,4 @@
-import { buildBaseEmbed, palette } from "../shared/embeds.js";
+import { buildBaseEmbed, convertLegacyPayload, palette } from "../shared/embeds.js";
 
 export function createBoostService(context, guildState) {
   async function getSettings(guildId) {
@@ -33,7 +33,7 @@ export function createBoostService(context, guildState) {
       footer: `${newMember.guild.name} · 서버 부스트 로그`,
       timestamp: Date.now()
     });
-    await channel.send({ embeds: [embed] });
+    await channel.send(convertLegacyPayload({ embeds: [embed] }));
     return true;
   }
 

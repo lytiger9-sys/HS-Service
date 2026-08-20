@@ -86,6 +86,35 @@ export function createBaseEmbed({
 
 export { createBaseEmbed as buildBaseEmbed };
 
+export function convertLegacyPayload(payload, footerText = "Powered by HS-Service") {
+  if (!payload || payload.flags === MessageFlags.IsComponentsV2 || !Array.isArray(payload.embeds) || !payload.embeds.length) return payload;
+  const container = new ContainerBuilder();
+  payload.embeds.forEach((raw, index) => {
+    const embed = typeof raw?.toJSON === "function" ? raw.toJSON() : raw;
+    const title = embed.title ? `## ${embed.title}` : "";
+    const author = embed.author?.name ? `**${embed.author.name}**` : "";
+    const body = [title, author, embed.description || ""].filter(Boolean).join("\n\n");
+    if (body) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+    if (embed.fields?.length) {
+      if (body || index > 0) container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(embed.fields.map((field) => `**${field.name}**\n${field.value}`).join("\n\n")));
+    }
+    const media = [embed.thumbnail?.url, embed.image?.url].filter(Boolean);
+    if (media.length) {
+      container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(media.map((url) => `[이미지 보기](${url})`).join("\n")));
+    }
+    if (embed.timestamp) {
+      container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`<t:${Math.floor(new Date(embed.timestamp).getTime() / 1000)}:F>`));
+    }
+  });
+  container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(footerText));
+  const { embeds, ...rest } = payload;
+  return { ...rest, flags: MessageFlags.IsComponentsV2, components: [container] };
+}
+
 export function buildWelcomeEmbeds(settings, member, guild) {
   const context = {
     user: member.user,

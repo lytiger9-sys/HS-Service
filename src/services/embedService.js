@@ -173,7 +173,7 @@ export function createEmbedService(context) {
 
     function buildPayload(guild, settings) {
     const normalized = normalizeSettings({ embed: settings });
-    return normalized.mode === "legacy" ? legacyPayload(guild, normalized) : componentsPayload(normalized, guild);
+    return componentsPayload(normalized, guild);
   }
 
   async function sendConfigured(guild, channelId, settingsOverride = null) {
