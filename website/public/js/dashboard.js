@@ -484,12 +484,16 @@ function setupChannelComboboxes() {
     updateLabel();
     render();
   });
-  document.addEventListener("click", (event) => {
-    if (event.target.closest(".channel-combobox")) return;
-    closeAll(null);
-    document.querySelectorAll(".channel-combobox-input").forEach((input) => input.setAttribute("aria-expanded", "false"));
-  }, { passive: true });
+  if (!document.body.dataset.channelComboboxDocumentReady) {
+    document.addEventListener("click", (event) => {
+      if (event.target.closest(".channel-combobox")) return;
+      closeAll(null);
+      document.querySelectorAll(".channel-combobox-input").forEach((input) => input.setAttribute("aria-expanded", "false"));
+    }, { passive: true });
+    document.body.dataset.channelComboboxDocumentReady = "true";
+  }
 }
+window.setupChannelComboboxes = setupChannelComboboxes;
 function setupShopPanel() {
   const list = document.querySelector("[data-shop-product-list]");
   const add = document.querySelector("[data-shop-add-product]");

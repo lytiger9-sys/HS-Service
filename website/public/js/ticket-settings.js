@@ -208,6 +208,7 @@ function buildTicketPreview() {
       if (card) {
         const list = form.querySelector("[data-ticket-category-list]");
         list.appendChild(card);
+        window.setupChannelComboboxes?.();
         refreshCategoryIndexes();
       }
       return;
