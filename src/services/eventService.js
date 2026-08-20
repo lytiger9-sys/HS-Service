@@ -20,8 +20,8 @@ function eventEmbed(event, ended = false) {
   return new EmbedBuilder()
     .setColor(ended ? 0x8f7a55 : 0x2d6a8f)
     .setTitle(event.name)
-    .setDescription([event.description ? event.description : `상품: ${event.prize}`, ...lines].join("\n"))
-    .setFooter({ text: "참가 버튼을 눌러 이벤트에 참여하세요." });
+    .setDescription([event.description || "", `상품: ${event.prize}`, ...lines, "", "────────────"].filter(Boolean).join("\n"))
+    .setFooter({ text: "Powered by HS-Service" });
 }
 
 function eventComponents(event, disabled = false) {
@@ -55,7 +55,7 @@ export function createEventService(context, guildState) {
     const hours = durationHours(payload.durationHours ?? settings.events.durationHours);
     const event = {
       id: randomUUID(), guildId, channelId: settings.events.channelId, messageId: "",
-      name: name.slice(0, 256), prize: prize.slice(0, 1000), winnerCount: Math.max(1, Math.min(100, Number(payload.winnerCount ?? settings.events.winnerCount) || 1)),
+      name: name.slice(0, 256), description: String(payload.description || settings.events.description || "").trim().slice(0, 4000), prize: prize.slice(0, 1000), winnerCount: Math.max(1, Math.min(100, Number(payload.winnerCount ?? settings.events.winnerCount) || 1)),
       durationHours: hours, expiresAt: new Date(Date.now() + hours * 3600000).toISOString(),
       participants: {}, winners: [], ended: false, dmResults: {}, createdAt: new Date().toISOString(), createdBy: payload.createdBy || ""
     };

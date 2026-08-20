@@ -121,6 +121,7 @@ export function createDefaultGuildSettings() {
       enabled: true,
       channelId: "",
       name: "서버 이벤트",
+      description: "이벤트에 참여하려면 아래 버튼을 눌러주세요.",
       prize: "",
       winnerCount: 1,
       durationHours: 24

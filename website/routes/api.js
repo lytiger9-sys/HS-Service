@@ -242,6 +242,7 @@ function sectionPayload(section, body) {
         enabled: readOptionalBoolean(body.eventsEnabled),
         channelId: readDiscordId(body.eventsChannelId),
         name: readText(body.eventsName, "서버 이벤트", 256),
+        description: readText(body.eventsDescription, "", 4000),
         prize: readText(body.eventsPrize, "", 1000),
         winnerCount: readNumber(body.eventsWinnerCount, 1, 1, 100),
         durationHours: readNumber(body.eventsDurationHours, 24, 1, 720)
