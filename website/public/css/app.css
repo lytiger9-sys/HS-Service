@@ -4713,3 +4713,10 @@ input[type="reset"] {
     text-align: left;
   }
 }
+
+/* The command shortcut now exists only in the feature-section header position */
+.guide-feature-command-link {
+  position: static;
+  top: auto;
+  right: auto;
+}
