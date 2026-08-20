@@ -1,7 +1,7 @@
 <%- include('partials/head', { title: `${botName} Dashboard` }) %>
 <body class="dashboard-page">
   <div class="app-shell">
-    <%- include('partials/sidebar', { botName, guild, sections, activeSection, currentUser, licenseSession }) %>
+    <%- include('partials/sidebar', { botName, guild, sections, activeSection, currentUser, licenseSession, managedGuilds }) %>
 
     <main class="content">
       <% const panelClass = (panel) => `dashboard-panel${activeSection === panel ? '' : ' is-hidden'}`; %>

@@ -6,7 +6,7 @@
   </div>
 
   <% if (currentUser) { %>
-    <%- include('sidebar-user', { currentUser }) %>
+    <%- include('sidebar-user', { currentUser, managedGuilds, currentGuildId: guild.id }) %>
   <% } else if (licenseSession) { %>
     <div class="sidebar-user">
       <div class="sidebar-user-copy license-session-user">

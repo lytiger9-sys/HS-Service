@@ -243,6 +243,7 @@ export function createIndexRouter(context) {
           const dashboardLocals = {
             ...viewModel,
             currentUser: req.user,
+            managedGuilds: await getManagedGuilds(req, context),
             activeSection,
             saved: req.query.saved || "",
             issuedBannerKey: req.query.bannerKey || "",
