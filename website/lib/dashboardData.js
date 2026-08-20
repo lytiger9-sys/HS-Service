@@ -91,7 +91,7 @@ function normalizeStaffSettings(settings = {}) {
   };
 }
 
-export async function buildDashboardViewModel(context, guild, planId = "enterprise") {
+export async function buildDashboardViewModel(context, guild, planId = "enterprise", licenseSession = false) {
   const [overview, settings, notes, polls, tempChannels, stalePartners, shop, events, allLicenses] = await Promise.all([
     context.services.serverInfo.getDashboardSnapshot(guild),
     context.services.settings.getSettings(guild.id),
@@ -180,11 +180,23 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
 
   const groupedChannels = groupChannels(guild);
   const roles = getBotManagedRoles(guild).map(roleOption);
+  const serviceLicenses = allLicenses
+    .filter((license) => license.kind === "service" && String(license.assignedGuildId || "") === String(guild.id))
+    .sort((left, right) => new Date(right.expiresAt || 0).getTime() - new Date(left.expiresAt || 0).getTime());
+  const licenseStatus = {
+    licenses: serviceLicenses,
+    activeCount: serviceLicenses.filter((license) => license.status === "active").length,
+    latestExpiresAt: serviceLicenses[0]?.expiresAt || null,
+    latestPlan: serviceLicenses[0]?.plan || planId
+  };
 
   return {
     botName: context.config.botName,
     guild,
-    sections: buildSections().filter((section) => planHasFeature(planId, section.id)),
+    sections: [
+      ...buildSections().filter((section) => planHasFeature(planId, section.id)),
+      ...(licenseSession ? [{ id: "license", label: "라이선스 현황", description: "연결 상태 및 만료일" }] : [])
+    ],
     activeSection: "overview",
     plan: getPlanDefinition(planId),
     planId,
@@ -198,6 +210,8 @@ export async function buildDashboardViewModel(context, guild, planId = "enterpri
     tempChannels,
     stalePartners,
     events,
+    licenseSession,
+    licenseStatus,
     bannerLicenses: allLicenses.filter((license) => license.kind === "banner" && String(license.issuerGuildId || "") === String(guild.id)),
     shop: normalizedSettings.shop,
     staffMembers,

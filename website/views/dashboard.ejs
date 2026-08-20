@@ -385,6 +385,9 @@
       <%- include('partials/nickname-panel', { guild, roles, settings, panelClass }) %>
       <%- include('partials/shop-panel', { guild, channels, shop, panelClass }) %>
       <%- include('partials/partner-panel', { guild, channels, settings, stalePartners, bannerLicenses, panelClass, formatDate, issuedBannerKey, bannerError }) %>
+      <% if (licenseSession) { %>
+        <%- include('partials/license-panel', { guild, plan, licenseStatus, panelClass, formatDate }) %>
+      <% } %>
 
     </main>
   </div>
