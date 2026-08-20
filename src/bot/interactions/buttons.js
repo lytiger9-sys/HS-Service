@@ -41,7 +41,7 @@ function buildPartnerApplicationModal() {
     ["partner-member-count", "파트너 현 인원", TextInputStyle.Short],
     ["partner-recovery-key", "복구키 사용 여부", TextInputStyle.Short],
     ["partner-server-link", "서버 링크", TextInputStyle.Short],
-    ["partner-promo-webhook", "우리 서버 홍보 웹훅", TextInputStyle.Paragraph]
+    ["partner-promo-webhook", "이 서버 홍보용 채널 웹훅", TextInputStyle.Paragraph]
   ];
   modal.addComponents(...fields.map(([id, label, style]) => new ActionRowBuilder().addComponents(
     new TextInputBuilder().setCustomId(id).setLabel(label).setStyle(style).setRequired(true).setMaxLength(500)

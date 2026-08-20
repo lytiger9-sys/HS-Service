@@ -46,7 +46,7 @@ function colorNumber(value, fallback = 0x3a7da8) {
 function conditionComponents(settings) {
   const container = new ContainerBuilder()
     .setAccentColor(colorNumber(settings.embedColor))
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${settings.embedTitle || "파트너 모집"}\n${settings.embedDescription || "파트너 조건을 확인한 후 신청해 주세요."}`))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${settings.embedTitle || "파트너 모집"}\n${settings.embedDescription || "파트너 조건을 입력한 후 신청해 주세요."}`))
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(new TextDisplayBuilder().setContent("파트너 조건을 확인했다면 아래 버튼을 눌러 신청서를 제출하세요."))
     .addActionRowComponents(new ActionRowBuilder().addComponents(

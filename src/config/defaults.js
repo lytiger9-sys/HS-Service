@@ -137,7 +137,7 @@ export function createDefaultGuildSettings() {
       namePrefix: "파트너-",
       nameSuffix: "",
       embedTitle: "파트너 모집",
-      embedDescription: "파트너 조건을 확인한 후 아래 버튼으로 신청해 주세요.",
+      embedDescription: "파트너 조건을 입력한 후 아래 버튼으로 신청해 주세요.",
       embedColor: "#3a7da8",
       buttonLabel: "파트너 신청",
       banner: {
