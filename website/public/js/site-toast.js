@@ -29,7 +29,7 @@
     if (form.dataset.toastForm === "true") return true;
     if (!/^https?:\/\//i.test(action) && !action.startsWith("/")) return false;
     if (!action.includes("/guild/") && !action.includes("/license/")) return false;
-    return !/\/license\/(login|logout)(?:[/?#]|$)/.test(action);
+    return !/\/license\/(login|logout|switch)(?:[/?#]|$)/.test(action);
   }
 
   async function refreshPartial(url, targets = []) {
