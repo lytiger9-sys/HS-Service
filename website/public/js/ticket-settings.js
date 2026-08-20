@@ -92,6 +92,25 @@ function buildTicketPreview() {
     }
   };
 
+  const syncSerializedCategories = () => {
+    const serialized = form.querySelector("[data-ticket-categories-json]");
+    if (!serialized) return;
+
+    const categories = [...form.querySelectorAll("[data-ticket-category]")].map((card) => ({
+      id: card.querySelector("[data-ticket-category-id]")?.value?.trim() || "",
+      label: card.querySelector("[data-ticket-category-label]")?.value?.trim() || "",
+      serverCategoryId: card.querySelector("select")?.value || "",
+      questions: [...card.querySelectorAll("[data-ticket-question]")].map((row) => ({
+        id: row.querySelector("[data-ticket-question-id]")?.value?.trim() || "",
+        label: row.querySelector("[data-ticket-question-label]")?.value?.trim() || "",
+        required: Boolean(row.querySelector("[data-ticket-question-required]")?.checked),
+        style: "paragraph"
+      }))
+    }));
+
+    serialized.value = JSON.stringify(categories);
+  };
+
   const refreshCategoryIndexes = () => {
     const categories = [...form.querySelectorAll("[data-ticket-category]")];
 
@@ -130,6 +149,7 @@ function buildTicketPreview() {
       });
     });
 
+    syncSerializedCategories();
     render();
   };
 

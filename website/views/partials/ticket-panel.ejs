@@ -20,6 +20,7 @@
 
     <form class="settings-form ticket-form" id="ticket-settings-form" method="post" action="/guild/<%= guild.id %>/settings/ticket" data-ticket-form>
       <input type="hidden" name="ticketBoardMessageId" value="<%= ticketBoard.messageId || '' %>" />
+      <input type="hidden" name="ticketCategoriesJson" value="" data-ticket-categories-json />
 
       <div class="form-grid">
         <label class="field">

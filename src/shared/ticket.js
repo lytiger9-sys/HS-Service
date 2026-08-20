@@ -116,8 +116,18 @@ export function normalizeTicketSettings(settings = {}) {
 }
 
 export function parseTicketSettingsBody(body = {}) {
+  const serializedCategories = body.ticketCategoriesJson;
   const categorySource = body.ticketCategories;
   const categories = (() => {
+    if (typeof serializedCategories === "string" && serializedCategories.trim()) {
+      try {
+        const parsed = JSON.parse(serializedCategories);
+        return toEntries(parsed);
+      } catch {
+        // Fall back to the nested form fields for older clients.
+      }
+    }
+
     if (typeof categorySource === "string" && categorySource.trim()) {
       try {
         const parsed = JSON.parse(categorySource);
