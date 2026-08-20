@@ -271,8 +271,7 @@ export function createIndexRouter(context) {
       if (!guild) {
         return renderActivation(res, context, "봇이 해당 서버에 참여하고 있지 않습니다.");
       }
-      const extendOnReconnect = ["on", "true", "1", "yes"].includes(String(req.body.extendOnReconnect || "").toLowerCase());
-      const license = await context.services.licenses.activate(licenseKey, guildId, { extendOnReconnect });
+      const license = await context.services.licenses.activate(licenseKey, guildId);
       if (!license) {
         return renderActivation(res, context, "라이선스 키가 유효하지 않거나 이미 사용·폐기·만료되었습니다.");
       }

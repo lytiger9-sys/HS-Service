@@ -18,7 +18,6 @@ const licenseSchema = new Schema(
     recipientUserId: { type: String, default: "" },
     activatedAt: { type: Date, default: null },
     expiresAt: { type: Date, default: null },
-    reconnectExtendedAt: { type: Date, default: null },
     revokedAt: { type: Date, default: null },
     workStopped: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },

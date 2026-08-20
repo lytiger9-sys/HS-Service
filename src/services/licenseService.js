@@ -148,29 +148,29 @@ export function createLicenseService() {
       return license.status === "active" ? license.toObject() : null;
     },
 
-    async activate(key, guildId, { extendOnReconnect = false } = {}) {
+    async activate(key, guildId) {
       const license = await this.findByKey(key);
       if (!license || license.kind !== "service") return null;
       const requestedGuildId = String(guildId);
       if (license.status === "active") {
-        // A license is consumed once, but the same server may reconnect with it.
+        // The same key can reconnect to its assigned server without changing its term.
         if (String(license.assignedGuildId || "") !== requestedGuildId) return null;
-        if (extendOnReconnect && !license.reconnectExtendedAt) {
-          const now = new Date();
-          const currentExpiry = license.expiresAt && license.expiresAt > now ? license.expiresAt : now;
-          license.expiresAt = new Date(currentExpiry.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
-          license.reconnectExtendedAt = now;
-          await license.save();
-        }
         return license.toObject();
       }
       if (license.status !== "available") return null;
       const now = new Date();
+      const existing = await LicenseModel.findOne({
+        assignedGuildId: requestedGuildId,
+        kind: "service",
+        status: "active",
+        expiresAt: { $ne: null }
+      }).sort({ expiresAt: -1 });
+      const existingExpiry = existing?.expiresAt && existing.expiresAt > now ? existing.expiresAt : now;
       license.status = "active";
       license.assignedGuildId = String(guildId);
       // 최초 웹 등록 시점에만 타이머를 시작하며, 재조회·재로그인으로 연장하지 않습니다.
       license.activatedAt = license.activatedAt || now;
-      license.expiresAt = license.expiresAt || new Date(license.activatedAt.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
+      license.expiresAt = new Date(existingExpiry.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
       await license.save();
       return license.toObject();
     },
