@@ -2346,11 +2346,19 @@ body.dashboard-page { background: var(--ink-deep); }
   border-radius: 999px;
   background: transparent;
   color: var(--ink);
-  font: inherit;
-  font-size: 1.15rem;
-  line-height: 1;
   cursor: pointer;
-  transition: transform .2s ease, background-color .2s ease, border-color .2s ease;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+.dashboard-page .ticket-category-chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .2s ease;
+}
+.dashboard-page .ticket-category-collapse.is-collapsed .ticket-category-chevron {
+  transform: translateY(2px) rotate(225deg);
 }
 .dashboard-page .ticket-category-collapse:hover {
   background: rgba(17,19,22,.08);
@@ -2358,9 +2366,6 @@ body.dashboard-page { background: var(--ink-deep); }
 }
 .dashboard-page .ticket-category-card.is-collapsed > :not(.ticket-category-head) {
   display: none;
-}
-.dashboard-page .ticket-category-card.is-collapsed .ticket-category-collapse {
-  transform: rotate(180deg);
 }
 .dashboard-page .ticket-category-row {
   display: grid;
@@ -5067,6 +5072,9 @@ html[data-theme="dark"] .dashboard-page .ticket-category-card .ticket-category-h
 html[data-theme="dark"] .dashboard-page .ticket-category-collapse {
   color: #FFFFFF;
   border-color: rgba(243,240,232,.3);
+}
+html[data-theme="dark"] .dashboard-page .ticket-category-chevron {
+  border-color: currentColor;
 }
 html[data-theme="dark"] .dashboard-page .ticket-category-collapse:hover {
   background: rgba(255,255,255,.12);

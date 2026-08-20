@@ -198,7 +198,7 @@ function buildTicketPreview() {
       const collapsed = card?.classList.toggle("is-collapsed") || false;
       toggleCategoryButton.setAttribute("aria-expanded", String(!collapsed));
       toggleCategoryButton.setAttribute("aria-label", collapsed ? "카테고리 펼치기" : "카테고리 접기");
-      toggleCategoryButton.textContent = collapsed ? "⌄" : "⌃";
+      toggleCategoryButton.classList.toggle("is-collapsed", collapsed);
       return;
     }
 
