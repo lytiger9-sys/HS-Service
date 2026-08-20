@@ -4897,3 +4897,17 @@ html[data-theme="dark"] .muted { color: rgba(243,240,232,.64); }
 .server-license-modal-actions .primary, .server-license-modal-actions .ghost { width: auto; }
 html[data-theme="dark"] .server-license-modal p { color: rgba(243,240,232,.62); }
 html[data-theme="dark"] .server-license-modal { border-color: rgba(243,240,232,.18); }
+
+.activation-discord-login {
+  margin-top: 22px;
+  min-height: 48px;
+  background: #5865F2;
+  border-color: #5865F2;
+  color: #fff;
+  font-size: .92rem;
+}
+.activation-discord-login:hover {
+  background: #4752C4;
+  border-color: #4752C4;
+  color: #fff;
+}
