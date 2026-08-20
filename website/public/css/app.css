@@ -5068,3 +5068,12 @@ html[data-theme="dark"] .dashboard-page .sidebar-user-copy strong,
 html[data-theme="dark"] .dashboard-page .sidebar-user-copy > span:not(.sidebar-user-kicker) {
   color: #FFFFFF !important;
 }
+
+
+html[data-theme="dark"] .dashboard-page .sidebar-tab:hover,
+html[data-theme="dark"] .dashboard-page .sidebar-tab:hover .nav-label,
+html[data-theme="dark"] .dashboard-page .sidebar-tab:hover .nav-description,
+html[data-theme="dark"] .dashboard-page .sidebar-tab:hover .nav-index,
+html[data-theme="dark"] .dashboard-page .sidebar-tab:hover .nav-arrow {
+  color: #FFFFFF !important;
+}
