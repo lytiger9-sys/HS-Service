@@ -5020,3 +5020,31 @@ html[data-theme="dark"] .dashboard-page .hero-grid .metric strong,
 html[data-theme="dark"] .dashboard-page .hero-grid .metric strong em {
   color: #111315 !important;
 }
+
+
+/* Dark-mode ticket category hierarchy. */
+html[data-theme="dark"] .dashboard-page .ticket-category-card {
+  background: #B8BBBD;
+  border-color: rgba(243,240,232,.28);
+  color: #FFFFFF;
+}
+html[data-theme="dark"] .dashboard-page .ticket-category-card .ticket-category-label,
+html[data-theme="dark"] .dashboard-page .ticket-category-card .field > span,
+html[data-theme="dark"] .dashboard-page .ticket-category-card h4 {
+  color: #FFFFFF !important;
+}
+html[data-theme="dark"] .dashboard-page .ticket-category-card .ticket-category-head {
+  border-bottom-color: rgba(17,19,22,.18);
+}
+html[data-theme="dark"] .dashboard-page .ticket-question-card {
+  background: #292D30;
+  border-color: rgba(243,240,232,.2);
+  color: #F3F0E8;
+}
+html[data-theme="dark"] .dashboard-page .ticket-question-card input,
+html[data-theme="dark"] .dashboard-page .ticket-question-card textarea,
+html[data-theme="dark"] .dashboard-page .ticket-question-card select {
+  background: #343A3D;
+  border-color: rgba(243,240,232,.22);
+  color: #F3F0E8;
+}
