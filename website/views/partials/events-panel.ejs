@@ -30,9 +30,13 @@
           <span>이벤트 임베드 내용</span>
           <textarea name="eventsDescription" rows="5" maxlength="4000" placeholder="이벤트 참여 방법과 안내 내용을 입력하세요."><%= settings.events?.description || '' %></textarea>
         </label>
+        <label class="field">
+          <span>상품 이름</span>
+          <input type="text" name="eventsPrizeName" maxlength="256" value="<%= settings.events?.prizeName || '' %>" placeholder="예: 10,000 캐시" required />
+        </label>
         <label class="field full">
-          <span>이벤트 상품</span>
-          <input type="text" name="eventsPrize" maxlength="1000" value="<%= settings.events?.prize || '' %>" placeholder="예: 10,000 캐시 또는 특별 역할" required />
+          <span>상품 내용(DM 전송)</span>
+          <textarea name="eventsPrizeContent" rows="4" maxlength="4000" placeholder="당첨자에게만 DM으로 보낼 상품 내용입니다." required><%= settings.events?.prizeContent || '' %></textarea>
         </label>
         <label class="field">
           <span>추첨 인원</span>
