@@ -5199,3 +5199,22 @@ html[data-theme="dark"] .site-toast[data-type="error"] {
   color: #FFF1F1 !important;
   border-color: rgba(240,150,158,.58);
 }
+
+
+/* Keep primary button labels readable throughout dark-mode animation states. */
+html[data-theme="dark"] .primary,
+html[data-theme="dark"] .primary > span,
+html[data-theme="dark"] .primary:hover,
+html[data-theme="dark"] .primary:hover > span,
+html[data-theme="dark"] .primary:focus,
+html[data-theme="dark"] .primary:focus-visible,
+html[data-theme="dark"] .primary:focus-visible > span,
+html[data-theme="dark"] .primary:active,
+html[data-theme="dark"] .primary:active > span {
+  background: #F8F6EF;
+  color: #111315 !important;
+}
+
+html[data-theme="dark"] .primary::before {
+  background: #FFFDF7;
+}
