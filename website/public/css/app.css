@@ -4788,3 +4788,85 @@ input[type="reset"] {
     font-size: 18px;
   }
 }
+
+
+/* Global theme switcher shared by every website route. */
+.site-theme-toggle {
+  position: fixed;
+  z-index: 1000;
+  top: 20px;
+  right: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid rgba(13,13,13,.2);
+  border-radius: 999px;
+  background: rgba(248,249,250,.82);
+  color: #0D0D0D;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 22px rgba(13,13,13,.08);
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .16em;
+  cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
+}
+.site-theme-toggle:hover { transform: translateY(-1px); border-color: var(--accent-warm); }
+.site-theme-toggle:active { transform: scale(.97); }
+.site-theme-toggle span:first-child { color: var(--accent-warm); font-size: .9rem; line-height: 1; }
+.dashboard-page .site-theme-toggle { right: 28px; }
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #F3F0E8;
+  --ink-soft: #E7E2D8;
+  --ink-mid: #D7D1C6;
+  --paper: #1B1E20;
+  --paper-soft: #24282A;
+  --paper-warm: #2B2F31;
+  --hairline: rgba(243,240,232,.18);
+  --hairline-soft: rgba(243,240,232,.1);
+  --control-border: rgba(243,240,232,.24);
+  --control-border-strong: rgba(243,240,232,.42);
+  --accent: #F3F0E8;
+  --accent-tint: rgba(243,240,232,.08);
+  --accent-warm: #C6A875;
+}
+html[data-theme="dark"] body { background: #111315; color: #F3F0E8; }
+html[data-theme="dark"] .site-theme-toggle { border-color: rgba(243,240,232,.22); background: rgba(27,30,32,.86); color: #F3F0E8; }
+html[data-theme="dark"] .dashboard-page,
+html[data-theme="dark"] .dashboard-page .content { background: #111315; color: #F3F0E8; }
+html[data-theme="dark"] .dashboard-page .card,
+html[data-theme="dark"] .dashboard-page .metric { background: #1B1E20; border-color: rgba(243,240,232,.14); }
+html[data-theme="dark"] .dashboard-page .metric:hover { background: #24282A; }
+html[data-theme="dark"] .dashboard-page .field input,
+html[data-theme="dark"] .dashboard-page .field textarea,
+html[data-theme="dark"] .dashboard-page .field select { background: #24282A; color: #F3F0E8; border-color: rgba(243,240,232,.22); }
+html[data-theme="dark"] .dashboard-page .field input:focus,
+html[data-theme="dark"] .dashboard-page .field textarea:focus,
+html[data-theme="dark"] .dashboard-page .field select:focus { background: #2B2F31; border-color: #C6A875; }
+html[data-theme="dark"] .license-auth-page { background: #111315; color: #F3F0E8; }
+html[data-theme="dark"] .license-auth-card { background: #1B1E20; border-color: rgba(243,240,232,.16); color: #F3F0E8; }
+html[data-theme="dark"] .license-auth-card input { background: #24282A; color: #F3F0E8; border-color: rgba(243,240,232,.22); }
+html[data-theme="dark"] .license-auth-card input::placeholder { color: rgba(243,240,232,.45); }
+html[data-theme="dark"] .managed-guild-card,
+html[data-theme="dark"] .activation-profile { background: #24282A; border-color: rgba(243,240,232,.16); }
+html[data-theme="dark"] .managed-guild-card:hover,
+html[data-theme="dark"] .managed-guild-card.is-selected { background: #2B2F31; border-color: #C6A875; }
+html[data-theme="dark"] .guide-page,
+html[data-theme="dark"] .commands-page,
+html[data-theme="dark"] .guide-plan-page { background: #111315; color: #F3F0E8; }
+html[data-theme="dark"] .guide-page .card,
+html[data-theme="dark"] .commands-page .card,
+html[data-theme="dark"] .guide-plan-page .card { background: #1B1E20; border-color: rgba(243,240,232,.14); }
+html[data-theme="dark"] .muted { color: rgba(243,240,232,.64); }
+
+@media (max-width: 720px) {
+  .site-theme-toggle { top: 12px; right: 14px; min-height: 34px; padding: 7px 10px; }
+  .dashboard-page .site-theme-toggle { right: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-theme-toggle { transition: none; }
+}
