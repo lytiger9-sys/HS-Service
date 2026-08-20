@@ -4485,3 +4485,35 @@ input[type="reset"] {
 .guide-page.guide-home-page {
   background: var(--guide-bg) !important;
 }
+
+/* Commands page home link matches the compact Guide home control */
+.guide-commands-page .guide-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  color: #17191a;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.guide-commands-page .guide-home-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+}
+.guide-commands-page .guide-home-icon svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
