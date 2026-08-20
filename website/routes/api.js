@@ -1,5 +1,5 @@
 import express from "express";
-import { getAccessMessage, resolveDashboardAccess, resolveGuildAdministrator } from "../lib/dashboardAccess.js";
+import { getAccessMessage, resolveRequestAccess, resolveRequestAdministrator } from "../lib/dashboardAccess.js";
 import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
 import { canUseFeature, featureDeniedMessage, planAllowsFeatureToggle, planHasFeature } from "../../src/shared/planAccess.js";
 
@@ -273,7 +273,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/settings/:section", async (req, res, next) => {
     try {
       const { guildId, section } = req.params;
-      const access = await resolveDashboardAccess(context, req.user?.id);
+      const access = await resolveRequestAccess(context, req);
       if (!access.allowed) {
         return res.status(access.status).send(getAccessMessage(access));
       }
@@ -321,7 +321,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/embed/send", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveDashboardAccess(context, req.user?.id);
+      const access = await resolveRequestAccess(context, req);
       if (!access.allowed || guildId !== access.guild.id) {
         return res.status(403).json({ ok: false, message: "접근할 수 없는 서버입니다." });
       }
@@ -343,7 +343,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/shop/products", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      const access = await resolveRequestAdministrator(context, req, guildId);
       if (!access.allowed) return res.status(403).send("서버 관리자만 상품을 관리할 수 있습니다.");
       const featureAccess = await requireFeature(context, guildId, "shop");
       if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
@@ -362,7 +362,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/shop/publish", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      const access = await resolveRequestAdministrator(context, req, guildId);
       if (!access.allowed) return res.status(403).send("서버 관리자만 상점을 게시할 수 있습니다.");
       const featureAccess = await requireFeature(context, guildId, "shop");
       if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
@@ -374,7 +374,7 @@ export function createApiRouter(context) {
 
   async function handlePollAdminAction(req, res, action) {
     const { guildId, pollId } = req.params;
-    const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+    const access = await resolveRequestAdministrator(context, req, guildId);
     if (!access.allowed) return res.status(403).send("서버 관리자만 투표를 관리할 수 있습니다.");
     const featureAccess = await requireFeature(context, guildId, "polls");
     if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
@@ -399,7 +399,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/reset", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveDashboardAccess(context, req.user?.id);
+      const access = await resolveRequestAccess(context, req);
       if (!access.allowed) {
         return res.status(access.status).send(getAccessMessage(access));
       }
@@ -423,7 +423,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/partner/:partnerId/delete", async (req, res, next) => {
     try {
       const { guildId, partnerId } = req.params;
-      const access = await resolveDashboardAccess(context, req.user?.id);
+      const access = await resolveRequestAccess(context, req);
       if (!access.allowed || guildId !== access.guild.id) return res.status(403).send("접근할 수 없는 서버입니다.");
       const featureAccess = await requireFeature(context, guildId, "partner");
       if (!featureAccess.allowed) return res.status(403).send(featureAccess.message);
@@ -437,7 +437,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/partner/banner-license", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      const access = await resolveRequestAdministrator(context, req, guildId);
       if (!access.allowed) return res.status(403).send("발급 서버의 관리자만 배너 라이선스를 발급할 수 있습니다.");
       const serviceLicense = await context.services.licenses.getActiveByGuild(guildId);
       const isManagementGuild = String(guildId) === String(context.config.allowedGuildId);
@@ -462,7 +462,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/partner/banner", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveGuildAdministrator(context, guildId, req.user?.id);
+      const access = await resolveRequestAdministrator(context, req, guildId);
       if (!access.allowed) return res.status(403).send("수령 서버의 관리자만 배너를 등록할 수 있습니다.");
       await context.services.partners.createBanner(guildId, {
         licenseKey: String(req.body.bannerLicenseKey || "").trim(),
@@ -480,7 +480,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/ticket/publish", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveDashboardAccess(context, req.user?.id);
+      const access = await resolveRequestAccess(context, req);
       if (!access.allowed) {
         return res.status(access.status).send(getAccessMessage(access));
       }
@@ -512,7 +512,7 @@ export function createApiRouter(context) {
   router.post("/:guildId/polls", async (req, res, next) => {
     try {
       const { guildId } = req.params;
-      const access = await resolveDashboardAccess(context, req.user?.id);
+      const access = await resolveRequestAccess(context, req);
       if (!access.allowed) {
         return res.status(access.status).send(getAccessMessage(access));
       }

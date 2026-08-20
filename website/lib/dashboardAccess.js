@@ -92,3 +92,27 @@ export async function resolveGuildAdministrator(context, guildId, userId) {
   const allowed = member.permissions.has(PermissionFlagsBits.Administrator);
   return { guild, member, allowed, status: allowed ? 200 : 403, reason: allowed ? "admin" : "not_admin" };
 }
+
+/**
+ * The activation form uses the server ID and license key as the access credential.
+ * When no Discord OAuth user is present, an active license session is therefore
+ * allowed to use the same existing dashboard/API surface for its assigned guild.
+ */
+export async function resolveRequestAccess(context, req, guildId = req.session?.activeGuildId || context.config.allowedGuildId) {
+  const requestedGuildId = String(guildId || "");
+  const sessionGuildId = String(req.session?.activeGuildId || "");
+  const licenseId = String(req.session?.activeLicenseId || "");
+  if (!req.user?.id && licenseId && sessionGuildId && requestedGuildId === sessionGuildId) {
+    const license = await context.services.licenses.getActiveById(licenseId, sessionGuildId);
+    const guildResult = await getAllowedGuild(context, sessionGuildId);
+    if (license && guildResult.guild) {
+      return { ...guildResult, member: null, license, allowed: true, status: 200, reason: "license" };
+    }
+  }
+  return resolveDashboardAccess(context, req.user?.id, guildId);
+}
+
+export async function resolveRequestAdministrator(context, req, guildId) {
+  const access = await resolveRequestAccess(context, req, guildId);
+  return access;
+}

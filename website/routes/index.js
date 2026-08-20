@@ -1,6 +1,6 @@
 import express from "express";
 import { buildDashboardViewModel } from "../lib/dashboardData.js";
-import { getAccessMessage, getAllowedGuild, resolveDashboardAccess } from "../lib/dashboardAccess.js";
+import { getAccessMessage, getAllowedGuild, resolveDashboardAccess, resolveRequestAccess } from "../lib/dashboardAccess.js";
 import { getPlanDefinition, PLAN_DEFINITIONS, PLAN_LABELS, PLAN_TAB_LABELS } from "../../src/config/plans.js";
 import { commandMap } from "../../src/bot/commands/index.js";
 import { commandFeature } from "../../src/bot/interactions/slash.js";
@@ -232,11 +232,7 @@ export function createIndexRouter(context) {
         return renderActivation(res, context, req.query.error || "");
       }
 
-      if (!res.locals.isAuthenticated) {
-        return res.redirect("/auth/discord");
-      }
-
-      const access = await resolveDashboardAccess(context, req.user?.id, req.session.activeGuildId);
+      const access = await resolveRequestAccess(context, req, req.session.activeGuildId);
       if (!access.allowed) {
         if (access.status === 401) return res.redirect("/auth/discord");
         return res.status(access.status || 403).render("error", {
