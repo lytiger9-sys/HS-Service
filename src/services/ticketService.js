@@ -41,6 +41,8 @@ function getTicketSettings(settings) {
 }
 
 export function createTicketService(context, guildState) {
+  const pendingDeletionTimers = new Map();
+
   async function getSettings(guildId) {
     const settings = await context.services.settings.getSettings(guildId);
     return getTicketSettings(settings);
@@ -316,8 +318,53 @@ export function createTicketService(context, guildState) {
     const ticket = await guildState.ensure(guild.id).then(() => getTicketRecord(guildState, guild.id, channel.id));
     if (!ticket || !["open", "closed"].includes(ticket.status)) throw new Error("삭제할 수 있는 봇 티켓이 아닙니다.");
     if (!deletedBy?.permissions?.has?.(PermissionFlagsBits.Administrator)) throw new Error("관리자만 티켓을 삭제할 수 있습니다.");
-    await channel.delete(`티켓 삭제: ${deletedBy.user?.tag || deletedBy.tag || deletedBy.id}`).catch(() => null);
-    await context.services.notes.deleteNotesByTicket(guild.id, channel.id).catch(() => null);
+    if (pendingDeletionTimers.has(channel.id)) throw new Error("이미 티켓 삭제가 예약되어 있습니다.");
+
+    const requestedAt = new Date().toISOString();
+    await guildState.patch(guild.id, (guildStateValue) => {
+      guildStateValue.tickets[channel.id] = {
+        ...guildStateValue.tickets[channel.id],
+        status: "closed",
+        deletePending: true,
+        deleteRequestedAt: requestedAt,
+        deleteRequestedById: deletedBy.id,
+        deleteRequestedByTag: deletedBy.user?.tag || deletedBy.tag || ""
+      };
+      return guildStateValue.tickets[channel.id];
+    });
+
+    const timer = setTimeout(async () => {
+      pendingDeletionTimers.delete(channel.id);
+      const current = await guildState.ensure(guild.id).then(() => getTicketRecord(guildState, guild.id, channel.id));
+      if (!current?.deletePending) return;
+      await channel.delete(`티켓 삭제: ${deletedBy.user?.tag || deletedBy.tag || deletedBy.id}`).catch(() => null);
+      await context.services.notes.deleteNotesByTicket(guild.id, channel.id).catch(() => null);
+    }, 10000);
+    pendingDeletionTimers.set(channel.id, timer);
+    return true;
+  }
+
+  async function handleMessage(message) {
+    if (!message.guild || message.author.bot || !message.channel?.id) return false;
+    const ticket = await guildState.ensure(message.guild.id).then(() => getTicketRecord(guildState, message.guild.id, message.channel.id));
+    if (!ticket?.deletePending) return false;
+    const member = message.member ?? await message.guild.members.fetch(message.author.id).catch(() => null);
+    if (!member?.permissions?.has?.(PermissionFlagsBits.Administrator)) return false;
+
+    const timer = pendingDeletionTimers.get(message.channel.id);
+    if (timer) clearTimeout(timer);
+    pendingDeletionTimers.delete(message.channel.id);
+    await guildState.patch(message.guild.id, (guildStateValue) => {
+      guildStateValue.tickets[message.channel.id] = {
+        ...guildStateValue.tickets[message.channel.id],
+        deletePending: false,
+        deleteCancelledAt: new Date().toISOString(),
+        deleteCancelledById: member.id,
+        deleteCancelledByTag: member.user?.tag || member.tag || ""
+      };
+      return guildStateValue.tickets[message.channel.id];
+    });
+    await message.channel.send({ content: "관리자 메시지가 확인되어 티켓 삭제가 취소되었습니다. 이 채널은 유지됩니다." }).catch(() => null);
     return true;
   }
 
@@ -410,6 +457,7 @@ export function createTicketService(context, guildState) {
     confirmClose,
     reopenTicket,
     deleteTicket,
+    handleMessage,
     listTicketNotes,
     cancelClosePrompt,
     handleCloseShortcut,

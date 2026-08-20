@@ -21,6 +21,9 @@ export default async function handleMessageCreate(message, context) {
   }
 
   const ticketAccess = await canUseFeature(context, message.guild.id, "ticket");
+  if (ticketAccess.featureAllowed && await context.services.tickets.handleMessage(message)) {
+    return;
+  }
   if (ticketAccess.featureAllowed && await context.services.tickets.handleCloseShortcut(message)) {
     return;
   }
