@@ -30,7 +30,7 @@ export function createServerInfoService(context, guildState) {
     const botMemberPresent = allMembers.some((member) => member.id === selfId);
     const countedMembers = allMembers.filter((member) => member.id !== selfId);
     const humans = countedMembers.filter((member) => !member.user.bot).length;
-    const bots = countedMembers.filter((member) => member.user.bot).length;
+    const bots = allMembers.filter((member) => member.user.bot).length;
     const administrators = allMembers
       .filter((member) => member.permissions.has(PermissionFlagsBits.Administrator))
       .map(formatAdministrator);
