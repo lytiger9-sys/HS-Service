@@ -25,15 +25,17 @@ export function createServerInfoService(context, guildState) {
   async function getOverview(guild) {
     const members = await guild.members.fetch().catch(() => guild.members.cache);
     const memberList = sortMembersByJoinDate(members);
-    const humans = memberList.filter((member) => !member.user.bot).length;
-    const bots = memberList.filter((member) => member.user.bot).length;
+    const selfId = context.client?.user?.id;
+    const countedMembers = memberList.filter((member) => member.id !== selfId);
+    const humans = countedMembers.filter((member) => !member.user.bot).length;
+    const bots = countedMembers.filter((member) => member.user.bot).length;
     const administrators = memberList
       .filter((member) => member.permissions.has(PermissionFlagsBits.Administrator))
       .map(formatAdministrator);
     const owner = await guild.fetchOwner().catch(() => null);
 
     return {
-      totalMembers: memberList.length || guild.memberCount,
+      totalMembers: countedMembers.length || Math.max(0, Number(guild.memberCount || 0) - (selfId ? 1 : 0)),
       humans,
       bots,
       adminCount: administrators.length,
