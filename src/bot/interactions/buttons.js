@@ -174,7 +174,8 @@ export async function handleButtonInteraction(interaction, context) {
     const content = notes.length
       ? notes.map((note, index) => `${index + 1}. **${note.title || "무제"}**\n${note.content || "내용 없음"}`).join("\n\n").slice(0, 1900)
       : "이 티켓에 저장된 내용이 없습니다.";
-    return interaction.reply({ content: `저장내용\n\n${content}`, ephemeral: true });
+    await interaction.deferUpdate();
+    return interaction.channel.send({ content: `저장내용\n\n${content}` });
   }
 
 
