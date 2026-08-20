@@ -155,25 +155,28 @@ export function buildNoticeEmbed(guild, notice) {
 }
 
 export function buildServerInfoComponents(guild, stats) {
+  const createdAt = Math.floor(guild.createdTimestamp / 1000);
   const container = new ContainerBuilder()
     .setAccentColor(palette.ink)
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${guild.name} 서버 정보`))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## 서버 정보\n${guild.name}`))
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(new TextDisplayBuilder().setContent([
       `**서버 ID**\n${guild.id}`,
       `**서버 소유자**\n<@${guild.ownerId}>`,
-      `**생성일**\n<t:${Math.floor(guild.createdTimestamp / 1000)}:F>`
+      `**생성일**\n<t:${createdAt}:d>`
     ].join("\n\n")))
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(new TextDisplayBuilder().setContent([
-      `**전체 인원**\n${stats.totalMembers}명`,
-      `**사람**\n${stats.humans}명`,
-      `**봇**\n${stats.bots}명`,
-      `**채널**\n${stats.channels}개`,
-      `**역할**\n${stats.roles}개`
-    ].join("\n\n")))
+      "**서버 규모**",
+      `전체 인원 · ${stats.totalMembers}명`,
+      `사람 · ${stats.humans}명`,
+      `봇 · ${stats.bots}명`,
+      `채널 · ${stats.channels}개`,
+      `역할 · ${stats.roles}개`,
+      `관리자 · ${stats.adminCount}명`
+    ].join("\n")))
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**관리자 수** ${stats.adminCount}명`));
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent("-# Powered by HS-Service"));
 
   return { flags: MessageFlags.IsComponentsV2, components: [container], allowedMentions: { parse: [] } };
 }
