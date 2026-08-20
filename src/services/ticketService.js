@@ -274,10 +274,11 @@ export function createTicketService(context, guildState) {
 
     await channel.send(buildTicketClosedNoticePayload()).catch(() => null);
 
-    const ticketLabel = ticket.categoryLabel || ticket.userTag || channel.name;
-    await channel.edit({
-      name: slugifyDiscordName(`closed-${ticketLabel}`, channel.name)
-    }).catch(() => null);
+    const ticketNumber = Number(ticket.ticketNumber);
+    const closedName = Number.isInteger(ticketNumber) && ticketNumber > 0
+      ? `closed-${String(ticketNumber).padStart(4, "0")}`
+      : slugifyDiscordName(`closed-${channel.name.replace(/^ticket-/, "")}`, channel.name);
+    await channel.edit({ name: closedName }).catch(() => null);
 
     setTimeout(async () => {
       await channel.delete(`티켓 삭제 확정: ${closedBy.user?.tag || closedBy.tag || closedBy.id}`).catch(() => null);
