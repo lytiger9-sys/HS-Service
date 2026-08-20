@@ -274,6 +274,14 @@ export function buildTicketQuestionModal(category) {
   return modal;
 }
 
+function discordTimestamp(value, fallback = Date.now()) {
+  const raw = value instanceof Date ? value.getTime() : value;
+  const numeric = typeof raw === "number" ? raw : Number(raw);
+  const parsed = Number.isFinite(numeric) ? numeric : Date.parse(String(value ?? ""));
+  const milliseconds = Number.isFinite(parsed) ? (parsed < 100000000000 ? parsed * 1000 : parsed) : fallback;
+  return Math.floor(milliseconds / 1000);
+}
+
 export function buildTicketChannelPayload({ guildName, requester, category, answers, channelId, createdAt = Date.now() }) {
   const answerLines = answers.length
     ? answers.map((entry) => `**${entry.label}**\n${entry.value || "없음"}`).join("\n\n")
@@ -296,7 +304,7 @@ export function buildTicketChannelPayload({ guildName, requester, category, answ
             [
               `**요청자** ${requester.mention}`,
               `**분류** ${category.label}`,
-              `**생성 시각** <t:${Math.floor(createdAt / 1000)}:F>`
+              `**생성 시각** <t:${discordTimestamp(createdAt)}:F>`
             ].join("\n"),
             closeButton
           ),
