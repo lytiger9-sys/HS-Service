@@ -164,6 +164,7 @@ export function createDefaultGuildState() {
     punishments: [],
     joinOrder: [],
     tickets: {},
+    ticketSequence: 0,
     polls: {},
     events: {},
     tempChannels: {},

@@ -8,10 +8,8 @@ import {
   buildTicketQuestionModal,
   buildTicketAnswersFromInteraction,
   buildTicketCategoryMenuPayload,
-  getTicketChannelName,
   normalizeTicketSettings
 } from "../shared/ticket.js";
-import { slugifyDiscordName } from "../shared/naming.js";
 
 async function resolveTextChannel(guild, channelId) {
   if (!channelId) {
@@ -124,12 +122,22 @@ export function createTicketService(context, guildState) {
       }
     }
 
-    const channelName = getTicketChannelName(category, member);
+    let ticketNumber = 0;
+    await guildState.patch(guild.id, (guildStateValue) => {
+      const existingNumbers = Object.values(guildStateValue.tickets || {})
+        .map((ticket) => Number(ticket.ticketNumber) || 0);
+      const currentSequence = Number(guildStateValue.ticketSequence) || 0;
+      ticketNumber = Math.max(currentSequence, ...existingNumbers, 0) + 1;
+      guildStateValue.ticketSequence = ticketNumber;
+      return guildStateValue;
+    });
+
+    const channelName = `ticket-${String(ticketNumber).padStart(4, "0")}`;
     const parentId = category.serverCategoryId || null;
     const botMemberId = guild.members.me?.id || context.client.user.id;
 
     const channel = await guild.channels.create({
-      name: slugifyDiscordName(channelName, "ticket"),
+      name: channelName,
       type: ChannelType.GuildText,
       parent: parentId,
       topic: `티켓 요청자: ${member.user.tag} / 카테고리: ${category.label}`,
@@ -171,6 +179,7 @@ export function createTicketService(context, guildState) {
 
     const ticketRecord = {
       channelId: channel.id,
+      ticketNumber,
       categoryId: category.id,
       categoryLabel: category.label,
       userId: member.id,
