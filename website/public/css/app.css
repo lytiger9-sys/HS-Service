@@ -4606,3 +4606,43 @@ input[type="reset"] {
   border-radius: 13px;
   font-size: 13px;
 }
+
+/* Keep the plan shortcut in the upper-right whitespace and keep each sentence on one line */
+.guide-plan-copy-hero {
+  position: relative;
+}
+.guide-plan-copy-description-row {
+  display: block;
+  max-width: none;
+}
+.guide-plan-copy-description {
+  max-width: none;
+  padding-right: 0;
+}
+.guide-plan-copy-description span {
+  white-space: nowrap;
+}
+.guide-command-guide-link {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  max-width: 230px;
+}
+@media (max-width: 860px) {
+  .guide-command-guide-link {
+    top: 22px;
+    right: 0;
+  }
+}
+@media (max-width: 720px) {
+  .guide-plan-copy-description span {
+    white-space: normal;
+  }
+  .guide-command-guide-link {
+    position: static;
+    display: inline-block;
+    max-width: none;
+    margin-top: 22px;
+    text-align: left;
+  }
+}
