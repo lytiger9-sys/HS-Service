@@ -16,11 +16,14 @@
       <p class="guide-kicker">PLAN <%= String(plan.order).padStart(2, "0") %> · HS-SERVICE</p>
       <h1><%= plan.label %></h1>
       <h2><%= plan.subtitle %></h2>
-      <p class="guide-plan-copy-description">
-        <% plan.guideDescription.split(/(?<=\.)\s+/).forEach((sentence, index) => { %>
-          <span><%= sentence %></span><% if (index < plan.guideDescription.split(/(?<=\.)\s+/).length - 1) { %><br /><% } %>
-        <% }) %>
-      </p>
+      <div class="guide-plan-copy-description-row">
+        <p class="guide-plan-copy-description">
+          <% plan.guideDescription.split(/(?<=\.)\s+/).forEach((sentence, index) => { %>
+            <span><%= sentence %></span><% if (index < plan.guideDescription.split(/(?<=\.)\s+/).length - 1) { %><br /><% } %>
+          <% }) %>
+        </p>
+        <a class="guide-command-guide-link" href="/commands?plan=<%= plan.slug %>">이 플랜으로 사용할 수 있는 명령어 보러가기 <span aria-hidden="true">↗</span></a>
+      </div>
     </section>
 
     <section class="guide-detail-section">

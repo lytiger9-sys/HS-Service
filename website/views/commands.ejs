@@ -70,6 +70,10 @@
       const count = document.getElementById("visible-command-count");
       const empty = document.getElementById("command-empty-state");
       const rows = [...document.querySelectorAll("#command-table-body tr")];
+      const requestedPlan = new URLSearchParams(window.location.search).get("plan")?.toLowerCase();
+      if (requestedPlan && [...select.options].some((option) => option.value === requestedPlan)) {
+        select.value = requestedPlan;
+      }
       const update = () => {
         const selectedId = select.value;
         const selectedLabel = select.options[select.selectedIndex].textContent;

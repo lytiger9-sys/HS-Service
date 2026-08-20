@@ -4535,3 +4535,60 @@ input[type="reset"] {
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* Per-plan command reference shortcut */
+.guide-plan-copy-description-row {
+  display: grid;
+  grid-template-columns: minmax(0, 760px) minmax(210px, 1fr);
+  align-items: end;
+  gap: 42px;
+  max-width: 1120px;
+}
+.guide-plan-copy-description-row .guide-plan-copy-description {
+  margin-bottom: 0;
+}
+.guide-command-guide-link {
+  justify-self: end;
+  align-self: end;
+  max-width: 230px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(141,112,68,.62);
+  color: #8d7044;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.55;
+  text-align: right;
+  text-decoration: none;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.guide-command-guide-link span {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 13px;
+  transition: transform .2s ease;
+}
+.guide-command-guide-link:hover {
+  border-color: #17191a;
+  color: #17191a;
+  transform: translateY(-1px);
+}
+.guide-command-guide-link:hover span {
+  transform: translate(2px, -1px);
+}
+@media (max-width: 860px) {
+  .guide-plan-copy-description-row {
+    grid-template-columns: minmax(0, 1fr) 190px;
+    gap: 26px;
+  }
+}
+@media (max-width: 720px) {
+  .guide-plan-copy-description-row {
+    display: block;
+  }
+  .guide-command-guide-link {
+    display: inline-block;
+    max-width: none;
+    margin-top: 22px;
+    text-align: left;
+  }
+}
