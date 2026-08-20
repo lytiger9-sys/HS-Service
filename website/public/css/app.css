@@ -5227,3 +5227,19 @@ html[data-theme="dark"] .dashboard-page select optgroup {
   color: #111315 !important;
   -webkit-text-fill-color: #111315;
 }
+
+
+/* Ticket configuration selects use a light native menu in dark mode. */
+html[data-theme="dark"] .dashboard-page .ticket-form select,
+html[data-theme="dark"] .dashboard-page .ticket-publish-form select {
+  color-scheme: light;
+  background: #24282A;
+  color: #F3F0E8;
+}
+
+html[data-theme="dark"] .dashboard-page .ticket-form select option,
+html[data-theme="dark"] .dashboard-page .ticket-publish-form select option {
+  background: #FFFFFF !important;
+  color: #111315 !important;
+  -webkit-text-fill-color: #111315;
+}
