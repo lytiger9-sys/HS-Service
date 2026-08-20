@@ -7,9 +7,6 @@ export default async function handleMessageDelete(message, context) {
     return;
   }
 
-  if (message?.author?.bot) {
-    return;
-  }
   const access = await canUseFeature(context, guildId, "logs");
   if (!access.featureAllowed) return;
 

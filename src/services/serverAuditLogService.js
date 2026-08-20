@@ -57,10 +57,34 @@ export function createServerAuditLogService(context) {
 
   async function handleChannelUpdate(oldChannel, newChannel) {
     if (!newChannel.guild) return false;
-    const changed = oldChannel.name !== newChannel.name || oldChannel.parentId !== newChannel.parentId || oldChannel.topic !== newChannel.topic;
-    if (!changed) return false;
-    const eventKey = newChannel.type === 4 ? "categoryChange" : "channelChange";
-    return send(newChannel.guild.id, eventKey, newChannel.type === 4 ? "카테고리 수정" : "채널 수정", `${oldChannel.name} → ${newChannel.name}`);
+
+    const nameChanged = oldChannel.name !== newChannel.name;
+    const parentChanged = oldChannel.parentId !== newChannel.parentId;
+    const topicChanged = oldChannel.topic !== newChannel.topic;
+    if (!nameChanged && !parentChanged && !topicChanged) return false;
+
+    if (parentChanged && newChannel.type !== 4) {
+      const beforeParent = oldChannel.parentId ? `<#${oldChannel.parentId}>` : "없음";
+      const afterParent = newChannel.parentId ? `<#${newChannel.parentId}>` : "없음";
+      return send(
+        newChannel.guild.id,
+        "categoryChange",
+        "채널 카테고리 변경",
+        `<#${newChannel.id}>의 카테고리가 변경되었습니다.`,
+        [{ name: "변경 전", value: beforeParent, inline: true }, { name: "변경 후", value: afterParent, inline: true }]
+      );
+    }
+
+    if (nameChanged) {
+      const eventKey = newChannel.type === 4 ? "categoryChange" : "channelChange";
+      return send(newChannel.guild.id, eventKey, newChannel.type === 4 ? "카테고리 수정" : "채널 수정", `${oldChannel.name} → ${newChannel.name}`);
+    }
+
+    if (topicChanged) {
+      return send(newChannel.guild.id, "channelChange", "채널 주제 변경", `<#${newChannel.id}>의 채널 주제가 변경되었습니다.`);
+    }
+
+    return false;
   }
 
   return { handleGuildUpdate, handleMemberUpdate, handleChannelCreate, handleChannelDelete, handleChannelUpdate };

@@ -15,20 +15,27 @@ function normalizeText(value, fallback = "내용 없음") {
 }
 
 function resolveAuthorTag(message) {
-  return message?.author?.tag || message?.author?.username || message?.author?.id || "알 수 없음";
+  return message?.author?.tag || message?.author?.username || message?.author?.id || "알 수 없는 사용자";
+}
+
+function resolveAuthorLabel(message) {
+  const author = message?.author;
+  if (author?.id) {
+    const tag = author.tag || author.username || author.id;
+    return `${author} (${tag}${author.bot ? ", 봇" : ""})`;
+  }
+
+  return message?.webhookId ? `웹훅 봇 (${message.webhookId})` : "알 수 없는 사용자";
 }
 
 function resolveChannelLabel(message, fallbackChannel = null) {
   const channel = message?.channel ?? fallbackChannel;
-  if (channel?.name) {
-    return `#${channel.name}`;
+  const channelId = channel?.id || message?.channelId;
+  if (channelId) {
+    return `<#${channelId}>`;
   }
 
-  if (channel?.id) {
-    return `<#${channel.id}>`;
-  }
-
-  return "알 수 없음";
+  return channel?.name ? `#${channel.name}` : "알 수 없는 채널";
 }
 
 function summarizeAttachments(message) {
@@ -126,20 +133,15 @@ export function createMessageLogService(context) {
       return false;
     }
 
-    const author = snapshot?.author || null;
-    if (author?.bot) {
-      return false;
-    }
-
     await sendServerLog(guildId, "messageChange", {
       embeds: [
         buildBaseEmbed({
           title: "메시지 삭제",
-          description: `${resolveAuthorTag(snapshot)}의 메시지가 삭제되었습니다.`,
+            description: `${resolveAuthorLabel(snapshot)}의 메시지가 삭제되었습니다.`,
           color: palette.danger,
           fields: [
             { name: "채널", value: resolveChannelLabel(snapshot), inline: true },
-            { name: "작성자", value: resolveAuthorTag(snapshot), inline: true },
+            { name: "작성자", value: resolveAuthorLabel(snapshot), inline: true },
             { name: "내용", value: shorten(normalizeText(snapshot?.content)), inline: false },
             { name: "첨부파일", value: summarizeAttachments(snapshot), inline: false }
           ],
@@ -152,7 +154,7 @@ export function createMessageLogService(context) {
   }
 
   async function handleMessageDeleteBulk(messages, channel = null) {
-    const entries = [...messages.values()].filter((message) => !message?.author?.bot);
+    const entries = [...messages.values()];
     if (!entries.length) {
       return false;
     }
@@ -163,7 +165,7 @@ export function createMessageLogService(context) {
     }
 
     const lines = entries.slice(0, 10).map((message) => {
-      const author = resolveAuthorTag(message);
+      const author = resolveAuthorLabel(message);
       const content = shorten(normalizeText(message?.content));
       return `- ${author}: ${content}`;
     });
