@@ -5146,3 +5146,10 @@ html[data-theme="dark"] .dashboard-page .ghost:hover {
   color: #FFFFFF;
   border-color: #C6A875;
 }
+
+
+html[data-theme="dark"] .dashboard-page .sidebar-logout,
+html[data-theme="dark"] .dashboard-page .sidebar-logout:hover,
+html[data-theme="dark"] .dashboard-page .sidebar-logout:focus-visible {
+  color: #FFFFFF !important;
+}
