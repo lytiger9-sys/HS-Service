@@ -5077,3 +5077,8 @@ html[data-theme="dark"] .dashboard-page .sidebar-tab:hover .nav-index,
 html[data-theme="dark"] .dashboard-page .sidebar-tab:hover .nav-arrow {
   color: #FFFFFF !important;
 }
+
+
+html[data-theme="dark"] .dashboard-page .hero-control-eyebrow {
+  color: #FFFFFF !important;
+}
