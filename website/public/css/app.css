@@ -4517,3 +4517,21 @@ input[type="reset"] {
   stroke-linejoin: round;
   stroke-width: 1.8;
 }
+
+/* Prevent accidental dragging on the home access page while preserving form input */
+.license-auth-page {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.license-auth-page img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+.license-auth-page input,
+.license-auth-page textarea,
+.license-auth-page select,
+.license-auth-page [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
