@@ -119,5 +119,5 @@ export function createEventService(context, guildState) {
     }
   }
 
-  return { get, list, create, publish, participate, finish, processExpirations, eventEmbed, eventComponents };
+  return { get, list, create, publish, participate, finish, processExpirations, eventPayload, eventComponents };
 }
