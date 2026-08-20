@@ -68,7 +68,8 @@ function buildPollPayload(poll) {
   const heading = `## ${poll.question}${poll.description ? `\n${poll.description}` : ""}${expiry}`;
   container.addTextDisplayComponents(new TextDisplayBuilder().setContent(heading));
   container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
-  return { flags: MessageFlags.IsComponentsV2, components: [container, ...buildPollComponents(poll)] };
+  for (const row of buildPollComponents(poll)) container.addActionRowComponents(row);
+  return { flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
 function applyVote(poll, user, optionIndex, freeText = "") {
@@ -249,9 +250,10 @@ export function createPollService(context, guildState) {
       .setLabel(poll.expired ? "투표 종료됨" : "투표 즉시 중지")
       .setStyle(ButtonStyle.Danger)
       .setDisabled(Boolean(poll.expired));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(stopButton));
     return {
       flags: MessageFlags.IsComponentsV2,
-      components: [container, new ActionRowBuilder().addComponents(stopButton)]
+      components: [container]
     };
   }
 
