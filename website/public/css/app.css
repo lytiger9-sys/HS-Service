@@ -5175,3 +5175,27 @@ html[data-theme="dark"] .license-auth-page .activation-heading h1 {
   color: #111315 !important;
   -webkit-text-fill-color: #111315;
 }
+
+
+/* Dark-mode toast readability. */
+html[data-theme="dark"] .save-toast,
+html[data-theme="dark"] .site-toast {
+  background: #24282A;
+  color: #F3F0E8 !important;
+  border-color: rgba(243,240,232,.28);
+  box-shadow: 0 18px 40px rgba(0,0,0,.36);
+}
+
+html[data-theme="dark"] .save-toast[data-type="success"],
+html[data-theme="dark"] .site-toast[data-type="success"] {
+  background: #2B332F;
+  color: #F3F0E8 !important;
+  border-color: rgba(151,210,177,.55);
+}
+
+html[data-theme="dark"] .save-toast[data-type="error"],
+html[data-theme="dark"] .site-toast[data-type="error"] {
+  background: #382B2D;
+  color: #FFF1F1 !important;
+  border-color: rgba(240,150,158,.58);
+}
