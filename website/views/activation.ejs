@@ -32,11 +32,6 @@
         <p class="license-notice license-notice-danger"><%= message %></p>
       <% } %>
 
-      <% if (!currentUser) { %>
-        <a class="license-admin-login activation-discord-login" href="/auth/discord"><span>Discord로 로그인</span><span aria-hidden="true">→</span></a>
-        <div class="activation-divider"><span>또는 라이센스로 연결</span></div>
-      <% } %>
-
       <% if (currentUser && managedGuilds.length) { %>
         <div class="managed-guilds" aria-label="관리자 서버 목록">
           <div class="activation-section-heading">
@@ -73,6 +68,10 @@
           </label>
           <button class="primary activation-submit license-login-button" type="submit"><span><%= selectedGuild ? `${selectedGuild.name} 연결` : '서버 연결' %></span><span aria-hidden="true">→</span></button>
         </form>
+        <% if (!currentUser) { %>
+          <div class="activation-divider"><span>또는 Discord로 로그인</span></div>
+          <a class="license-admin-login activation-discord-login" href="/auth/discord"><span>Discord로 로그인</span><span aria-hidden="true">→</span></a>
+        <% } %>
       <% } else { %>
         <p class="activation-selection-hint">위 목록에서 연결할 서버를 선택하세요.</p>
       <% } %>
