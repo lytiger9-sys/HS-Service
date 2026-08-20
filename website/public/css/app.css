@@ -5082,3 +5082,9 @@ html[data-theme="dark"] .dashboard-page .sidebar-tab:hover .nav-arrow {
 html[data-theme="dark"] .dashboard-page .hero-control-eyebrow {
   color: #FFFFFF !important;
 }
+
+
+html[data-theme="light"] .dashboard-page .sidebar-search-input::placeholder {
+  color: rgba(13,13,13,.82) !important;
+  opacity: 1;
+}
