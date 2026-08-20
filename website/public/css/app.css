@@ -4646,3 +4646,54 @@ input[type="reset"] {
     text-align: left;
   }
 }
+
+/* Give the unavailable-server guide page a calmer editorial rhythm */
+.guide-unavailable-shell {
+  max-width: 820px;
+  padding-top: 150px;
+}
+.guide-unavailable-shell .guide-kicker {
+  margin-bottom: 24px;
+  letter-spacing: .2em;
+  line-height: 1.6;
+}
+.guide-unavailable-shell h1 {
+  max-width: 760px;
+  margin: 0 0 38px;
+  font-size: clamp(50px, 8vw, 96px);
+  letter-spacing: -.065em;
+  line-height: 1.02;
+}
+.guide-unavailable-shell h1 em {
+  display: inline-block;
+  margin-top: 8px;
+}
+.guide-unavailable-shell > p:not(.guide-kicker) {
+  max-width: 620px;
+  margin: 0 0 24px;
+  font-size: 16px;
+  letter-spacing: -.018em;
+  line-height: 2;
+}
+.guide-unavailable-shell > code {
+  margin-bottom: 34px;
+  letter-spacing: .02em;
+  line-height: 1.7;
+}
+.guide-unavailable-button {
+  padding: 12px 20px;
+  line-height: 1.5;
+}
+@media (max-width: 760px) {
+  .guide-unavailable-shell {
+    padding-top: 72px;
+  }
+  .guide-unavailable-shell h1 {
+    margin-bottom: 28px;
+    font-size: clamp(46px, 13vw, 76px);
+  }
+  .guide-unavailable-shell > p:not(.guide-kicker) {
+    font-size: 15px;
+    line-height: 1.9;
+  }
+}
