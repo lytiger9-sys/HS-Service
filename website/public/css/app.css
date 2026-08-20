@@ -4975,3 +4975,26 @@ html[data-theme="dark"] .license-auth-page .license-login-button:focus-visible s
   background: #FFFDF7 !important;
   color: #111315 !important;
 }
+
+
+/* Dashboard dark-mode overview contrast. */
+html[data-theme="dark"] .dashboard-page .hero-grid .metric {
+  background: #C7C9C8;
+  border-color: rgba(243,240,232,.24);
+}
+html[data-theme="dark"] .dashboard-page .hero-grid .metric:hover {
+  background: #D3D5D4;
+}
+html[data-theme="dark"] .dashboard-page .hero-grid .metric span,
+html[data-theme="dark"] .dashboard-page .key-list dt,
+html[data-theme="dark"] .dashboard-page .field > span,
+html[data-theme="dark"] .dashboard-page .section-head .eyebrow {
+  color: #FFFFFF !important;
+}
+html[data-theme="dark"] .dashboard-page .hero-grid .metric strong,
+html[data-theme="dark"] .dashboard-page .hero-grid .metric strong em {
+  color: #111315 !important;
+}
+html[data-theme="dark"] .dashboard-page .key-list dd {
+  color: #F3F0E8;
+}
