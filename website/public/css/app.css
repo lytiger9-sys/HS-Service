@@ -4592,3 +4592,17 @@ input[type="reset"] {
     text-align: left;
   }
 }
+
+/* Keep the commands header brand scale identical to the Guide landing header */
+.guide-commands-page .guide-brand {
+  gap: 14px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+.guide-commands-page .guide-brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  font-size: 13px;
+}
