@@ -4998,3 +4998,16 @@ html[data-theme="dark"] .dashboard-page .hero-grid .metric strong em {
 html[data-theme="dark"] .dashboard-page .key-list dd {
   color: #F3F0E8;
 }
+
+/* Dark-mode administrator and selected navigation text contrast. */
+html[data-theme="dark"] .dashboard-page .admin-topline span,
+html[data-theme="dark"] .dashboard-page .admin-status-note {
+  color: #F3F0E8 !important;
+}
+html[data-theme="dark"] .dashboard-page .sidebar-tab.is-active,
+html[data-theme="dark"] .dashboard-page .sidebar-tab.is-active .nav-label,
+html[data-theme="dark"] .dashboard-page .sidebar-tab.is-active .nav-description,
+html[data-theme="dark"] .dashboard-page .sidebar-tab.is-active .nav-index,
+html[data-theme="dark"] .dashboard-page .sidebar-tab.is-active .nav-arrow {
+  color: #FFFFFF !important;
+}
