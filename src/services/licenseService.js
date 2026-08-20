@@ -122,7 +122,8 @@ export function createLicenseService() {
 
     async findByKey(key) {
       const normalizedKey = String(key || "").trim().toUpperCase();
-      if (!/^HS-[A-Z0-9]{6}(?:-[A-Z0-9]{6}){2}$/.test(normalizedKey)) return null;
+      // createPlainKey() uses base64url, so a valid issued key may contain `_` or `-` inside a segment.
+      if (!/^HS-[A-Z0-9_-]{6}(?:-[A-Z0-9_-]{6}){2}$/.test(normalizedKey)) return null;
       const license = await LicenseModel.findOne({ $or: [{ key: normalizedKey }, { keyHash: hashKey(normalizedKey) }] });
       if (!license) return null;
       refreshExpiredStatus(license);
