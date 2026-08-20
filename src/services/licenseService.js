@@ -148,13 +148,20 @@ export function createLicenseService() {
       return license.status === "active" ? license.toObject() : null;
     },
 
-    async activate(key, guildId) {
+    async activate(key, guildId, { extendOnReconnect = false } = {}) {
       const license = await this.findByKey(key);
       if (!license || license.kind !== "service") return null;
       const requestedGuildId = String(guildId);
       if (license.status === "active") {
         // A license is consumed once, but the same server may reconnect with it.
         if (String(license.assignedGuildId || "") !== requestedGuildId) return null;
+        if (extendOnReconnect && !license.reconnectExtendedAt) {
+          const now = new Date();
+          const currentExpiry = license.expiresAt && license.expiresAt > now ? license.expiresAt : now;
+          license.expiresAt = new Date(currentExpiry.getTime() + license.durationDays * 24 * 60 * 60 * 1000);
+          license.reconnectExtendedAt = now;
+          await license.save();
+        }
         return license.toObject();
       }
       if (license.status !== "available") return null;

@@ -27,6 +27,11 @@
           <span>라이선스 키</span>
           <input type="text" name="licenseKey" placeholder="HS-XXXXXX-XXXXXX-XXXXXX" autocomplete="off" required />
         </label>
+        <label class="field toggle activation-extension-option">
+          <input type="checkbox" name="extendOnReconnect" value="on" />
+          <span>재연결 시 라이선스 기간 1회 연장</span>
+        </label>
+        <p class="activation-extension-help">이미 이 서버에 연결된 라이선스만 원래 기간만큼 한 번 연장됩니다.</p>
         <button class="primary activation-submit license-login-button" type="submit"><span>서버 연결</span><span aria-hidden="true">→</span></button>
       </form>
       <div class="activation-divider"><span>관리자라면</span></div>
