@@ -5011,3 +5011,12 @@ html[data-theme="dark"] .dashboard-page .sidebar-tab.is-active .nav-index,
 html[data-theme="dark"] .dashboard-page .sidebar-tab.is-active .nav-arrow {
   color: #FFFFFF !important;
 }
+
+
+html[data-theme="dark"] .dashboard-page .hero-grid .metric span {
+  color: #5B6063 !important;
+}
+html[data-theme="dark"] .dashboard-page .hero-grid .metric strong,
+html[data-theme="dark"] .dashboard-page .hero-grid .metric strong em {
+  color: #111315 !important;
+}
