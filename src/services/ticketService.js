@@ -10,6 +10,7 @@ import {
   buildTicketCategoryMenuPayload,
   normalizeTicketSettings
 } from "../shared/ticket.js";
+import { slugifyDiscordName } from "../shared/naming.js";
 
 async function resolveTextChannel(guild, channelId) {
   if (!channelId) {
