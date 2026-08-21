@@ -326,11 +326,12 @@ a {
 }
 
 .sidebar-search-label {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: rgba(248, 249, 250, 0.62);
+  font-family: "Pretendard", "Noto Sans KR", var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: rgba(248, 249, 250, 0.72);
 }
 
 .sidebar-search-input {
@@ -339,8 +340,9 @@ a {
   border: 1px solid var(--control-border-dark);
   background: rgba(248, 249, 250, 0.04);
   color: var(--paper);
-  font: inherit;
+  font-family: "Pretendard", "Noto Sans KR", var(--sans);
   font-size: 0.92rem;
+  font-weight: 400;
   transition: border-color 0.35s var(--ease), background 0.35s var(--ease);
 }
 
@@ -4922,8 +4924,9 @@ html[data-theme="dark"] .muted { color: rgba(243,240,232,.64); }
 
 /* Discord-authenticated server picker and license modal. */
 .sidebar-server-picker { display: grid; gap: 8px; }
-.sidebar-server-picker > span { color: rgba(248,249,250,.62); font-family: var(--mono); font-size: .62rem; letter-spacing: .22em; text-transform: uppercase; }
-.sidebar-server-picker select { width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid var(--control-border-dark); border-radius: 0; background: rgba(248,249,250,.04); color: var(--paper); font: inherit; font-size: .82rem; outline: none; }
+.sidebar-server-picker > span { color: rgba(248,249,250,.72); font-family: "Pretendard", "Noto Sans KR", var(--sans); font-size: .72rem; font-weight: 600; letter-spacing: .02em; text-transform: none; }
+.sidebar-server-picker select { width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid var(--control-border-dark); border-radius: 0; background: rgba(248,249,250,.04); color: var(--paper); font-family: "Pretendard", "Noto Sans KR", var(--sans); font-size: .88rem; font-weight: 400; outline: none; }
+.sidebar-server-picker select option { font-family: "Pretendard", "Noto Sans KR", var(--sans); }
 .sidebar-server-picker select:focus { border-color: var(--accent-warm); }
 .server-license-modal { width: min(440px, calc(100% - 32px)); padding: 0; border: 1px solid var(--control-border); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 24px 70px rgba(0,0,0,.3); }
 .server-license-modal::backdrop { background: rgba(8,10,12,.62); backdrop-filter: blur(5px); }
