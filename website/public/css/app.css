@@ -1191,11 +1191,12 @@ a {
 }
 
 .ticket-category-label {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(248, 249, 250, 0.72);
+  font-family: "Pretendard", "Noto Sans KR", var(--sans);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: rgba(248, 249, 250, 0.86);
 }
 
 .ticket-category-row {
