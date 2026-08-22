@@ -12,7 +12,7 @@ import {
   TextDisplayBuilder,
   WebhookClient
 } from "discord.js";
-import { convertLegacyPayload } from "../shared/embeds.js";
+import { buildBaseEmbed, convertLegacyPayload, palette } from "../shared/embeds.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const STALE_MS = 7 * DAY_MS;
@@ -431,7 +431,19 @@ export function createPartnerService(context) {
     warningCount += 1;
     const durationMs = warningCount >= 2 ? 7 * DAY_MS : DAY_MS;
     const member = await message.guild.members.fetch(message.author.id).catch(() => null);
-    await member?.timeout(durationMs, "파트너 채널 전체 멘션 제재").catch(() => null);
+    const timedOut = await member?.timeout(durationMs, "파트너 채널 전체 멘션 제재").then(() => true).catch(() => false);
+    if (timedOut) {
+      await context.services.logs.sendLogByKey(message.guild.id, "moderationAction", {
+        embeds: [
+          buildBaseEmbed({
+            title: "타임아웃",
+            description: `<@${member.id}> - 파트너 채널 1일 2회 이상 멘션 // ${Math.ceil(durationMs / 60000)}분`,
+            color: palette.danger,
+            timestamp: Date.now()
+          })
+        ]
+      });
+    }
     await member?.send(`파트너 채널에서 하루 2회 이상 전체 멘션을 사용해 ${warningCount >= 2 ? "7일" : "1일"} 타임아웃이 적용되었습니다.`).catch(() => null);
     await patch(message.guild.id, (draft) => {
       const item = draft.partners.find((entry) => entry.id === partner.id);

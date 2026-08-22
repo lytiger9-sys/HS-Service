@@ -44,7 +44,11 @@ export async function createBot(context) {
   client.once("ready", () => void handleReady(client, context).catch((error) => console.error("[bot] ready error:", error)));
   client.on("guildCreate", (guild) => void handleGuildCreate(guild, context).catch((error) => console.error("[bot] guildCreate error:", error)));
   client.on("guildMemberAdd", (member) => void runAllowedGuildEvent(member.guild?.id, () => handleGuildMemberAdd(member, context)).catch((error) => console.error("[bot] guildMemberAdd error:", error)));
-  client.on("guildMemberRemove", (member) => void runAllowedGuildEvent(member.guild?.id, () => handleGuildMemberRemove(member, context)).catch((error) => console.error("[bot] guildMemberRemove error:", error)));
+  client.on("guildMemberRemove", (member) => void runAllowedGuildEvent(member.guild?.id, () => Promise.all([
+    handleGuildMemberRemove(member, context),
+    context.services.serverAuditLogs.handleMemberRemove(member)
+  ])).catch((error) => console.error("[bot] guildMemberRemove error:", error)));
+  client.on("guildBanAdd", (ban) => void runAllowedGuildEvent(ban.guild?.id, () => context.services.serverAuditLogs.handleBanAdd(ban)).catch((error) => console.error("[audit] guildBanAdd error:", error)));
   client.on("guildMemberUpdate", (oldMember, newMember) => void runAllowedGuildEvent(newMember.guild?.id || oldMember.guild?.id, () => handleGuildMemberUpdate(oldMember, newMember, context)).catch((error) => console.error("[bot] guildMemberUpdate error:", error)));
   client.on("channelDelete", (channel) => void runAllowedGuildEvent(channel.guild?.id || channel.guildId, () => Promise.all([
     handleChannelDelete(channel, context),

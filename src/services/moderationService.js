@@ -82,11 +82,11 @@ async function applyTimeout(context, message, timeoutSeconds, reason, type) {
     expiresAt: new Date(Date.now() + durationSeconds * 1000).toISOString()
   });
 
-  await context.services.logs.sendLogByKey(message.guild.id, "moderationChannelId", {
+  await context.services.logs.sendLogByKey(message.guild.id, "securityChannelId", {
     embeds: [
       buildBaseEmbed({
-        title: "자동 제재",
-        description: `${member.user.tag} 에게 타임아웃을 적용했습니다.`,
+        title: "타임아웃",
+        description: `<@${member.id}> - ${reason} // ${Math.ceil(durationSeconds / 60)}분`,
         color: palette.danger,
         fields: [
           { name: "사유", value: reason, inline: false },
@@ -170,8 +170,20 @@ export function createModerationService(context, guildState) {
     joins.push(now);
     recentJoins.set(key, joins);
     if (joins.length < RAID_JOIN_THRESHOLD || !member.moderatable) return null;
-    await member.timeout(RAID_TIMEOUT_SECONDS * 1000, "레이드 방지: 짧은 시간 내 다수의 멤버 가입").catch(() => null);
-    return { type: "raid-protection", count: joins.length, timeoutSeconds: RAID_TIMEOUT_SECONDS };
+    const timedOut = await member.timeout(RAID_TIMEOUT_SECONDS * 1000, "레이드 방지: 짧은 시간 내 다수의 멤버 가입").then(() => true).catch(() => false);
+    if (timedOut) {
+      await context.services.logs.sendLogByKey(member.guild.id, "securityChannelId", {
+        embeds: [
+          buildBaseEmbed({
+            title: "타임아웃",
+            description: `레이드 감지됨 - ${joins.length}명 타임아웃 ${Math.ceil(RAID_TIMEOUT_SECONDS / 60)}분`,
+            color: palette.danger,
+            timestamp: Date.now()
+          })
+        ]
+      });
+    }
+    return { type: "raid-protection", count: joins.length, timeoutSeconds: RAID_TIMEOUT_SECONDS, timedOut };
   }
 
   return {

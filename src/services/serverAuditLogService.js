@@ -1,4 +1,5 @@
 import { ContainerBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
+import { AuditLogEvent } from "discord.js";
 import { palette } from "../shared/embeds.js";
 
 export function createServerAuditLogService(context) {
@@ -29,8 +30,33 @@ export function createServerAuditLogService(context) {
     return true;
   }
 
+  async function findRecentExecutor(guild, action, targetId) {
+    const logs = await guild.fetchAuditLogs({ type: action, limit: 8 }).catch(() => null);
+    const entry = logs?.entries.find((item) => String(item.target?.id || item.targetId) === String(targetId) && Date.now() - item.createdTimestamp < 15000);
+    return entry?.executor || null;
+  }
+
+  function durationLabel(timestamp) {
+    const minutes = Math.max(1, Math.ceil((timestamp - Date.now()) / 60000));
+    if (minutes >= 1440 && minutes % 1440 === 0) return `${minutes / 1440}일`;
+    return `${minutes}분`;
+  }
+
   async function handleMemberUpdate(oldMember, newMember) {
     if (!newMember?.guild || !oldMember?.roles?.cache || !newMember?.roles?.cache) return false;
+    const oldTimeout = oldMember.communicationDisabledUntilTimestamp || null;
+    const newTimeout = newMember.communicationDisabledUntilTimestamp || null;
+    if (oldTimeout !== newTimeout) {
+      const executor = await findRecentExecutor(newMember.guild, AuditLogEvent.MemberUpdate, newMember.id);
+      if (executor && String(executor.id) !== String(context.client.user?.id)) {
+        const action = newTimeout ? `타임아웃 ${durationLabel(newTimeout)}` : "타임아웃 해제";
+        await send(newMember.guild.id, "moderationAction", "유저 제재", `관리자 <@${executor.id}>에 의해 <@${newMember.id}>가 ${action} 되었습니다.`, [
+          { name: "관리자", value: `<@${executor.id}>`, inline: true },
+          { name: "대상", value: `<@${newMember.id}>`, inline: true }
+        ]);
+      }
+      if (!oldMember.roles?.cache || !newMember.roles?.cache) return true;
+    }
     const added = [...newMember.roles.cache.values()].filter((role) => !oldMember.roles.cache.has(role.id) && role.id !== newMember.guild.id);
     const removed = [...oldMember.roles.cache.values()].filter((role) => !newMember.roles.cache.has(role.id) && role.id !== newMember.guild.id);
     if (!added.length && !removed.length) return false;
@@ -41,6 +67,26 @@ export function createServerAuditLogService(context) {
       { name: "사용자", value: `${newMember.user.tag} (${newMember.id})`, inline: false }
     ]);
     return true;
+  }
+
+  async function handleMemberRemove(member) {
+    if (!member?.guild) return false;
+    const executor = await findRecentExecutor(member.guild, AuditLogEvent.MemberKick, member.id);
+    if (!executor || String(executor.id) === String(context.client.user?.id)) return false;
+    return send(member.guild.id, "moderationAction", "유저 제재", `관리자 <@${executor.id}>에 의해 <@${member.id}>가 강제퇴장 되었습니다.`, [
+      { name: "관리자", value: `<@${executor.id}>`, inline: true },
+      { name: "대상", value: `<@${member.id}>`, inline: true }
+    ]);
+  }
+
+  async function handleBanAdd(ban) {
+    if (!ban?.guild || !ban.user) return false;
+    const executor = await findRecentExecutor(ban.guild, AuditLogEvent.MemberBanAdd, ban.user.id);
+    if (!executor || String(executor.id) === String(context.client.user?.id)) return false;
+    return send(ban.guild.id, "moderationAction", "유저 제재", `관리자 <@${executor.id}>에 의해 <@${ban.user.id}>가 서버차단 되었습니다.`, [
+      { name: "관리자", value: `<@${executor.id}>`, inline: true },
+      { name: "대상", value: `<@${ban.user.id}>`, inline: true }
+    ]);
   }
 
   async function handleChannelCreate(channel) {
@@ -87,5 +133,5 @@ export function createServerAuditLogService(context) {
     return false;
   }
 
-  return { handleGuildUpdate, handleMemberUpdate, handleChannelCreate, handleChannelDelete, handleChannelUpdate };
+  return { handleGuildUpdate, handleMemberUpdate, handleMemberRemove, handleBanAdd, handleChannelCreate, handleChannelDelete, handleChannelUpdate };
 }
