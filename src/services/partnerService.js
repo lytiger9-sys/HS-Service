@@ -13,6 +13,7 @@ import {
   WebhookClient
 } from "discord.js";
 import { buildBaseEmbed, convertLegacyPayload, palette } from "../shared/embeds.js";
+import { formatDurationMinutes } from "../shared/time.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const STALE_MS = 7 * DAY_MS;
@@ -437,7 +438,7 @@ export function createPartnerService(context) {
         embeds: [
           buildBaseEmbed({
             title: "타임아웃",
-            description: `<@${member.id}> - 파트너 채널 1일 2회 이상 멘션 // ${Math.ceil(durationMs / 60000)}분`,
+            description: `<@${member.id}> - 파트너 채널 1일 2회 이상 멘션 // ${formatDurationMinutes(durationMs / 60000)}`,
             color: palette.danger,
             timestamp: Date.now()
           })

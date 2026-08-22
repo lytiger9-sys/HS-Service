@@ -1,5 +1,6 @@
 import { PermissionFlagsBits } from "discord.js";
 import { buildBaseEmbed, palette } from "../shared/embeds.js";
+import { formatDurationMinutes } from "../shared/time.js";
 
 const recentMessages = new Map();
 const recentJoins = new Map();
@@ -86,11 +87,11 @@ async function applyTimeout(context, message, timeoutSeconds, reason, type) {
     embeds: [
       buildBaseEmbed({
         title: "타임아웃",
-        description: `<@${member.id}> - ${reason} // ${Math.ceil(durationSeconds / 60)}분`,
+        description: `<@${member.id}> - ${reason} // ${formatDurationMinutes(durationSeconds / 60)}`,
         color: palette.danger,
         fields: [
           { name: "사유", value: reason, inline: false },
-          { name: "기간", value: `${Math.ceil(durationSeconds / 60)}분`, inline: true },
+          { name: "기간", value: formatDurationMinutes(durationSeconds / 60), inline: true },
           { name: "채널", value: `<#${message.channelId}>`, inline: true }
         ],
         timestamp: Date.now()
@@ -176,7 +177,7 @@ export function createModerationService(context, guildState) {
         embeds: [
           buildBaseEmbed({
             title: "타임아웃",
-            description: `레이드 감지됨 - ${joins.length}명 타임아웃 ${Math.ceil(RAID_TIMEOUT_SECONDS / 60)}분`,
+            description: `레이드 감지됨 - ${joins.length}명 타임아웃 ${formatDurationMinutes(RAID_TIMEOUT_SECONDS / 60)}`,
             color: palette.danger,
             timestamp: Date.now()
           })

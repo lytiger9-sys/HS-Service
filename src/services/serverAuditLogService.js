@@ -1,6 +1,7 @@
 import { ContainerBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
 import { AuditLogEvent } from "discord.js";
 import { palette } from "../shared/embeds.js";
+import { formatDurationMinutes } from "../shared/time.js";
 
 export function createServerAuditLogService(context) {
   function componentsLog(title, description, fields = []) {
@@ -36,12 +37,6 @@ export function createServerAuditLogService(context) {
     return entry?.executor || null;
   }
 
-  function durationLabel(timestamp) {
-    const minutes = Math.max(1, Math.ceil((timestamp - Date.now()) / 60000));
-    if (minutes >= 1440 && minutes % 1440 === 0) return `${minutes / 1440}일`;
-    return `${minutes}분`;
-  }
-
   async function handleMemberUpdate(oldMember, newMember) {
     if (!newMember?.guild || !oldMember?.roles?.cache || !newMember?.roles?.cache) return false;
     const oldTimeout = oldMember.communicationDisabledUntilTimestamp || null;
@@ -49,7 +44,7 @@ export function createServerAuditLogService(context) {
     if (oldTimeout !== newTimeout) {
       const executor = await findRecentExecutor(newMember.guild, AuditLogEvent.MemberUpdate, newMember.id);
       if (executor && String(executor.id) !== String(context.client.user?.id)) {
-        const action = newTimeout ? `타임아웃 ${durationLabel(newTimeout)}` : "타임아웃 해제";
+        const action = newTimeout ? `타임아웃 ${formatDurationMinutes((newTimeout - Date.now()) / 60000)}` : "타임아웃 해제";
         await send(newMember.guild.id, "moderationAction", "유저 제재", `관리자 <@${executor.id}>에 의해 <@${newMember.id}>가 ${action} 되었습니다.`, [
           { name: "관리자", value: `<@${executor.id}>`, inline: true },
           { name: "대상", value: `<@${newMember.id}>`, inline: true }

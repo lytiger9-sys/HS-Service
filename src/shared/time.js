@@ -32,3 +32,10 @@ export function formatKst(value, options = {}) {
 export function formatKstDateTime(value) {
   return formatKst(value, { dateStyle: "medium", timeStyle: "short" });
 }
+
+export function formatDurationMinutes(value) {
+  const minutes = Math.max(1, Math.ceil(Number(value) || 0));
+  if (minutes >= 1440 && minutes % 1440 === 0) return `${minutes / 1440}일`;
+  if (minutes >= 60 && minutes % 60 === 0) return `${minutes / 60}시간`;
+  return `${minutes}분`;
+}
