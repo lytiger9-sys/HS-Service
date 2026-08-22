@@ -166,6 +166,10 @@
                   <% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.security.securityLogChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %>
                 </select>
               </label>
+              <div class="field full security-raid-threshold">
+                <span class="security-field-label">레이드 감지 기준 <span class="security-info-hover" tabindex="0" aria-label="레이드 감지 기준 안내">?<span class="security-info-popover" role="tooltip"><span class="security-info-line">10초 이내 5명 이상 가입하면 레이드로 감지합니다.</span><span class="security-info-line">감지된 신규 멤버에게 24시간 타임아웃을 적용하고 보안 로그 채널에 기록합니다.</span></span></span></span>
+                <span class="muted">10초 이내 신규 가입 5명 이상</span>
+              </div>
               <label class="field">
                 <span>전체 멘션 타임아웃(분)</span>
                 <input type="number" min="0" name="massMentionTimeoutMinutes" value="<%= settings.security.massMentionTimeoutMinutes %>" />
