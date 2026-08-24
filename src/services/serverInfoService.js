@@ -26,21 +26,21 @@ export function createServerInfoService(context, guildState) {
     const members = await guild.members.fetch({ force: true }).catch(() => guild.members.cache);
     const allMembers = [...members.values()];
     const memberList = sortMembersByJoinDate(members);
-    const selfId = context.client?.user?.id;
-    const botMemberPresent = allMembers.some((member) => member.id === selfId);
-    const countedMembers = allMembers.filter((member) => member.id !== selfId);
-    const humans = countedMembers.filter((member) => !member.user.bot).length;
+
     const bots = allMembers.filter((member) => member.user.bot).length;
+    const humans = allMembers.length - bots;
+
     const administrators = allMembers
       .filter((member) => member.permissions.has(PermissionFlagsBits.Administrator))
       .map(formatAdministrator);
+    
     const channels = await guild.channels.fetch().catch(() => guild.channels.cache);
     const countableChannels = [...channels.values()].filter((channel) => channel.type !== ChannelType.GuildCategory && !channel.isThread?.());
     const roles = await guild.roles.fetch().catch(() => guild.roles.cache);
     const owner = await guild.fetchOwner().catch(() => null);
 
     return {
-      totalMembers: Math.max(0, Number(guild.memberCount || allMembers.length) - (botMemberPresent ? 1 : 0)),
+      totalMembers: guild.memberCount || allMembers.length,
       humans,
       bots,
       adminCount: administrators.length,

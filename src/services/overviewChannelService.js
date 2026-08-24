@@ -37,13 +37,14 @@ export function createOverviewChannelService(context) {
   async function getCounts(guild) {
     const fetchedMembers = await guild.members.fetch({ force: true }).catch(() => guild.members.cache);
     const members = [...fetchedMembers.values()];
-    const selfId = context.client?.user?.id;
-    const countedMembers = members.filter((member) => member.id !== selfId);
+
     const botCount = members.filter((member) => member.user.bot).length;
+    const userCount = members.length - botCount;
+
     return {
-      members: countedMembers.filter((member) => !member.user.bot).length,
+      members: userCount,
       bots: botCount,
-      total: countedMembers.length
+      total: members.length
     };
   }
 
@@ -87,7 +88,7 @@ export function createOverviewChannelService(context) {
   }
 
   async function syncGuildById(guildId) {
-    const guild = context.client?.guilds.cache.get(guildId) || await context.client?.guilds.fetch(guildId).catch(() => null);
+    const guild = context.client?.guilds.cache.get(guildId) || (await context.client?.guilds.fetch(guildId).catch(() => null));
     return syncGuild(guild);
   }
 

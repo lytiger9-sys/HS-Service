@@ -52,8 +52,13 @@ export function createServerAuditLogService(context) {
       }
       if (!oldMember.roles?.cache || !newMember.roles?.cache) return true;
     }
-    const added = [...newMember.roles.cache.values()].filter((role) => !oldMember.roles.cache.has(role.id) && role.id !== newMember.guild.id);
-    const removed = [...oldMember.roles.cache.values()].filter((role) => !newMember.roles.cache.has(role.id) && role.id !== newMember.guild.id);
+
+    // @everyone 역할 ID 명확히 추출 (guild.roles.everyone.id 활용)
+    const everyoneRoleId = newMember.guild.roles?.everyone?.id || newMember.guild.id;
+
+    const added = [...newMember.roles.cache.values()].filter((role) => !oldMember.roles.cache.has(role.id) && role.id !== everyoneRoleId);
+    const removed = [...oldMember.roles.cache.values()].filter((role) => !newMember.roles.cache.has(role.id) && role.id !== everyoneRoleId);
+    
     if (!added.length && !removed.length) return false;
     const lines = [];
     if (added.length) lines.push(`지급: ${added.map((role) => `<@&${role.id}>`).join(", ")}`);
