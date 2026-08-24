@@ -92,7 +92,8 @@ export function createServerAuditLogService(context) {
   async function handleChannelCreate(channel) {
     if (!channel.guild) return false;
     const eventKey = channel.type === 4 ? "categoryChange" : "channelChange";
-    return send(channel.guild.id, eventKey, channel.type === 4 ? "카테고리 추가" : "채널 추가", `${channel.name}이(가) 추가되었습니다.`);
+    const label = channel.type === 4 ? channel.name : `<#${channel.id}>`;
+    return send(channel.guild.id, eventKey, channel.type === 4 ? "카테고리 추가" : "채널 추가", `${label}이(가) 추가되었습니다.`);
   }
 
   async function handleChannelDelete(channel) {

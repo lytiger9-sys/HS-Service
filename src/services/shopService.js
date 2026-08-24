@@ -105,7 +105,8 @@ export function createShopService(context) {
     if (result?.attendanceAmount) reasons.push("오늘 첫 메시지 보상");
     if (result?.amount) reasons.push("활동 메시지 보상");
     if (result?.birthdayAmount) reasons.push("생일 축하 보상");
-    await message.author.send(`캐시 지급 안내\n+${amount.toLocaleString()} 캐시 (${reasons.join(" + ")})\n현재 잔액: ${Number(result.balance || 0).toLocaleString()} 캐시`).catch(() => null);
+    const guildName = message.guild?.name || "알 수 없는 서버";
+    await message.author.send(`[${guildName}] 캐시 지급 안내\n+${amount.toLocaleString()} 캐시 (${reasons.join(" + ")})\n현재 잔액: ${Number(result.balance || 0).toLocaleString()} 캐시`).catch(() => null);
   }
 
   function isValidBirthday(month, day) {

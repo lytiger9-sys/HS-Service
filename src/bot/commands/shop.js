@@ -22,6 +22,8 @@ export const adminGrantCommand = {
     const user = interaction.options.getUser("유저", true);
     const amount = interaction.options.getInteger("금액", true);
     const result = await context.services.shop.grant(interaction.guildId, user.id, amount, `관리자 ${interaction.user.id} 지급`);
+    const guildName = interaction.guild?.name || "알 수 없는 서버";
+    await user.send(`[${guildName}] 캐시 지급 안내\n+${result.amount.toLocaleString()} 캐시 (관리자 지급)\n현재 잔액: ${result.balance.toLocaleString()} 캐시`).catch(() => null);
     await interaction.reply({ content: `${user.tag}에게 ${result.amount.toLocaleString()} 캐시를 지급했습니다.`, ephemeral: true });
   }
 };
