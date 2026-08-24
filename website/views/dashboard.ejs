@@ -149,7 +149,7 @@
           <div class="section-head">
             <div>
               <p class="eyebrow">Security</p>
-              <h3 class="security-heading-with-info">보안 규칙 <span class="security-info-hover" tabindex="0" aria-label="레이드 방지 안내">ⓘ<span class="security-info-popover" role="tooltip"><span class="security-info-line">레이드 방지 기능은 보안 기능이 켜져 있을 때 자동으로 작동합니다.</span><span class="security-info-line">보안 기능을 OFF로 변경하면 레이드 방지도 자동으로 꺼집니다.</span></span></span></h3>
+              <h3 class="security-heading-with-info">보안 규칙 <span class="security-info-hover" tabindex="0" aria-label="레이드 방지 안내">ⓘ<span class="security-info-popover" role="tooltip"><span class="security-info-line">10초 이내 5명 이상 가입하면 레이드로 감지합니다.</span><span class="security-info-line">감지된 신규 멤버에게 24시간 타임아웃을 적용하고 보안 로그 채널에 기록합니다.</span><span class="security-info-line">보안 기능을 off하면 레이드 기능도 off됩니다.</span></span></span></h3>
             </div>
             <label class="field toggle section-toggle">
               <input type="checkbox" form="security-settings-form" name="securityEnabled" <%= settings.security.enabled !== false ? 'checked' : '' %> />
@@ -166,10 +166,6 @@
                   <% channels.text.forEach((channel) => { %><option value="<%= channel.id %>" <%= settings.security.securityLogChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option><% }) %>
                 </select>
               </label>
-              <div class="field full security-raid-threshold">
-                <span class="security-field-label">레이드 감지 기준 <span class="security-info-hover" tabindex="0" aria-label="레이드 감지 기준 안내">?<span class="security-info-popover" role="tooltip"><span class="security-info-line">10초 이내 5명 이상 가입하면 레이드로 감지합니다.</span><span class="security-info-line">감지된 신규 멤버에게 24시간 타임아웃을 적용하고 보안 로그 채널에 기록합니다.</span></span></span></span>
-                <span class="muted">10초 이내 신규 가입 5명 이상</span>
-              </div>
               <label class="field">
                 <span>전체 멘션 타임아웃(분)</span>
                 <input type="number" min="0" name="massMentionTimeoutMinutes" value="<%= settings.security.massMentionTimeoutMinutes %>" />
