@@ -124,7 +124,8 @@ export function createServerAuditLogService(context) {
 
     if (nameChanged) {
       const eventKey = newChannel.type === 4 ? "categoryChange" : "channelChange";
-      return send(newChannel.guild.id, eventKey, newChannel.type === 4 ? "카테고리 수정" : "채널 수정", `${oldChannel.name} → ${newChannel.name}`);
+      const afterLabel = newChannel.type === 4 ? newChannel.name : `<#${newChannel.id}>`;
+      return send(newChannel.guild.id, eventKey, newChannel.type === 4 ? "카테고리 수정" : "채널 수정", `${oldChannel.name} → ${afterLabel}`);
     }
 
     if (topicChanged) {
