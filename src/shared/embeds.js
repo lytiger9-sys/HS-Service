@@ -1,4 +1,4 @@
-import { ContainerBuilder, EmbedBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
+import { ContainerBuilder, EmbedBuilder, MediaGalleryBuilder, MediaGalleryItemBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
 import { applyPlaceholders } from "./placeholders.js";
 import { clampText } from "./naming.js";
 import { formatKstDateTime } from "./time.js";
@@ -102,7 +102,10 @@ export function convertLegacyPayload(payload, footerText = "Powered by HS-Servic
     const media = [embed.thumbnail?.url, embed.image?.url].filter(Boolean);
     if (media.length) {
       container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
-      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(media.map((url) => `[이미지 보기](${url})`).join("\n")));
+      const gallery = new MediaGalleryBuilder().addItems(
+        media.map((url) => new MediaGalleryItemBuilder().setURL(url))
+      );
+      container.addMediaGalleryComponents(gallery);
     }
     if (embed.timestamp) {
       container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
