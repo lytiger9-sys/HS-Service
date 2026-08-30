@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { commandMap } from "../src/bot/commands/index.js";
 import { commandFeature } from "../src/bot/interactions/slash.js";
 import { PLAN_TAB_LABELS, getPlanDefinition } from "../src/config/plans.js";
-import { syncGlobalCommands } from "../src/bot/syncGlobalCommands.js";
+import { clearGuildCommandOverrides, syncGlobalCommands } from "../src/bot/syncGlobalCommands.js";
 
 function option(commandName, optionName) {
   return commandMap.get(commandName)?.data.toJSON().options?.find((item) => item.name === optionName);
@@ -62,6 +62,21 @@ test("전역 명령어 동기화는 현재 전체 명령어 목록을 Discord �
   assert.equal(payload.length, commandMap.size);
   assert.ok(payload.some((command) => command.name === "메시지삭제"));
   assert.equal(payload.some((command) => command.name === "clear"), false);
+});
+
+test("전역 등록 전 서버별 이전 명령어 등록을 비운다", async () => {
+  const cleared = [];
+  const legacyCommands = new Map([["legacy", { name: "clear" }]]);
+  const client = {
+    guilds: {
+      cache: new Map([
+        ["guild-1", { id: "guild-1", name: "테스트 서버", commands: { fetch: async () => legacyCommands, set: async (commands) => { cleared.push(commands); } } }],
+        ["guild-2", { id: "guild-2", name: "빈 서버", commands: { fetch: async () => new Map(), set: async () => { throw new Error("빈 목록에는 호출되지 않아야 합니다."); } } }]
+      ])
+    }
+  };
+  assert.equal(await clearGuildCommandOverrides(client), 1);
+  assert.deepEqual(cleared, [[]]);
 });
 
 test("허니팟은 대시보드 탭에서 제외할 수 있는 기능 게이트로 유지된다", () => {

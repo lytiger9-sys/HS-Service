@@ -1,5 +1,5 @@
 import { ActivityType } from "discord.js";
-import { syncGlobalCommands } from "../syncGlobalCommands.js";
+import { clearGuildCommandOverrides, syncGlobalCommands } from "../syncGlobalCommands.js";
 import { isAllowedGuild, scheduleGuildValidation } from "../../shared/guards.js";
 
 export default async function handleReady(client, context) {
@@ -19,6 +19,8 @@ export default async function handleReady(client, context) {
 
   try {
     await syncGlobalCommands(client, "startup");
+    const clearedGuilds = await clearGuildCommandOverrides(client);
+    if (clearedGuilds) console.log(`[commands] cleared legacy guild command overrides in ${clearedGuilds} guild(s)`);
   } catch (error) {
     console.error("[commands] global command sync failed:", error);
   }

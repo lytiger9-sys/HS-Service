@@ -12,6 +12,24 @@ function buildCommandPayload() {
   return commandPayload;
 }
 
+export async function clearGuildCommandOverrides(client) {
+  let clearedGuilds = 0;
+
+  for (const guild of client.guilds.cache.values()) {
+    try {
+      const registered = await guild.commands.fetch();
+      if (!registered.size) continue;
+      await guild.commands.set([]);
+      clearedGuilds += 1;
+      console.log(`[commands] removed ${registered.size} legacy guild commands from ${guild.id} (${guild.name})`);
+    } catch (error) {
+      console.error(`[commands] failed to remove legacy guild commands from ${guild.id} (${guild.name})`, error);
+    }
+  }
+
+  return clearedGuilds;
+}
+
 export async function syncGlobalCommands(client, reason = "startup") {
   if (!client.application) {
     throw new Error("[commands] Discord application 정보를 찾을 수 없습니다.");

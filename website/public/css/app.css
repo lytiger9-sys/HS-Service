@@ -5463,3 +5463,19 @@ html[data-theme="dark"] .dashboard-page .ticket-publish-form select option {
     white-space: nowrap;
   }
 }
+
+
+/* Align the guide wordmark with the left edge of the three-plan card grid. */
+.guide-home-page .guide-brand-wordmark {
+  margin-left: max(0px, calc((100% - 1200px) / 2));
+}
+@media (max-width: 1280px) {
+  .guide-home-page .guide-brand-wordmark {
+    margin-left: max(0px, calc((100% - 1038px) / 2));
+  }
+}
+@media (max-width: 800px) {
+  .guide-home-page .guide-brand-wordmark {
+    margin-left: 0;
+  }
+}
