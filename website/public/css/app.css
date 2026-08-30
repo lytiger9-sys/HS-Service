@@ -5457,7 +5457,7 @@ html[data-theme="dark"] .dashboard-page .ticket-publish-form select option {
 
 /* Keep the server command-note on one line beside its heading on desktop. */
 @media (min-width: 721px) {
-  .guide-server-page #commands .guide-section-heading > p {
+  .guide-plan-detail-page #commands .guide-section-heading > p {
     max-width: none;
     flex: 0 0 auto;
     white-space: nowrap;

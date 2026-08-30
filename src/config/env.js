@@ -35,7 +35,7 @@ function readBoolean(name, fallback = false) {
 
 export function loadConfig() {
   return {
-    botName: process.env.BOT_NAME?.trim() || "HS 종합봇",
+    botName: process.env.BOT_NAME?.trim() || "HS System",
     discordToken: readRequired("DISCORD_TOKEN"),
     allowedGuildId: readRequired("ALLOWED_GUILD_ID"),
     mongoUri: readRequired("MONGODB_URI"),
