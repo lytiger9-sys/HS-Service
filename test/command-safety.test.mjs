@@ -82,3 +82,23 @@ test("전역 등록 전 서버별 이전 명령어 등록을 비운다", async (
 test("허니팟은 대시보드 탭에서 제외할 수 있는 기능 게이트로 유지된다", () => {
   assert.equal(getPlanDefinition("free").tabs.includes("honeypot"), true);
 });
+
+test("새 역할·웹훅·이모지·스티커 명령어가 필요한 입력값과 함께 등록된다", () => {
+  for (const commandName of ["역할전체지금", "웹훅생성", "이모지확대", "이모지추가", "스티커추가"]) {
+    assert.ok(commandMap.has(commandName), `${commandName} 명령어 누락`);
+  }
+  assert.equal(option("역할전체지금", "역할")?.required, true);
+  assert.equal(option("이모지확대", "이모지")?.required, true);
+  assert.equal(option("이모지추가", "이모지")?.required, true);
+  assert.equal(option("스티커추가", "스티커")?.required, true);
+  assert.equal(option("웹훅생성", "이름")?.required, false);
+  assert.equal(option("웹훅생성", "프로필")?.required, false);
+});
+
+test("새 명령어가 기존 플랜별 접근 제어와 연결된다", () => {
+  assert.equal(commandFeature("역할전체지금"), "administrators");
+  assert.equal(commandFeature("웹훅생성"), "administrators");
+  assert.equal(commandFeature("이모지확대"), "voice");
+  assert.equal(commandFeature("이모지추가"), "voice");
+  assert.equal(commandFeature("스티커추가"), "voice");
+});

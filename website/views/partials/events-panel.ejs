@@ -45,8 +45,9 @@
           <input type="number" name="eventsWinnerCount" min="1" max="100" value="<%= settings.events?.winnerCount || 1 %>" required />
         </label>
         <label class="field">
-          <span>이벤트 기한(시간)</span>
-          <input type="number" name="eventsDurationHours" min="1" max="720" value="<%= settings.events?.durationHours || 24 %>" required />
+          <span>이벤트 기한</span>
+          <input type="text" inputmode="decimal" name="eventsDurationHours" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.events?.durationHours || 24, 'hours') : (settings.events?.durationHours || 24) %>" data-duration-input data-duration-default-unit="hours" data-duration-minutes-min="60" data-duration-minutes-max="43200" required />
+          <small class="muted">예: 1시간, 1일, 90분 · 숫자만 입력하면 시간으로 저장됩니다.</small>
         </label>
       </div>
       <div class="form-actions">

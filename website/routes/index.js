@@ -4,6 +4,11 @@ import { getAccessMessage, getAllowedGuild, resolveDashboardAccess, resolveReque
 import { getPlanDefinition, PLAN_DEFINITIONS, PLAN_LABELS, PLAN_TAB_LABELS } from "../../src/config/plans.js";
 import { commandMap } from "../../src/bot/commands/index.js";
 import { commandFeature } from "../../src/bot/interactions/slash.js";
+import { formatDurationMinutes, storedDurationToMinutes } from "../../src/shared/duration.js";
+
+function formatDurationInput(value, storageUnit) {
+  return formatDurationMinutes(storedDurationToMinutes(value, storageUnit));
+}
 
 function getActiveLicenseId(req) {
   return req.session?.activeLicenseId || "";
@@ -272,7 +277,8 @@ export function createIndexRouter(context) {
             activeSection,
             saved: req.query.saved || "",
             issuedBannerKey: req.query.bannerKey || "",
-            bannerError: req.query.bannerError || ""
+            bannerError: req.query.bannerError || "",
+            formatDurationInput
           };
           if (req.query.partial === "partner") {
             return res.render("partials/partner-panel", {
@@ -327,7 +333,8 @@ export function createIndexRouter(context) {
         activeSection,
         saved: req.query.saved || "",
         issuedBannerKey: req.query.bannerKey || "",
-        bannerError: req.query.bannerError || ""
+        bannerError: req.query.bannerError || "",
+        formatDurationInput
       });
     } catch (error) {
       next(error);

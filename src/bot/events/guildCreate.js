@@ -9,6 +9,7 @@ export default async function handleGuildCreate(guild, context) {
     return;
   }
 
+  await context.services.invites.prime(guild).catch((error) => console.warn(`[welcome] invite tracking unavailable for ${guild.id}:`, error.message));
   await context.services.honeypot.syncStatusMessage(guild.id).catch(() => null);
   await context.services.overviewChannels.syncGuild(guild).catch((error) => console.error(`[overview] sync failed for ${guild.id}:`, error));
 }

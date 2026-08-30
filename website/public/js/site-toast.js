@@ -51,7 +51,18 @@
   async function submitWithToast(event) {
     const form = event.target;
     if (!shouldHandle(form) || form.dataset.toastSubmitting === "true") return;
+
+    if (form.dataset.confirmReset === "true") {
+      const confirmed = window.confirm(form.dataset.confirmMessage || "서버 데이터를 기본값으로 초기화할까요?");
+      if (!confirmed) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+    }
+
     event.preventDefault();
+    window.normalizeDurationInputs?.(form);
     form.dataset.toastSubmitting = "true";
     const submitter = event.submitter;
     const buttons = [...form.querySelectorAll("button, input[type=submit]")];

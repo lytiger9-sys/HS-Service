@@ -2,6 +2,7 @@ import express from "express";
 import { getAccessMessage, resolveRequestAccess, resolveRequestAdministrator } from "../lib/dashboardAccess.js";
 import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
 import { canUseFeature, featureDeniedMessage, planAllowsFeatureToggle, planHasFeature } from "../../src/shared/planAccess.js";
+import { durationToStoredUnit } from "../../src/shared/duration.js";
 
 function readBoolean(value) {
   if (Array.isArray(value)) return value.some((entry) => readBoolean(entry));
@@ -118,10 +119,10 @@ function sectionPayload(section, body) {
         spamEnabled: body.spamEnabled === undefined ? true : readBoolean(body.spamEnabled),
         profanityEnabled: body.profanityEnabled === undefined ? true : readBoolean(body.profanityEnabled),
         inviteEnabled: body.inviteEnabled === undefined ? true : readBoolean(body.inviteEnabled),
-        massMentionTimeoutMinutes: readNumber(body.massMentionTimeoutMinutes, 10, 0, 10080),
-        spamTimeoutMinutes: readNumber(body.spamTimeoutMinutes, 10, 0, 10080),
-        profanityTimeoutMinutes: readNumber(body.profanityTimeoutMinutes, 10, 0, 10080),
-        inviteTimeoutMinutes: readNumber(body.inviteTimeoutMinutes, 10, 0, 10080),
+        massMentionTimeoutMinutes: durationToStoredUnit(body.massMentionTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "전체 멘션 타임아웃" }),
+        spamTimeoutMinutes: durationToStoredUnit(body.spamTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "도배 타임아웃" }),
+        profanityTimeoutMinutes: durationToStoredUnit(body.profanityTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "욕설 타임아웃" }),
+        inviteTimeoutMinutes: durationToStoredUnit(body.inviteTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "초대 링크 타임아웃" }),
         spamRepeatThreshold: readNumber(body.spamRepeatThreshold, 3, 2, 100),
         profanityWords: splitLines(body.profanityWords, 200, 80),
         securityLogChannelId: readDiscordId(body.securityLogChannelId)
@@ -178,7 +179,7 @@ function sectionPayload(section, body) {
         mentionHere: readBoolean(body.embedMentionHere),
         mentionRoleIds: splitLines(body.embedMentionRoleIds, 20, 22).filter((id) => /^\d{15,22}$/.test(id)),
         scheduleEnabled: readBoolean(body.embedScheduleEnabled),
-        scheduleIntervalMinutes: readNumber(body.embedScheduleIntervalMinutes, 60, 1, 10080),
+        scheduleIntervalMinutes: durationToStoredUnit(body.embedScheduleIntervalMinutes, { defaultUnit: "days", storageUnit: "minutes", minMinutes: 1, maxMinutes: 10080, fieldLabel: "자동 전송 주기" }),
         updatedAt: new Date().toISOString()
       }
     };
@@ -189,7 +190,7 @@ function sectionPayload(section, body) {
       polls: {
         enabled: readOptionalBoolean(body.pollsEnabled),
         resultVisibility: body.pollResultVisibility === "private" ? "private" : "public",
-        expirationDays: readNumber(body.pollExpirationDays, 7, 1, 365),
+        expirationDays: durationToStoredUnit(body.pollExpirationDays, { defaultUnit: "days", storageUnit: "days", minMinutes: 1440, maxMinutes: 365 * 1440, fieldLabel: "투표 만료 기간" }),
         voteLogChannelId: readDiscordId(body.pollVoteLogChannelId)
       }
     };
@@ -246,7 +247,7 @@ function sectionPayload(section, body) {
         prizeName: readText(body.eventsPrizeName, "이벤트 상품", 256),
         prizeContent: readText(body.eventsPrizeContent, "", 4000),
         winnerCount: readNumber(body.eventsWinnerCount, 1, 1, 100),
-        durationHours: readNumber(body.eventsDurationHours, 24, 1, 720)
+        durationHours: durationToStoredUnit(body.eventsDurationHours, { defaultUnit: "hours", storageUnit: "hours", minMinutes: 60, maxMinutes: 720 * 60, fieldLabel: "이벤트 기한" })
       }
     };
   }

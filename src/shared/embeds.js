@@ -118,24 +118,103 @@ export function convertLegacyPayload(payload, footerText = "Powered by HS-Servic
   return { ...rest, flags: MessageFlags.IsComponentsV2, components: [container] };
 }
 
-export function buildWelcomeEmbeds(settings, member, guild) {
+function normalizeWelcomeRoleMentions(value, guild) {
+  let text = String(value || "");
+  const roles = [...(guild?.roles?.cache?.values?.() || [])]
+    .filter((role) => role.id !== guild.id && role.name)
+    .sort((a, b) => b.name.length - a.name.length);
+  for (const role of roles) {
+    const escaped = role.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    text = text.replace(new RegExp(`@${escaped}(?![\\w])`, "g"), `<@&${role.id}>`);
+  }
+  return text;
+}
+
+function normalizeWelcomeMediaUrl(value, label) {
+  try {
+    const url = new URL(String(value || "").trim());
+    if (url.protocol !== "https:" || !url.hostname) throw new Error("invalid-url");
+    return url.toString();
+  } catch {
+    throw new Error(`${label}에는 https://로 시작하는 유효한 이미지 링크를 입력해 주세요.`);
+  }
+}
+
+function buildWelcomeComponents(settings, member, guild, context) {
+  const container = new ContainerBuilder().setAccentColor(parseColor(settings.welcome.embedColor));
+  const title = applyPlaceholders(settings.welcome.embedTitle, context).trim();
+  const description = applyPlaceholders(settings.welcome.embedDescription, context).trim();
+  const source = normalizeWelcomeRoleMentions([title ? `# ${title}` : "", description].filter(Boolean).join("\n\n"), guild);
+  const lines = source ? source.split(/\r?\n/) : [];
+  let bufferedLines = [];
+  let componentCount = 1;
+
+  const addComponent = (callback) => {
+    if (componentCount >= 40) throw new Error("환영 메시지 구성요소는 사진·썸네일·실선을 합쳐 최대 40개까지 추가할 수 있습니다.");
+    callback();
+    componentCount += 1;
+  };
+  const flushText = () => {
+    const content = bufferedLines.join("\n").trim();
+    bufferedLines = [];
+    if (!content) return;
+    if (content.length > 4000) throw new Error("환영 메시지의 한 텍스트 영역은 4,000자 이하로 입력해 주세요.");
+    addComponent(() => container.addTextDisplayComponents(new TextDisplayBuilder().setContent(content)));
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
+    const thumbnailMatch = trimmed.match(/^\[thumbnail\]\s+(https?:\/\/\S+)$/i);
+    const imageSyntax = /^\[image\]\b/i.test(trimmed);
+    const thumbnailSyntax = /^\[thumbnail\]\b/i.test(trimmed);
+    if (imageSyntax && !imageMatch) throw new Error("사진에는 https://로 시작하는 유효한 이미지 링크를 입력해 주세요.");
+    if (thumbnailSyntax && !thumbnailMatch) throw new Error("썸네일에는 https://로 시작하는 유효한 이미지 링크를 입력해 주세요.");
+
+    if (trimmed === "--" || trimmed === "---" || trimmed === "___") {
+      flushText();
+      addComponent(() => container.addSeparatorComponents(new SeparatorBuilder().setDivider(true)));
+    } else if (imageMatch) {
+      flushText();
+      const imageUrl = normalizeWelcomeMediaUrl(imageMatch[1], "사진");
+      addComponent(() => container.addMediaGalleryComponents(new MediaGalleryBuilder().addItems(new MediaGalleryItemBuilder().setURL(imageUrl))));
+    } else if (thumbnailMatch) {
+      flushText();
+      const thumbnailUrl = normalizeWelcomeMediaUrl(thumbnailMatch[1], "썸네일");
+      addComponent(() => container.addSectionComponents(new SectionBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(" ")).setThumbnailAccessory(new ThumbnailBuilder({ media: { url: thumbnailUrl } }))));
+    } else {
+      bufferedLines.push(line);
+    }
+  }
+  flushText();
+  if (!source) addComponent(() => container.addTextDisplayComponents(new TextDisplayBuilder().setContent("환영 메시지가 아직 설정되지 않았습니다.")));
+  addComponent(() => container.addSeparatorComponents(new SeparatorBuilder().setDivider(true)));
+  addComponent(() => container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${guild.name}`)));
+
+  const allowsEveryone = /@everyone\b|@here\b/.test(source);
+  const mentionedRoleIds = [...new Set([...source.matchAll(/<@&(\d{15,22})>/g)].map((match) => match[1]))];
+  return {
+    flags: MessageFlags.IsComponentsV2,
+    components: [container],
+    allowedMentions: {
+      parse: allowsEveryone ? ["everyone"] : [],
+      users: [member.id, context.inviter?.id].filter(Boolean),
+      roles: mentionedRoleIds
+    }
+  };
+}
+
+export function buildWelcomeEmbeds(settings, member, guild, details = {}) {
   const context = {
     user: member.user,
     guild,
-    totalmember: guild.memberCount
+    totalmember: guild.memberCount,
+    joinedAt: member.joinedAt || Date.now(),
+    accountCreatedAt: member.user.createdAt,
+    inviter: details.inviter || null
   };
-
-  const channelDescription = applyPlaceholders(settings.welcome.embedDescription, context);
   const dmMessage = applyPlaceholders(settings.welcome.dmMessage, context);
-
-  const channelEmbed = createBaseEmbed({
-    title: applyPlaceholders(settings.welcome.embedTitle, context),
-    description: channelDescription,
-    color: parseColor(settings.welcome.embedColor),
-    footer: guild.name,
-    timestamp: Date.now()
-  }).setThumbnail(member.user.displayAvatarURL({ size: 256 }));
-
+  const channelEmbed = buildWelcomeComponents(settings, member, guild, context);
   const dmEmbed = createBaseEmbed({
     title: applyPlaceholders(settings.welcome.dmTitle, context),
     description: dmMessage,

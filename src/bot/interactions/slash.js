@@ -4,8 +4,8 @@ export function commandFeature(commandName) {
   const name = String(commandName || "");
   if (["저장", "저장내용"].includes(name)) return "ticket";
   if (["메시지삭제", "제재조회", "허니팟차단", "허니팟추방", "허니팟해제"].includes(name)) return "security";
-  if (["음성채널생성", "이모지스틸", "이모지목록", "이모지삭제", "사운드스틸", "사운드목록", "사운드삭제"].includes(name)) return "voice";
-  if (["서버정보", "입장순서", "관리자", "프로필", "복제", "카테고리삭제"].includes(name)) return "administrators";
+  if (["음성채널생성", "이모지스틸", "이모지목록", "이모지삭제", "이모지확대", "이모지추가", "스티커추가", "사운드스틸", "사운드목록", "사운드삭제"].includes(name)) return "voice";
+  if (["서버정보", "입장순서", "관리자", "프로필", "복제", "카테고리삭제", "역할전체지금", "웹훅생성"].includes(name)) return "administrators";
   if (["닉네임적용", "닉네임랜덤", "닉네임초기화"].includes(name)) return "nickname";
   if (["도박", "캐시", "캐시지급", "생일"].includes(name)) return "shop";
   if (["부스트로그켜기", "부스트로그끄기"].includes(name)) return "logs";

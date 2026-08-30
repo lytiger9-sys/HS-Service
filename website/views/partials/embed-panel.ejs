@@ -55,13 +55,15 @@
             <div class="component-tool-list">
               <div class="component-tool-row component-tool-row-main">
                 <button type="button" class="ghost" data-component-insert="--">-- <span>실선 추가</span></button>
-                <button type="button" class="ghost" data-component-insert="[image] ">[image] <span>사진 링크 입력</span></button>
+                                <button type="button" class="ghost" data-component-insert="[image] ">[image] <span>사진 링크 입력</span></button>
                 <button type="button" class="ghost" data-component-insert="[thumbnail] ">[thumbnail] <span>썸네일 링크 입력</span></button>
+
+                
               </div>
               <div class="component-tool-row component-tool-row-mentions">
                 <button type="button" class="ghost" data-component-insert="@everyone">@everyone <span>전체 멘션</span></button>
                 <button type="button" class="ghost" data-component-insert="@here">@here <span>온라인 멤버 멘션</span></button>
-                <select data-component-role aria-label="멘션할 역할 선택">
+                <select data-component-role aria-label="멘션할 역할 선택" data-combo-placeholder="역할 이름 검색 또는 선택">
                   <option value="">역할 멘션 추가</option>
                   <% roles.filter((role) => role.id !== guild.id).forEach((role) => { %>
                     <option value="<%= role.name %>">@<%= role.name %></option>
@@ -84,8 +86,9 @@
           <span>주기적으로 자동 전송</span>
         </label>
         <label class="field">
-          <span>전송 주기(분)</span>
-          <input type="number" min="1" max="10080" name="embedScheduleIntervalMinutes" value="<%= settings.embed.scheduleIntervalMinutes %>" />
+          <span>전송 주기</span>
+          <input type="text" inputmode="decimal" name="embedScheduleIntervalMinutes" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.embed.scheduleIntervalMinutes, 'minutes') : settings.embed.scheduleIntervalMinutes %>" data-duration-input data-duration-default-unit="days" data-duration-minutes-min="1" data-duration-minutes-max="10080" />
+          <small class="muted">예: 1일, 12시간, 60분 · 숫자만 입력하면 일로 저장됩니다.</small>
         </label>
       </div>
       <div class="form-actions">

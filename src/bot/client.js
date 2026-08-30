@@ -44,6 +44,8 @@ export async function createBot(context) {
   client.once("ready", () => void handleReady(client, context).catch((error) => console.error("[bot] ready error:", error)));
   client.on("guildCreate", (guild) => void handleGuildCreate(guild, context).catch((error) => console.error("[bot] guildCreate error:", error)));
   client.on("guildMemberAdd", (member) => void runAllowedGuildEvent(member.guild?.id, () => handleGuildMemberAdd(member, context)).catch((error) => console.error("[bot] guildMemberAdd error:", error)));
+  client.on("inviteCreate", (invite) => context.services.invites.remember(invite));
+  client.on("inviteDelete", (invite) => context.services.invites.forget(invite));
   client.on("guildMemberRemove", (member) => void runAllowedGuildEvent(member.guild?.id, () => Promise.all([
     handleGuildMemberRemove(member, context),
     context.services.serverAuditLogs.handleMemberRemove(member)

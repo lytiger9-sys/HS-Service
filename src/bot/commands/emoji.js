@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { buildBaseEmbed, palette } from "../../shared/embeds.js";
 
 export const emojiSteal = {
@@ -12,6 +12,59 @@ export const emojiSteal = {
     await interaction.deferReply({ ephemeral: true });
     try {
       const created = await context.services.emojis.importEmoji(interaction.guild, interaction.options.getString("이모지", true), interaction.options.getString("이름"), interaction.user.id);
+      return interaction.editReply(`이모지 ${created}를 등록했습니다. 이름: **${created.name}**`);
+    } catch (error) {
+      return interaction.editReply(error.message || "이모지를 등록하지 못했습니다.");
+    }
+  }
+};
+
+function resolveEmojiImageUrl(value) {
+  const input = String(value || "").trim();
+  const customEmoji = input.match(/^<(a?):[\w~+-]{2,32}:(\d+)>$/);
+  if (customEmoji) {
+    const extension = customEmoji[1] ? "gif" : "png";
+    return `https://cdn.discordapp.com/emojis/${customEmoji[2]}.${extension}?size=4096&quality=lossless`;
+  }
+  try {
+    const url = new URL(input);
+    if (url.protocol !== "https:" || !url.hostname) throw new Error("invalid-url");
+    return url.toString();
+  } catch {
+    throw new Error("커스텀 이모지 또는 https://로 시작하는 이미지 링크를 입력해 주세요.");
+  }
+}
+
+export const emojiEnlarge = {
+  data: new SlashCommandBuilder()
+    .setName("이모지확대")
+    .setDescription("이모지 링크 또는 커스텀 이모지를 크게 보여줍니다.")
+    .addStringOption((option) => option.setName("이모지").setDescription("확대할 이모지 링크 또는 커스텀 이모지").setRequired(true)),
+  async execute(interaction) {
+    try {
+      const imageUrl = resolveEmojiImageUrl(interaction.options.getString("이모지", true));
+      return interaction.reply({
+        embeds: [new EmbedBuilder().setTitle("이모지 확대").setImage(imageUrl).setColor(0x1a1d23)],
+        ephemeral: true
+      });
+    } catch (error) {
+      return interaction.reply({ content: error.message || "이모지 이미지를 표시하지 못했습니다.", ephemeral: true });
+    }
+  }
+};
+
+export const emojiAdd = {
+  data: new SlashCommandBuilder()
+    .setName("이모지추가")
+    .setDescription("이미지 링크를 현재 서버의 이모지로 저장합니다.")
+    .addStringOption((option) => option.setName("이모지").setDescription("저장할 이미지 링크").setRequired(true)),
+  async execute(interaction, context) {
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuildExpressions)) {
+      return interaction.reply({ content: "이모지 관리 권한이 필요합니다.", ephemeral: true });
+    }
+    await interaction.deferReply({ ephemeral: true });
+    try {
+      const created = await context.services.emojis.importEmojiFromUrl(interaction.guild, interaction.options.getString("이모지", true), interaction.user.id);
       return interaction.editReply(`이모지 ${created}를 등록했습니다. 이름: **${created.name}**`);
     } catch (error) {
       return interaction.editReply(error.message || "이모지를 등록하지 못했습니다.");

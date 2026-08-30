@@ -37,7 +37,8 @@ export default async function handleGuildMemberAdd(member, context) {
     return;
   }
 
-  const { channelEmbed, dmEmbed } = buildWelcomeEmbeds(settings, member, member.guild);
+  const inviter = await context.services.invites.resolveInviter(member.guild).catch(() => null);
+  const { channelEmbed, dmEmbed } = buildWelcomeEmbeds(settings, member, member.guild, { inviter });
 
   if (settings.welcome.channelId) {
     const channel = await member.guild.channels.fetch(settings.welcome.channelId).catch(() => null);

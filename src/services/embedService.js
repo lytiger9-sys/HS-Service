@@ -61,10 +61,24 @@ function normalizeRoleMentions(value, guild) {
     .filter((role) => role.id !== guild.id && role.name)
     .sort((a, b) => b.name.length - a.name.length);
   for (const role of roles) {
-    const escaped = role.name.replace(/[.*+?^${}()|[\\]\\]/g, "\\\\$&");
+    const escaped = role.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     text = text.replace(new RegExp(`@${escaped}(?![\\w])`, "g"), `<@&${role.id}>`);
   }
   return text;
+}
+
+function normalizeComponentMediaUrl(value, label) {
+  try {
+    const url = new URL(String(value || "").trim());
+    if (url.protocol !== "https:" || !url.hostname) throw new Error("invalid-url");
+    return url.toString();
+  } catch {
+    throw new Error(`${label}에는 https://로 시작하는 유효한 이미지 링크를 입력해 주세요.`);
+  }
+}
+
+function countComponentTree(component) {
+  return 1 + (component?.components || []).reduce((count, child) => count + countComponentTree(child), 0);
 }
 
 function mentionPayload(settings, guild, includeContent = false) {
@@ -108,38 +122,53 @@ function legacyPayload(guild, settings) {
 }
 
 function componentsPayload(settings, guild) {
-  const container = new ContainerBuilder();
+  const container = new ContainerBuilder().setAccentColor(parseColor(settings.color));
   const contentParts = [];
   if (settings.title) contentParts.push(`# ${settings.title}`);
   if (settings.componentsBody) contentParts.push(settings.componentsBody);
-  const lines = normalizeRoleMentions(contentParts.join("\n\n"), guild).split(/\r?\n/);
+  const content = normalizeRoleMentions(contentParts.join("\n\n"), guild).trim();
+  const lines = content ? content.split(/\r?\n/) : [];
   let text = [];
+  let hasComponents = false;
   const flush = () => {
-    if (!text.length) return;
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(text.join("\n")));
+    const textContent = text.join("\n").trim();
     text = [];
+    if (!textContent) return;
+    if (textContent.length > 4000) throw new Error("임베드의 한 텍스트 영역은 4,000자 이하로 입력해 주세요.");
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(textContent));
+    hasComponents = true;
   };
   for (const line of lines) {
     const trimmed = line.trim();
-    const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
+            const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
     const thumbnailMatch = trimmed.match(/^\[thumbnail\]\s+(https?:\/\/\S+)$/i);
+    const imageSyntax = /^\[image\]\b/i.test(trimmed);
+    const thumbnailSyntax = /^\[thumbnail\]\b/i.test(trimmed);
+    if (imageSyntax && !imageMatch) throw new Error("사진에는 https://로 시작하는 유효한 이미지 링크를 입력해 주세요.");
+    if (thumbnailSyntax && !thumbnailMatch) throw new Error("썸네일에는 https://로 시작하는 유효한 이미지 링크를 입력해 주세요.");
+    const imageUrl = imageMatch ? normalizeComponentMediaUrl(imageMatch[1], "사진") : null;
+    const thumbnailUrl = thumbnailMatch ? normalizeComponentMediaUrl(thumbnailMatch[1], "썸네일") : null;
+
     if (trimmed === "--" || trimmed === "---" || trimmed === "___") {
       flush();
       container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+      hasComponents = true;
     } else if (imageMatch) {
       flush();
       container.addMediaGalleryComponents(
         new MediaGalleryBuilder().addItems(
-          new MediaGalleryItemBuilder().setURL(imageMatch[1])
+          new MediaGalleryItemBuilder().setURL(imageUrl)
         )
       );
+      hasComponents = true;
     } else if (thumbnailMatch) {
       flush();
       container.addSectionComponents(
         new SectionBuilder()
           .addTextDisplayComponents(new TextDisplayBuilder().setContent(" "))
-          .setThumbnailAccessory(new ThumbnailBuilder({ media: { url: thumbnailMatch[1] } }))
+          .setThumbnailAccessory(new ThumbnailBuilder({ media: { url: thumbnailUrl } }))
       );
+      hasComponents = true;
     } else {
       text.push(line);
     }
@@ -148,8 +177,10 @@ function componentsPayload(settings, guild) {
   if (settings.footer) {
     container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${normalizeRoleMentions(settings.footer, guild)}`));
+    hasComponents = true;
   }
-  if (!lines.length && !settings.footer) container.addTextDisplayComponents(new TextDisplayBuilder().setContent(" "));
+  if (!hasComponents) container.addTextDisplayComponents(new TextDisplayBuilder().setContent("공지 내용이 아직 설정되지 않았습니다."));
+  if (countComponentTree(container.toJSON()) > 40) throw new Error("임베드 구성요소는 이미지·썸네일·실선을 합쳐 최대 40개까지 추가할 수 있습니다.");
   return { flags: MessageFlags.IsComponentsV2, components: [container], ...mentionPayload(settings, guild, false) };
 }
 

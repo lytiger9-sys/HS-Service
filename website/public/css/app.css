@@ -5479,3 +5479,18 @@ html[data-theme="dark"] .dashboard-page .ticket-publish-form select option {
     margin-left: 0;
   }
 }
+
+
+/* Keep role-mention combobox text legible on the dark embed editor. */
+.dashboard-page .component-tool-row-mentions .channel-combobox-input,
+.dashboard-page .component-tool-row-mentions .channel-combobox-option,
+.dashboard-page .component-tool-row-mentions .channel-combobox-option:hover,
+.dashboard-page .component-tool-row-mentions .channel-combobox-option:focus-visible,
+.dashboard-page .component-tool-row-mentions .channel-combobox-option[aria-selected="true"] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.dashboard-page .component-tool-row-mentions .channel-combobox-input::placeholder {
+  color: rgba(255, 255, 255, .78);
+  opacity: 1;
+}

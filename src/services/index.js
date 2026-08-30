@@ -25,6 +25,9 @@ import { createExchangeService } from "./exchangeService.js";
 import { createCloneService } from "./cloneService.js";
 import { createEmojiService } from "./emojiService.js";
 import { createSoundboardService } from "./soundboardService.js";
+import { createStickerService } from "./stickerService.js";
+import { createInviteTrackerService } from "./inviteTrackerService.js";
+
 import { createAdminControlService } from "./adminControlService.js";
 
 export function createServices(context) {
@@ -57,6 +60,8 @@ export function createServices(context) {
     exchange: createExchangeService(),
     cloner: createCloneService(),
     emojis: createEmojiService(context),
+    stickers: createStickerService(context),
+    invites: createInviteTrackerService(),
     soundboards: createSoundboardService(context),
     adminControl: createAdminControlService()
   };

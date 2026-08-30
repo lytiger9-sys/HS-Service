@@ -104,6 +104,38 @@ function renderSearchResults(query) {
   });
 }
 
+function formatDurationMinutes(minutes) {
+  const value = Math.round(Number(minutes) || 0);
+  if (value === 0) return "0분";
+  if (value % (24 * 60) === 0) return `${value / (24 * 60)}일`;
+  if (value % 60 === 0) return `${value / 60}시간`;
+  return `${value}분`;
+}
+
+function normalizeDurationField(input) {
+  const defaultUnit = input.dataset.durationDefaultUnit || "minutes";
+  const multipliers = { minutes: 1, hours: 60, days: 24 * 60 };
+  const koreanUnits = { "분": "minutes", "시간": "hours", "일": "days" };
+  const match = String(input.value || "").trim().match(/^(\d+(?:\.\d+)?)\s*(분|시간|일)?$/);
+  if (!match) return false;
+  const unit = koreanUnits[match[2]] || defaultUnit;
+  const minutes = Math.round(Number(match[1]) * multipliers[unit]);
+  const minimum = Number(input.dataset.durationMinutesMin || 0);
+  const maximum = Number(input.dataset.durationMinutesMax || Infinity);
+  if (!Number.isFinite(minutes) || minutes < minimum || minutes > maximum) return false;
+  input.value = formatDurationMinutes(minutes);
+  return true;
+}
+
+window.normalizeDurationInputs = (form) => {
+  form?.querySelectorAll?.("[data-duration-input]").forEach((input) => normalizeDurationField(input));
+};
+
+document.querySelectorAll("[data-duration-input]").forEach((input) => {
+  input.addEventListener("change", () => normalizeDurationField(input));
+  input.addEventListener("blur", () => normalizeDurationField(input));
+});
+
 function showToast(message) {
   if (!toast) {
     return;
@@ -228,6 +260,32 @@ function setupForms() {
   });
 }
 
+function setupWelcomeComponentTools() {
+  document.querySelectorAll("[data-welcome-component-tools]").forEach((tools) => {
+    const targetName = tools.dataset.welcomeComponentTarget;
+    const target = targetName ? document.querySelector(`[name="${targetName}"]`) : null;
+    if (!target) return;
+    const insert = (syntax) => {
+      const current = target.value.trimEnd();
+      target.value = `${current ? `${current}\n` : ""}${syntax}`;
+      target.focus();
+      target.setSelectionRange(target.value.length, target.value.length);
+      target.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+    tools.querySelectorAll("[data-welcome-component-insert]").forEach((button) => {
+      button.addEventListener("click", () => insert(button.dataset.welcomeComponentInsert || ""));
+    });
+    tools.querySelectorAll("[data-variable]").forEach((button) => {
+      button.addEventListener("click", () => insert(button.dataset.variable || ""));
+    });
+    const roleSelect = tools.querySelector("[data-welcome-component-role]");
+    roleSelect?.addEventListener("change", () => {
+      if (roleSelect.value) insert(`@${roleSelect.value}`);
+      roleSelect.value = "";
+    });
+  });
+}
+
 function setupEmbedPanel() {
   const form = document.querySelector("[data-embed-form]");
   if (!form) return;
@@ -295,8 +353,10 @@ function setupEmbedPanel() {
       addPreviewText(description, "discord-component-text");
       String(form.querySelector('[name="embedComponentsBody"]')?.value || "").split(/\r?\n/).forEach((line) => {
         const trimmed = line.trim();
-        const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
+                const imageMatch = trimmed.match(/^\[image\]\s+(https?:\/\/\S+)$/i);
         const thumbnailMatch = trimmed.match(/^\[thumbnail\]\s+(https?:\/\/\S+)$/i);
+
+        
         if (trimmed === "--" || trimmed === "---" || trimmed === "___") {
           const divider = document.createElement("div");
           divider.className = "discord-component-divider";
@@ -569,6 +629,7 @@ function setupSearch() {
   });
 }
 
+setupWelcomeComponentTools();
 setupChannelComboboxes();
 setupShopPanel();
 setupTabs();

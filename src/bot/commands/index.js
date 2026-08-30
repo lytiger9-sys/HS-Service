@@ -17,13 +17,16 @@ import profile from "./profile.js";
 import exchange from "./exchange.js";
 import clone from "./clone.js";
 import categoryDelete from "./categoryDelete.js";
-import { emojiSteal, emojiList, emojiDelete } from "./emoji.js";
+import { emojiSteal, emojiList, emojiDelete, emojiEnlarge, emojiAdd } from "./emoji.js";
 import { soundboardSteal, soundboardList, soundboardDelete } from "./soundboard.js";
 import shop, { balanceCommand, adminGrantCommand } from "./shop.js";
 import birthday from "./birthday.js";
 import partnermsg from "./partnermsg.js";
 import { accountSettings, account } from "./account.js";
 import { securout, securin } from "./securityChannel.js";
+import roleAllNow from "./roleAllNow.js";
+import webhookCreate from "./webhookCreate.js";
+import stickerAdd from "./sticker.js";
 
 export const commandList = [
   serverinfo,
@@ -49,6 +52,11 @@ export const commandList = [
   emojiSteal,
   emojiList,
   emojiDelete,
+  emojiEnlarge,
+  emojiAdd,
+  stickerAdd,
+  roleAllNow,
+  webhookCreate,
   soundboardSteal,
   soundboardList,
   soundboardDelete,

@@ -116,7 +116,38 @@
               <label class="field full">
                 <span>채널 임베드 내용</span>
                 <textarea name="welcomeEmbedDescription" rows="4" data-welcome-preview="description"><%= settings.welcome.embedDescription %></textarea>
-                <div class="welcome-variable-buttons" data-variable-target="welcomeEmbedDescription"><button type="button" class="ghost variable-button" data-variable="{user}">유저</button><button type="button" class="ghost variable-button" data-variable="{guild}">길드</button><button type="button" class="ghost variable-button" data-variable="{totalmember}">총멤버</button></div>
+                <div class="component-tools welcome-component-tools" data-welcome-component-tools data-welcome-component-target="welcomeEmbedDescription">
+                  <p class="component-tools-title">사용 가능한 기능</p>
+                  <div class="component-tool-list">
+                    <div class="component-tool-row component-tool-row-main">
+                      <button type="button" class="ghost" data-welcome-component-insert="--">-- <span>실선 추가</span></button>
+                      <button type="button" class="ghost" data-welcome-component-insert="[image] ">[image] <span>사진 링크 입력</span></button>
+                      <button type="button" class="ghost" data-welcome-component-insert="[thumbnail] ">[thumbnail] <span>썸네일 링크 입력</span></button>
+                    </div>
+                    <div class="component-tool-row component-tool-row-mentions">
+                      <button type="button" class="ghost" data-welcome-component-insert="@everyone">@everyone <span>전체 멘션</span></button>
+                      <button type="button" class="ghost" data-welcome-component-insert="@here">@here <span>온라인 멤버 멘션</span></button>
+                      <select data-welcome-component-role aria-label="멘션할 역할 선택" data-combo-placeholder="역할 이름 검색 또는 선택">
+                        <option value="">역할 멘션 추가</option>
+                        <% roles.filter((role) => role.id !== guild.id).forEach((role) => { %>
+                          <option value="<%= role.name %>">@<%= role.name %></option>
+                        <% }) %>
+                      </select>
+                    </div>
+                    <div class="component-tool-row welcome-variable-buttons">
+                      <button type="button" class="ghost variable-button" data-variable="{totalmember}">전체 인원</button>
+                      <button type="button" class="ghost variable-button" data-variable="{user}">유저 멘션</button>
+                      <button type="button" class="ghost variable-button" data-variable="{username}">사용자명</button>
+                      <button type="button" class="ghost variable-button" data-variable="{joinedat}">입장 시간</button>
+                      <button type="button" class="ghost variable-button" data-variable="{joinedrelative}">입장 경과</button>
+                      <button type="button" class="ghost variable-button" data-variable="{accountcreatedat}">계정 생성일</button>
+                      <button type="button" class="ghost variable-button" data-variable="{accountcreatedrelative}">계정 생성 경과</button>
+                      <button type="button" class="ghost variable-button" data-variable="{inviter}">초대자 멘션</button>
+                      <button type="button" class="ghost variable-button" data-variable="{invitername}">초대자명</button>
+                    </div>
+                  </div>
+                  <small class="muted">사진·썸네일 링크는 HTTPS 주소를 사용하세요. 초대자는 봇이 초대 링크를 조회할 권한이 없거나 초대자를 특정할 수 없으면 안내 문구로 표시됩니다.</small>
+                </div>
               </label>
               <label class="field">
                 <span>채널 임베드 색상</span>
@@ -167,20 +198,24 @@
                 </select>
               </label>
               <label class="field">
-                <span>전체 멘션 타임아웃(분)</span>
-                <input type="number" min="0" name="massMentionTimeoutMinutes" value="<%= settings.security.massMentionTimeoutMinutes %>" />
+                <span>전체 멘션 타임아웃</span>
+                <input type="text" inputmode="decimal" name="massMentionTimeoutMinutes" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.security.massMentionTimeoutMinutes, 'minutes') : settings.security.massMentionTimeoutMinutes %>" data-duration-input data-duration-default-unit="minutes" data-duration-minutes-min="0" data-duration-minutes-max="10080" />
+                <small class="muted">예: 30분, 1시간, 2일 · 숫자만 입력하면 분으로 저장됩니다.</small>
               </label>
               <label class="field">
-                <span>도배 타임아웃(분)</span>
-                <input type="number" min="0" name="spamTimeoutMinutes" value="<%= settings.security.spamTimeoutMinutes %>" />
+                <span>도배 타임아웃</span>
+                <input type="text" inputmode="decimal" name="spamTimeoutMinutes" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.security.spamTimeoutMinutes, 'minutes') : settings.security.spamTimeoutMinutes %>" data-duration-input data-duration-default-unit="minutes" data-duration-minutes-min="0" data-duration-minutes-max="10080" />
+                <small class="muted">예: 30분, 1시간, 2일 · 숫자만 입력하면 분으로 저장됩니다.</small>
               </label>
               <label class="field">
-                <span>욕설 타임아웃(분)</span>
-                <input type="number" min="0" name="profanityTimeoutMinutes" value="<%= settings.security.profanityTimeoutMinutes %>" />
+                <span>욕설 타임아웃</span>
+                <input type="text" inputmode="decimal" name="profanityTimeoutMinutes" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.security.profanityTimeoutMinutes, 'minutes') : settings.security.profanityTimeoutMinutes %>" data-duration-input data-duration-default-unit="minutes" data-duration-minutes-min="0" data-duration-minutes-max="10080" />
+                <small class="muted">예: 30분, 1시간, 2일 · 숫자만 입력하면 분으로 저장됩니다.</small>
               </label>
               <label class="field">
-                <span>초대 링크 타임아웃(분)</span>
-                <input type="number" min="0" name="inviteTimeoutMinutes" value="<%= settings.security.inviteTimeoutMinutes %>" />
+                <span>초대 링크 타임아웃</span>
+                <input type="text" inputmode="decimal" name="inviteTimeoutMinutes" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.security.inviteTimeoutMinutes, 'minutes') : settings.security.inviteTimeoutMinutes %>" data-duration-input data-duration-default-unit="minutes" data-duration-minutes-min="0" data-duration-minutes-max="10080" />
+                <small class="muted">예: 30분, 1시간, 2일 · 숫자만 입력하면 분으로 저장됩니다.</small>
               </label>
               <label class="field">
                 <span>도배 반복 기준</span>
@@ -312,8 +347,9 @@
                 <input type="text" name="pollQuestion" data-poll-preview="question" />
               </label>
               <label class="field">
-                <span>투표 만료 일수</span>
-                <input type="number" name="pollExpirationDays" min="1" max="365" value="<%= settings.polls.expirationDays || 7 %>" />
+                <span>투표 만료 기간</span>
+                <input type="text" inputmode="decimal" name="pollExpirationDays" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.polls.expirationDays || 7, 'days') : (settings.polls.expirationDays || 7) %>" data-duration-input data-duration-default-unit="days" data-duration-minutes-min="1440" data-duration-minutes-max="525600" />
+                <small class="muted">예: 1일, 24시간 · 숫자만 입력하면 일로 저장됩니다.</small>
               </label>
               <label class="field full">
                 <span>설명</span>
