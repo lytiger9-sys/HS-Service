@@ -30,7 +30,7 @@ function buildSaveModal() {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("save")
+    .setName("저장")
     .setDescription("제목과 내용을 모달로 저장합니다."),
 
   async execute(interaction, context) {

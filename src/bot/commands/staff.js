@@ -3,7 +3,7 @@ import { isAdministrator } from "../../shared/guards.js";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("staff")
+    .setName("관리자")
     .setDescription("관리자 출퇴근 상태 게시판을 게시합니다."),
 
   async execute(interaction, context) {

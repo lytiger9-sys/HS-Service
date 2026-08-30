@@ -33,10 +33,9 @@
               <span>플랜</span>
               <select name="plan">
                 <option value="free">Free · 기본 기능</option>
-                <option value="basic">Basic · 개인 서버 운영</option>
-                <option value="standard">Standard · 성장 서버 운영</option>
-                <option value="pro">Pro · 고급 관리 기능</option>
-                <option value="enterprise">Enterprise · 전체 기능 및 확장 운영</option>
+                <option value="standard">Standard · 개인 서버 운영</option>
+                <option value="pro">Pro · 전체 기능 및 확장 운영</option>
+                
               </select>
             </label>
             <label class="field">
@@ -89,10 +88,9 @@
             <select name="plan">
               <option value="">전체 플랜</option>
               <option value="free" <%= licenseFilters.plan === 'free' ? 'selected' : '' %>>Free</option>
-              <option value="basic" <%= licenseFilters.plan === 'basic' ? 'selected' : '' %>>Basic</option>
               <option value="standard" <%= licenseFilters.plan === 'standard' ? 'selected' : '' %>>Standard</option>
               <option value="pro" <%= licenseFilters.plan === 'pro' ? 'selected' : '' %>>Pro</option>
-              <option value="enterprise" <%= licenseFilters.plan === 'enterprise' ? 'selected' : '' %>>Enterprise</option>
+              
             </select>
           </label>
           <label class="field">

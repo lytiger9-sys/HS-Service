@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("exithoneypot")
+    .setName("허니팟해제")
     .setDescription("현재 채널의 허니팟 지정을 해제합니다."),
   async execute(interaction, context) {
     if (!isAdministrator(interaction.member)) {

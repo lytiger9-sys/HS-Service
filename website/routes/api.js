@@ -469,7 +469,7 @@ export function createApiRouter(context) {
       if (!access.allowed) return res.status(403).send("발급 서버의 관리자만 배너 라이선스를 발급할 수 있습니다.");
       const serviceLicense = await context.services.licenses.getActiveByGuild(guildId);
       const isManagementGuild = String(guildId) === String(context.config.allowedGuildId);
-      const issuerPlan = serviceLicense?.plan || (isManagementGuild ? "enterprise" : "");
+      const issuerPlan = serviceLicense?.plan || (isManagementGuild ? "pro" : "");
       if (!serviceLicense && !isManagementGuild) {
         const message = "상단배너 라이센스 발급에는 해당 서버의 활성 서비스 라이센스가 필요합니다.";
         return wantsJson(req) ? res.status(400).json({ ok: false, message }) : res.redirect(`/?section=partner&bannerError=${encodeURIComponent(message)}`);

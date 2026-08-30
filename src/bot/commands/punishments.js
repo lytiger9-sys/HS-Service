@@ -4,18 +4,18 @@ import { buildBaseEmbed, palette } from "../../shared/embeds.js";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("punishments")
+    .setName("제재조회")
     .setDescription("유저의 제재 목록을 보여줍니다.")
     .addUserOption((option) =>
       option
-        .setName("user")
+        .setName("유저")
         .setDescription("조회할 유저")
         .setRequired(false)
     ),
 
   async execute(interaction, context) {
     await interaction.deferReply({ ephemeral: true });
-    const targetUser = interaction.options.getUser("user") ?? interaction.user;
+    const targetUser = interaction.options.getUser("유저") ?? interaction.user;
     if (targetUser.id !== interaction.user.id && !isAdministrator(interaction.member)) {
       return interaction.editReply({ content: "다른 유저의 제재 목록은 관리자만 볼 수 있습니다." });
     }

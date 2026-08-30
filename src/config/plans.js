@@ -5,6 +5,12 @@ const FEATURE_ALIASES = {
   notice: "embed"
 };
 
+// 신규 판매 플랜에서는 Enterprise를 제거했습니다. 마이그레이션 전 남아 있는
+// Enterprise 라이선스는 Pro 권한으로 해석해 기존 고객 기능이 축소되지 않게 합니다.
+const LEGACY_PLAN_ALIASES = {
+  enterprise: "pro"
+};
+
 export const PLAN_DEFINITIONS = [
   {
     id: "free",
@@ -15,34 +21,18 @@ export const PLAN_DEFINITIONS = [
     tabs: ["overview", "administrators", "assignment", "voice", "honeypot", "embed", "polls"]
   },
   {
-    id: "basic",
-    label: "Basic",
+    id: "standard",
+    label: "Standard",
     description: "기본 서버 관리 기능",
     order: 2,
     allowFeatureToggle: true,
     tabs: ["overview", "administrators", "welcome", "ticket", "assignment", "voice", "honeypot", "embed", "polls", "logs", "nickname"]
   },
   {
-    id: "standard",
-    label: "Standard",
-    description: "성장 서버 운영 기능",
-    order: 3,
-    allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "nickname", "events"]
-  },
-  {
     id: "pro",
     label: "Pro",
-    description: "고급 서버 운영 및 파트너 기능",
-    order: 4,
-    allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "events"]
-  },
-  {
-    id: "enterprise",
-    label: "Enterprise",
-    description: "전체 기능 및 확장 운영",
-    order: 5,
+    description: "보안·이벤트·파트너·상점을 포함한 전체 서버 운영 기능",
+    order: 3,
     allowFeatureToggle: true,
     tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "shop", "events"],
     includesFutureFeatures: true
@@ -74,5 +64,6 @@ export function normalizeFeatureId(feature) {
 }
 
 export function getPlanDefinition(planId) {
-  return PLAN_DEFINITIONS.find((plan) => plan.id === planId) || PLAN_DEFINITIONS[0];
+  const normalizedPlanId = LEGACY_PLAN_ALIASES[planId] || planId;
+  return PLAN_DEFINITIONS.find((plan) => plan.id === normalizedPlanId) || PLAN_DEFINITIONS[0];
 }

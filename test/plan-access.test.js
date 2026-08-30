@@ -3,29 +3,29 @@ import assert from "node:assert/strict";
 import { canUseFeature, interactionFeature, planHasFeature } from "../src/shared/planAccess.js";
 import { isAllowedGuild } from "../src/shared/guards.js";
 
-test("plan feature gates match the five plan definitions", () => {
+test("plan feature gates match the three current plan definitions", () => {
   assert.equal(planHasFeature("free", "partner"), false);
-  assert.equal(planHasFeature("basic", "welcome"), true);
-  assert.equal(planHasFeature("standard", "ticket"), true);
-  assert.equal(planHasFeature("standard", "partner"), false);
+  assert.equal(planHasFeature("standard", "welcome"), true);
+  assert.equal(planHasFeature("standard", "security"), false);
+  assert.equal(planHasFeature("pro", "security"), true);
+  assert.equal(planHasFeature("pro", "events"), true);
   assert.equal(planHasFeature("pro", "partner"), true);
+  assert.equal(planHasFeature("pro", "shop"), true);
   assert.equal(planHasFeature("enterprise", "shop"), true);
-  for (const plan of ["free", "basic", "standard", "pro", "enterprise"]) {
+  for (const plan of ["free", "standard", "pro"]) {
     assert.equal(planHasFeature(plan, "assignment"), true);
     assert.equal(planHasFeature(plan, "voice"), true);
     assert.equal(planHasFeature(plan, "honeypot"), true);
   }
   assert.equal(planHasFeature("free", "logs"), false);
-  assert.equal(planHasFeature("basic", "logs"), true);
-  assert.equal(planHasFeature("standard", "embed"), true);
-  assert.equal(planHasFeature("pro", "partner"), true);
-  assert.equal(planHasFeature("enterprise", "shop"), true);
+  assert.equal(planHasFeature("standard", "logs"), true);
+  assert.equal(planHasFeature("pro", "embed"), true);
 });
 
 test("licensed guilds are allowed while unlicensed guilds are rejected", async () => {
   const context = {
     config: { allowedGuildId: "management" },
-    services: { licenses: { getActiveByGuild: async (guildId) => guildId === "licensed" ? { plan: "basic" } : null } }
+    services: {       licenses: { getActiveByGuild: async (guildId) => guildId === "licensed" ? { plan: "standard" } : null } }
   };
   assert.equal(await isAllowedGuild(context, "management"), true);
   assert.equal(await isAllowedGuild(context, "licensed"), true);

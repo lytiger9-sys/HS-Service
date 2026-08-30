@@ -44,7 +44,7 @@ async function setChannelSecurity(interaction, context, excluded) {
 
 export const securout = {
   data: new SlashCommandBuilder()
-    .setName("securout")
+    .setName("보안제외")
     .setDescription("현재 채널을 보안 적용에서 제외합니다."),
   async execute(interaction, context) {
     return setChannelSecurity(interaction, context, true);
@@ -53,7 +53,7 @@ export const securout = {
 
 export const securin = {
   data: new SlashCommandBuilder()
-    .setName("securin")
+    .setName("보안적용")
     .setDescription("현재 채널을 보안 적용 대상으로 복귀시킵니다."),
   async execute(interaction, context) {
     return setChannelSecurity(interaction, context, false);

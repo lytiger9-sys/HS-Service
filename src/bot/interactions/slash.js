@@ -2,15 +2,15 @@ import { canUseFeature, featureDeniedMessage, getGuildPlanAccess } from "../../s
 
 export function commandFeature(commandName) {
   const name = String(commandName || "");
-  if (["save", "savednote", "savednotes", "저장", "저장내용"].includes(name)) return "ticket";
-  if (["clear", "punishments", "honeypotban", "honeypotkick", "exithoneypot"].includes(name)) return "security";
-  if (["tempvoice", "이모지스틸", "이모지목록", "이모지삭제", "사운드스틸", "사운드목록", "사운드삭제"].includes(name)) return "voice";
-  if (["serverinfo", "joinorder", "staff", "프로필", "복제", "카테고리삭제"].includes(name)) return "administrators";
-  if (["nickapply", "nickrandom", "nickinit"].includes(name)) return "nickname";
+  if (["저장", "저장내용"].includes(name)) return "ticket";
+  if (["메시지삭제", "제재조회", "허니팟차단", "허니팟추방", "허니팟해제"].includes(name)) return "security";
+  if (["음성채널생성", "이모지스틸", "이모지목록", "이모지삭제", "사운드스틸", "사운드목록", "사운드삭제"].includes(name)) return "voice";
+  if (["서버정보", "입장순서", "관리자", "프로필", "복제", "카테고리삭제"].includes(name)) return "administrators";
+  if (["닉네임적용", "닉네임랜덤", "닉네임초기화"].includes(name)) return "nickname";
   if (["도박", "캐시", "캐시지급", "생일"].includes(name)) return "shop";
-  if (["booston", "boostoff"].includes(name)) return "logs";
-  if (name === "partnermsg") return "partner";
-  if (["securout", "securin"].includes(name)) return "security";
+  if (["부스트로그켜기", "부스트로그끄기"].includes(name)) return "logs";
+  if (name === "파트너메시지") return "partner";
+  if (["보안제외", "보안적용"].includes(name)) return "security";
   if (name === "환율") return "events";
   return null;
 }

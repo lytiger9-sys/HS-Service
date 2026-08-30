@@ -3,10 +3,10 @@ import { isAdministrator } from "../../shared/guards.js";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("honeypotban")
+    .setName("허니팟차단")
     .setDescription("허니팟 채널을 설정하고 메시지 작성자를 차단합니다.")
     .addChannelOption((option) => option
-      .setName("channel")
+      .setName("채널")
       .setDescription("허니팟으로 사용할 텍스트 채널")
       .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
       .setRequired(true)),
@@ -14,7 +14,7 @@ export default {
     if (!isAdministrator(interaction.member)) {
       return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
     }
-    const channel = interaction.options.getChannel("channel", true);
+    const channel = interaction.options.getChannel("채널", true);
     await interaction.deferReply({ ephemeral: true });
     try {
       await context.services.honeypot.configureChannel(interaction.guildId, channel.id, "ban");

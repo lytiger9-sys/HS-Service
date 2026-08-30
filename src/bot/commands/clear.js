@@ -60,19 +60,19 @@ async function recreateTextChannel(channel) {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("clear")
+    .setName("메시지삭제")
     .setDescription("메시지를 삭제하거나 채널을 초기화합니다.")
     .addStringOption((option) => option
-      .setName("mode")
+      .setName("방식")
       .setDescription("실행 방식을 선택합니다.")
       .setRequired(true)
       .addChoices(
-        { name: "general · 메시지 개수 삭제", value: "general" },
-        { name: "hard · 채널 재생성", value: "hard" }
+        { name: "일반 삭제 · 메시지 개수 삭제", value: "general" },
+        { name: "채널 초기화 · 채널 재생성", value: "hard" }
       ))
     .addIntegerOption((option) => option
-      .setName("count")
-      .setDescription("general 모드에서 삭제할 개수. 비우면 가능한 만큼 삭제")
+      .setName("개수")
+      .setDescription("일반 삭제 방식에서 삭제할 개수. 비우면 가능한 만큼 삭제")
       .setMinValue(1)
       .setMaxValue(1000)),
   async execute(interaction) {
@@ -83,7 +83,7 @@ export default {
     if (!channel || ![ChannelType.GuildText, ChannelType.GuildAnnouncement].includes(channel.type)) {
       return interaction.reply({ content: "일반 텍스트 채널 또는 공지 채널에서만 사용할 수 있습니다.", ephemeral: true });
     }
-    const mode = interaction.options.getString("mode", true);
+    const mode = interaction.options.getString("방식", true);
     await interaction.deferReply({ ephemeral: true });
     if (mode === "hard") {
       try {
@@ -94,7 +94,7 @@ export default {
         return interaction.editReply({ content: "채널 재생성에 실패했습니다. 봇의 채널 관리 권한과 카테고리 권한을 확인해 주세요." });
       }
     }
-    const count = interaction.options.getInteger("count") ?? 1000;
+    const count = interaction.options.getInteger("개수") ?? 1000;
     const deleted = await deleteMessages(channel, count);
     return interaction.editReply({ content: `${deleted}개의 메시지를 삭제했습니다.` });
   }

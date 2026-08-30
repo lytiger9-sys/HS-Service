@@ -1,6 +1,6 @@
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 export default {
-  data: new SlashCommandBuilder().setName("nickapply").setDescription("역할별 닉네임 규칙을 모든 멤버에게 적용합니다."),
+  data: new SlashCommandBuilder().setName("닉네임적용").setDescription("역할별 닉네임 규칙을 모든 멤버에게 적용합니다."),
   async execute(interaction, context) {
     if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) return interaction.reply({ content: "관리자만 사용할 수 있습니다.", ephemeral: true });
     const settings = await context.services.settings.getSettings(interaction.guildId);

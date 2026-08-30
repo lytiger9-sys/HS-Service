@@ -17,7 +17,7 @@ function buildTextReport(notes) {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("savednotes")
+    .setName("저장내용")
     .setDescription("지금까지 저장한 내용을 보여줍니다."),
 
   async execute(interaction, context) {

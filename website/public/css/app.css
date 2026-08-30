@@ -5300,3 +5300,166 @@ html[data-theme="dark"] .dashboard-page .ticket-publish-form select option {
   color: #111315 !important;
   -webkit-text-fill-color: #111315;
 }
+
+
+/* Three-plan guide layout and plan-difference emphasis */
+.guide-home-page .guide-plan-grid-interactive {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.guide-plan-difference-section {
+  margin-bottom: 44px;
+}
+.guide-plan-difference-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+.guide-plan-difference-heading > p {
+  max-width: 300px;
+  margin: 0;
+  color: #8d7044;
+  font-size: .88rem;
+  font-weight: 700;
+  line-height: 1.55;
+  text-align: right;
+}
+.guide-plan-difference-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.guide-plan-difference-card {
+  min-height: 154px;
+  padding: 22px 24px;
+  border: 1px solid rgba(184, 139, 75, .58);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(255, 250, 236, .98), rgba(244, 235, 216, .86));
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, .94), 0 10px 26px rgba(132, 99, 52, .09);
+}
+.guide-plan-difference-card h3 {
+  margin: 0 0 9px;
+  color: #6f5229;
+  font-size: 1.08rem;
+  letter-spacing: -.04em;
+}
+.guide-plan-difference-card p {
+  margin: 0;
+  color: #74654e;
+  font-size: .9rem;
+  line-height: 1.7;
+}
+@media (max-width: 720px) {
+  .guide-home-page .guide-plan-grid-interactive {
+    grid-template-columns: 1fr;
+  }
+  .guide-plan-difference-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .guide-plan-difference-heading > p {
+    max-width: none;
+    text-align: left;
+  }
+  .guide-plan-difference-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Portrait plan cards with visible key features */
+.guide-home-page .guide-plan-grid-interactive {
+  grid-template-columns: repeat(3, minmax(270px, 360px));
+  justify-content: center;
+  gap: clamp(28px, 3.5vw, 60px);
+}
+.guide-home-page .guide-plan-card-interactive {
+  min-height: 510px;
+  padding: 26px 24px 23px;
+}
+.guide-home-page .guide-plan-card-interactive .guide-plan-title {
+  align-self: flex-start;
+  margin: 25px 0 15px;
+  font-size: clamp(31px, 2.6vw, 42px);
+  text-align: left;
+}
+.guide-home-page .guide-plan-price {
+  margin-bottom: 18px;
+  font-weight: 850;
+}
+.guide-home-page .guide-plan-audience {
+  min-height: 0;
+  color: #687477;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.72;
+}
+.guide-home-page .guide-plan-feature-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(13, 13, 13, .12);
+}
+.guide-home-page .guide-plan-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #394347;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.guide-home-page .guide-plan-feature-check {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(164, 132, 79, .16);
+  color: #8d7044;
+  font-size: 12px;
+  font-weight: 900;
+}
+.guide-home-page .guide-plan-card-hint {
+  margin-top: auto;
+  padding-top: 18px;
+}
+@media (max-width: 1120px) {
+  .guide-home-page .guide-plan-grid-interactive {
+    grid-template-columns: repeat(3, minmax(0, 330px));
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+@media (max-width: 800px) {
+  .guide-home-page .guide-plan-grid-interactive {
+    grid-template-columns: repeat(2, minmax(260px, 340px));
+    justify-content: center;
+    gap: 28px;
+  }
+}
+@media (max-width: 620px) {
+  .guide-home-page .guide-plan-grid-interactive {
+    grid-template-columns: minmax(0, 360px);
+    justify-content: center;
+  }
+  .guide-home-page .guide-plan-card-interactive {
+    min-height: 480px;
+  }
+  .guide-home-page .guide-plan-card-interactive .guide-plan-title {
+    font-size: 38px;
+  }
+}
+
+
+/* Keep the server command-note on one line beside its heading on desktop. */
+@media (min-width: 721px) {
+  .guide-server-page #commands .guide-section-heading > p {
+    max-width: none;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}

@@ -33,7 +33,7 @@ export function buildJoinOrderPayload(rows, page = 0, ownerId = "") {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("joinorder")
+    .setName("입장순서")
     .setDescription("서버 입장 순서를 내림차순으로 보여줍니다."),
 
   async execute(interaction, context) {

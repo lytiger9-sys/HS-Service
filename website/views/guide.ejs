@@ -25,8 +25,8 @@
     <section class="guide-plan-section" id="plans" aria-label="서비스 플랜">
       <div class="guide-plan-grid guide-plan-grid-interactive">
         <% plans.forEach((plan) => { %>
-          <a class="guide-plan-card guide-plan-card-interactive<%= (plan.order === 3 || plan.order === 4) ? ' guide-plan-card-recommended' : '' %>" href="/guide/<%= plan.slug %>">
-            <% if (plan.order === 3 || plan.order === 4) { %><span class="guide-plan-recommended-badge">추천</span><% } %>
+          <a class="guide-plan-card guide-plan-card-interactive<%= plan.id === 'pro' ? ' guide-plan-card-recommended' : '' %>" href="/guide/<%= plan.slug %>">
+            <% if (plan.id === 'pro') { %><span class="guide-plan-recommended-badge">추천</span><% } %>
             <span class="guide-plan-card-topline">
               <span class="guide-plan-order">0<%= plan.order %></span>
               <span class="guide-plan-arrow" aria-hidden="true">↗</span>
@@ -34,6 +34,11 @@
             <span class="guide-plan-title"><%= plan.label %></span>
             <span class="guide-plan-price"><%= plan.price %></span>
             <span class="guide-plan-audience"><%= plan.audience %></span>
+            <span class="guide-plan-feature-list" aria-label="<%= plan.label %> 플랜 주요 기능">
+              <% plan.cardFeatures.forEach((feature) => { %>
+                <span class="guide-plan-feature-item"><span class="guide-plan-feature-check" aria-hidden="true">✓</span><%= feature %></span>
+              <% }) %>
+            </span>
             <span class="guide-plan-card-hint">플랜 상세 보기</span>
           </a>
         <% }) %>

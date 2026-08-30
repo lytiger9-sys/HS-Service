@@ -45,7 +45,7 @@ export function interactionFeature(customId = "") {
 
 export async function getGuildPlanAccess(context, guildId) {
   if (String(guildId) === String(context.config.allowedGuildId)) {
-    return { allowed: true, bypass: true, plan: "enterprise", reason: "management-guild" };
+    return { allowed: true, bypass: true, plan: "pro", reason: "management-guild" };
   }
   const license = await context.services.licenses.getActiveByGuild(guildId).catch(() => null);
   if (!license) return { allowed: false, bypass: false, plan: null, reason: "license-required" };

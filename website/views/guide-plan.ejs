@@ -23,6 +23,26 @@
       </p>
     </section>
 
+    <% if (plan.order > 1 && plan.addedFeatures.length) { %>
+      <section class="guide-detail-section guide-plan-difference-section" aria-labelledby="plan-difference-title">
+        <div class="guide-section-heading guide-plan-difference-heading">
+          <div>
+            <p class="guide-kicker">PLAN DIFFERENCE</p>
+            <h2 id="plan-difference-title">이전 플랜에서 추가된 기능</h2>
+          </div>
+          <p>현재 플랜에서 새로 사용할 수 있는 기능입니다.</p>
+        </div>
+        <div class="guide-plan-difference-grid">
+          <% plan.addedFeatures.forEach((feature) => { %>
+            <article class="guide-plan-difference-card">
+              <h3><%= feature.label %></h3>
+              <p><%= feature.description %></p>
+            </article>
+          <% }) %>
+        </div>
+      </section>
+    <% } %>
+
     <section class="guide-detail-section">
       <div class="guide-section-heading">
         <div>

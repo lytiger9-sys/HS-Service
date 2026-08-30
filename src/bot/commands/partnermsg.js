@@ -2,7 +2,7 @@ import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("partnermsg")
+    .setName("파트너메시지")
     .setDescription("현재 채널의 마지막 메시지를 매일 홍보 메시지로 지정합니다."),
   async execute(interaction, context) {
     if (!interaction.member?.permissions?.has(PermissionFlagsBits.Administrator)) {

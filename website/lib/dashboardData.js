@@ -91,7 +91,7 @@ function normalizeStaffSettings(settings = {}) {
   };
 }
 
-export async function buildDashboardViewModel(context, guild, planId = "enterprise", licenseSession = false) {
+export async function buildDashboardViewModel(context, guild, planId = "pro", licenseSession = false) {
   const [overview, settings, notes, polls, tempChannels, stalePartners, shop, events, allLicenses] = await Promise.all([
     context.services.serverInfo.getDashboardSnapshot(guild),
     context.services.settings.getSettings(guild.id),
