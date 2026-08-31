@@ -27,6 +27,7 @@ import { createEmojiService } from "./emojiService.js";
 import { createSoundboardService } from "./soundboardService.js";
 import { createStickerService } from "./stickerService.js";
 import { createInviteTrackerService } from "./inviteTrackerService.js";
+import { createPurchaseFeedbackService } from "./purchaseFeedbackService.js";
 
 import { createAdminControlService } from "./adminControlService.js";
 
@@ -54,7 +55,8 @@ export function createServices(context) {
     embeds: createEmbedService(context),
     events: createEventService(context, guildState),
     nicknames: { applyAllNicknames, randomizeNicknames, restoreNicknames, applyNickname, getBotManagedRoles },
-    shop: createShopService(context),
+        shop: createShopService(context),
+    purchaseFeedback: createPurchaseFeedbackService(context, guildState),
     serverAuditLogs: createServerAuditLogService(context),
     boost: createBoostService(context, guildState),
     exchange: createExchangeService(),

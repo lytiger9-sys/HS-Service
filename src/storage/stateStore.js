@@ -57,6 +57,12 @@ function normalizeGuildState(doc) {
     },
     partners: Array.isArray(data.partners) ? data.partners : [],
     bannerSlots: Array.isArray(data.bannerSlots) ? data.bannerSlots : [],
+    purchaseFeedback: {
+      ...defaults.purchaseFeedback,
+      ...(data.purchaseFeedback || {}),
+      pending: data.purchaseFeedback?.pending && typeof data.purchaseFeedback.pending === "object" ? data.purchaseFeedback.pending : {},
+      history: Array.isArray(data.purchaseFeedback?.history) ? data.purchaseFeedback.history.slice(0, 100) : []
+    },
     account: {
       ...defaults.account,
       ...(data.account || {}),

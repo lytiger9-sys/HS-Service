@@ -408,8 +408,16 @@ function setupEmbedPanel() {
 
   const updateDestinationFields = () => {
     const useWebhook = destinationSelect?.value === "webhook";
-    if (channelField) channelField.hidden = useWebhook;
-    if (webhookField) webhookField.hidden = !useWebhook;
+    if (channelField) {
+      channelField.hidden = useWebhook;
+      channelField.style.display = useWebhook ? "none" : "";
+      channelField.setAttribute("aria-hidden", String(useWebhook));
+    }
+    if (webhookField) {
+      webhookField.hidden = !useWebhook;
+      webhookField.style.display = useWebhook ? "" : "none";
+      webhookField.setAttribute("aria-hidden", String(!useWebhook));
+    }
     if (channelSelect) channelSelect.required = !useWebhook;
     if (webhookInput) webhookInput.required = useWebhook;
   };

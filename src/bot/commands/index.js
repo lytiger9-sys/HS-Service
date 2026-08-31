@@ -27,6 +27,7 @@ import { securout, securin } from "./securityChannel.js";
 import roleAllNow from "./roleAllNow.js";
 import webhookCreate from "./webhookCreate.js";
 import stickerAdd from "./sticker.js";
+import purchaseLog from "./purchaseLog.js";
 
 export const commandList = [
   serverinfo,
@@ -57,6 +58,7 @@ export const commandList = [
   stickerAdd,
   roleAllNow,
   webhookCreate,
+  purchaseLog,
   soundboardSteal,
   soundboardList,
   soundboardDelete,

@@ -57,7 +57,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", nickname: "nickname", shop: "shop", partner: "partner" };
+  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", nickname: "nickname", shop: "shop", partner: "partner", purchaseFeedback: "purchaseFeedback" };
   return map[section] || null;
 }
 
@@ -236,6 +236,17 @@ function sectionPayload(section, body) {
       gamblingMaxBet: readNumber(body.shopGamblingMaxBet, 100000, 1, 100000000),
       embedBody: readText(body.shopEmbedBody, "상품을 확인하거나 내 캐시 잔액을 확인하세요.", 4000)
     } };
+  }
+  if (section === "purchaseFeedback") {
+    return {
+      purchaseFeedback: {
+        enabled: readOptionalBoolean(body.purchaseFeedbackEnabled),
+        logChannelId: readDiscordId(body.purchaseFeedbackLogChannelId),
+        reviewChannelId: readDiscordId(body.purchaseFeedbackReviewChannelId),
+        logTemplate: readText(body.purchaseFeedbackLogTemplate, "# 구매 로그\n--\n유저\n{user}\n제품명\n{product}", 4000),
+        reviewTemplate: readText(body.purchaseFeedbackReviewTemplate, "# 구매 후기\n--\n유저\n{user}\n제품명\n{product}\n후기\n{review}", 4000)
+      }
+    };
   }
   if (section === "events") {
     return {

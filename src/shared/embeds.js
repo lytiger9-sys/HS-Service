@@ -88,7 +88,8 @@ export { createBaseEmbed as buildBaseEmbed };
 
 export function convertLegacyPayload(payload, footerText = "Powered by HS-Service") {
   if (!payload || payload.flags === MessageFlags.IsComponentsV2 || !Array.isArray(payload.embeds) || !payload.embeds.length) return payload;
-  const container = new ContainerBuilder();
+  const firstEmbed = typeof payload.embeds[0]?.toJSON === "function" ? payload.embeds[0].toJSON() : payload.embeds[0];
+  const container = new ContainerBuilder().setAccentColor(parseColor(firstEmbed?.color, palette.ink));
   payload.embeds.forEach((raw, index) => {
     const embed = typeof raw?.toJSON === "function" ? raw.toJSON() : raw;
     const title = embed.title ? `## ${embed.title}` : "";

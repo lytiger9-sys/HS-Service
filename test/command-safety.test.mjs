@@ -102,3 +102,12 @@ test("새 명령어가 기존 플랜별 접근 제어와 연결된다", () => {
   assert.equal(commandFeature("이모지추가"), "voice");
   assert.equal(commandFeature("스티커추가"), "voice");
 });
+
+test("구매로그 명령어가 필수 입력값과 Pro 전용 후기 기능 게이트로 등록된다", () => {
+  assert.ok(commandMap.has("구매로그"));
+  assert.equal(option("구매로그", "유저")?.required, true);
+  assert.equal(option("구매로그", "제품명")?.required, true);
+  assert.equal(commandFeature("구매로그"), "purchaseFeedback");
+  assert.equal(getPlanDefinition("pro").tabs.includes("purchaseFeedback"), true);
+  assert.equal(getPlanDefinition("standard").tabs.includes("purchaseFeedback"), false);
+});

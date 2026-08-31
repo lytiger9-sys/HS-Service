@@ -59,7 +59,12 @@ export async function createBot(context) {
   client.on("guildUpdate", (oldGuild, newGuild) => void runAllowedGuildEvent(newGuild.id, () => context.services.serverAuditLogs.handleGuildUpdate(oldGuild, newGuild)).catch((error) => console.error("[audit] guildUpdate error:", error)));
   client.on("channelCreate", (channel) => void runAllowedGuildEvent(channel.guild?.id, () => context.services.serverAuditLogs.handleChannelCreate(channel)).catch((error) => console.error("[audit] channelCreate error:", error)));
   client.on("channelUpdate", (oldChannel, newChannel) => void runAllowedGuildEvent(newChannel.guild?.id || oldChannel.guild?.id, () => context.services.serverAuditLogs.handleChannelUpdate(oldChannel, newChannel)).catch((error) => console.error("[audit] channelUpdate error:", error)));
-  client.on("messageCreate", (message) => void runAllowedGuildEvent(message.guild?.id, () => handleMessageCreate(message, context)).catch((error) => console.error("[bot] messageCreate error:", error)));
+  client.on("messageCreate", (message) => {
+    if (!message.guild) {
+      return void context.services.purchaseFeedback.handleDirectMessage(message).catch((error) => console.error("[bot] purchase feedback DM error:", error));
+    }
+    return void runAllowedGuildEvent(message.guild.id, () => handleMessageCreate(message, context)).catch((error) => console.error("[bot] messageCreate error:", error));
+  });
   client.on("messageUpdate", (oldMessage, newMessage) => void runAllowedGuildEvent(newMessage.guild?.id || oldMessage.guild?.id, () => handleMessageUpdate(oldMessage, newMessage, context)).catch((error) => console.error("[bot] messageUpdate error:", error)));
   client.on("messageDelete", (message) => void runAllowedGuildEvent(message.guild?.id, () => handleMessageDelete(message, context)).catch((error) => console.error("[bot] messageDelete error:", error)));
   client.on("messageDeleteBulk", (messages, channel) => void runAllowedGuildEvent(channel.guild?.id, () => handleMessageDeleteBulk(messages, channel, context)).catch((error) => console.error("[bot] messageDeleteBulk error:", error)));

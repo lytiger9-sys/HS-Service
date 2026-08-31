@@ -105,8 +105,7 @@ export function createShopService(context) {
     if (result?.attendanceAmount) reasons.push("오늘 첫 메시지 보상");
     if (result?.amount) reasons.push("활동 메시지 보상");
     if (result?.birthdayAmount) reasons.push("생일 축하 보상");
-    const guildName = message.guild?.name || "알 수 없는 서버";
-    await message.author.send(`[${guildName}] 캐시 지급 안내\n+${amount.toLocaleString()} 캐시 (${reasons.join(" + ")})\n현재 잔액: ${Number(result.balance || 0).toLocaleString()} 캐시`).catch(() => null);
+    await message.author.send(`캐시 지급 안내 (${message.guild?.name || "알 수 없는 서버"})\n+${amount.toLocaleString()} 캐시 (${reasons.join(" + ")})\n현재 잔액: ${Number(result.balance || 0).toLocaleString()} 캐시`).catch(() => null);
   }
 
   function isValidBirthday(month, day) {
@@ -288,7 +287,7 @@ export function createShopService(context) {
       state.shop.purchases.unshift({ id: id(), userId: user.id, productId, productName: product.name, price: product.price, delivery, createdAt: new Date().toISOString() });
       state.shop.purchases = state.shop.purchases.slice(0, 500);
     });
-    try { await user.send(`구매가 완료되었습니다.\n상품: ${product.name}\n\n${delivery || "상품 지급 내용이 없습니다."}`); }
+    try { await user.send(`구매가 완료되었습니다. (${guild.name})\n상품: ${product.name}\n\n${delivery || "상품 지급 내용이 없습니다."}`); }
     catch {
       await patch(guild.id, (state) => {
         state.shop = normalizeShop(state.shop);

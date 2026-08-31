@@ -15,7 +15,8 @@ const guildStateSchema = new Schema(
     events: { type: Schema.Types.Mixed, default: () => ({}) },
     tempChannels: { type: Schema.Types.Mixed, default: () => ({}) },
     partners: { type: [Schema.Types.Mixed], default: () => [] },
-    bannerSlots: { type: [Schema.Types.Mixed], default: () => [] },
+        bannerSlots: { type: [Schema.Types.Mixed], default: () => [] },
+    purchaseFeedback: { type: Schema.Types.Mixed, default: () => ({ pending: {}, history: [] }) },
     shop: { type: Schema.Types.Mixed, default: () => createDefaultGuildState().shop }
   },
   {

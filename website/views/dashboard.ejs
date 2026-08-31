@@ -419,7 +419,8 @@
       <%- include('partials/events-panel', { guild, channels, settings, events, panelClass, formatDate }) %>
       <%- include('partials/logs-panel', { guild, channels, settings, panelClass }) %>
       <%- include('partials/nickname-panel', { guild, roles, settings, panelClass }) %>
-      <%- include('partials/shop-panel', { guild, channels, shop, panelClass }) %>
+            <%- include('partials/shop-panel', { guild, channels, shop, panelClass }) %>
+      <%- include('partials/purchase-feedback-panel', { guild, channels, settings, panelClass }) %>
       <%- include('partials/partner-panel', { guild, channels, settings, stalePartners, bannerLicenses, panelClass, formatDate, issuedBannerKey, bannerError }) %>
       <% if (licenseSession) { %>
         <%- include('partials/license-panel', { guild, plan, licenseStatus, panelClass, formatDate }) %>

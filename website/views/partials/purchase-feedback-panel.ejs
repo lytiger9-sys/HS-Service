@@ -1,0 +1,49 @@
+<section class="panel-stack <%= panelClass('purchaseFeedback') %>" data-panel="purchaseFeedback">
+  <article class="card section-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Purchase Feedback</p>
+        <h3>구매로그 / 후기</h3>
+      </div>
+      <label class="field toggle section-toggle">
+        <input type="checkbox" form="purchase-feedback-settings-form" name="purchaseFeedbackEnabled" <%= settings.purchaseFeedback.enabled !== false ? 'checked' : '' %> />
+        <span>구매로그/후기 기능 활성화</span>
+      </label>
+    </div>
+    <p class="muted">`/구매로그` 실행 시 구매로그를 전송하고, 대상 유저에게 DM으로 후기를 요청합니다. 유저가 DM으로 후기를 보내면 자동으로 후기 채널에 게시됩니다.</p>
+
+    <form class="settings-form" id="purchase-feedback-settings-form" method="post" action="/guild/<%= guild.id %>/settings/purchaseFeedback" data-async-form>
+      <div class="form-grid">
+        <label class="field">
+          <span>구매로그 게시 채널</span>
+          <select name="purchaseFeedbackLogChannelId" required>
+            <option value="">채널을 선택하세요</option>
+            <% channels.text.forEach((channel) => { %>
+              <option value="<%= channel.id %>" <%= settings.purchaseFeedback.logChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
+            <% }) %>
+          </select>
+        </label>
+        <label class="field">
+          <span>구매후기 게시 채널</span>
+          <select name="purchaseFeedbackReviewChannelId" required>
+            <option value="">채널을 선택하세요</option>
+            <% channels.text.forEach((channel) => { %>
+              <option value="<%= channel.id %>" <%= settings.purchaseFeedback.reviewChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
+            <% }) %>
+          </select>
+        </label>
+        <label class="field full">
+          <span>구매로그 기본 틀</span>
+          <textarea name="purchaseFeedbackLogTemplate" rows="5" maxlength="4000" required><%= settings.purchaseFeedback.logTemplate %></textarea>
+          <small class="muted">사용 가능 변수: <code>{user}</code>, <code>{product}</code> · 전송 결과는 Components V2 메시지로 표시됩니다.</small>
+        </label>
+        <label class="field full">
+          <span>구매후기 기본 틀</span>
+          <textarea name="purchaseFeedbackReviewTemplate" rows="6" maxlength="4000" required><%= settings.purchaseFeedback.reviewTemplate %></textarea>
+          <small class="muted">사용 가능 변수: <code>{user}</code>, <code>{product}</code>, <code>{review}</code> · <code>{review}</code>는 후기 내용으로 자동 치환됩니다.</small>
+        </label>
+      </div>
+      <div class="form-actions"><button class="primary" type="submit">설정 저장</button></div>
+    </form>
+  </article>
+</section>

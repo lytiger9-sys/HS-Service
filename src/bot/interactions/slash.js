@@ -8,6 +8,7 @@ export function commandFeature(commandName) {
   if (["서버정보", "입장순서", "관리자", "프로필", "복제", "카테고리삭제", "역할전체지금", "웹훅생성"].includes(name)) return "administrators";
   if (["닉네임적용", "닉네임랜덤", "닉네임초기화"].includes(name)) return "nickname";
   if (["도박", "캐시", "캐시지급", "생일"].includes(name)) return "shop";
+  if (name === "구매로그") return "purchaseFeedback";
   if (["부스트로그켜기", "부스트로그끄기"].includes(name)) return "logs";
   if (name === "파트너메시지") return "partner";
   if (["보안제외", "보안적용"].includes(name)) return "security";

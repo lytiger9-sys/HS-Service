@@ -118,6 +118,13 @@ export function createDefaultGuildSettings() {
       roleChangeEnabled: true,
       moderationActionEnabled: true
     },
+    purchaseFeedback: {
+      enabled: true,
+      logChannelId: "",
+      reviewChannelId: "",
+      logTemplate: "# 구매 로그\n--\n유저\n{user}\n제품명\n{product}",
+      reviewTemplate: "# 구매 후기\n--\n유저\n{user}\n제품명\n{product}\n후기\n{review}"
+    },
     events: {
       enabled: true,
       channelId: "",
@@ -170,6 +177,10 @@ export function createDefaultGuildState() {
     tempChannels: {},
     partners: [],
     bannerSlots: [],
+    purchaseFeedback: {
+      pending: {},
+      history: []
+    },
     account: { bank: "", number: "", holder: "" },
     expressions: { emojis: [], sounds: [] },
     shop: {
