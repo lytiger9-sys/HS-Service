@@ -17,7 +17,7 @@
       <div class="form-grid">
         <label class="field">
           <span>게시 채널</span>
-          <select name="eventsChannelId" required>
+          <select name="eventsChannelId">
             <option value="">채널을 선택하세요</option>
             <% for (const channel of (channels.text || [])) { %>
               <option value="<%= channel.id %>" <%= settings.events?.channelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
@@ -26,7 +26,7 @@
         </label>
         <label class="field">
           <span>이벤트 이름</span>
-          <input type="text" name="eventsName" maxlength="256" value="<%= settings.events?.name || '' %>" required />
+          <input type="text" name="eventsName" maxlength="256" value="<%= settings.events?.name || '' %>" />
         </label>
         <label class="field full">
           <span>이벤트 임베드 내용</span>
@@ -34,19 +34,19 @@
         </label>
         <label class="field">
           <span>상품 이름</span>
-          <input type="text" name="eventsPrizeName" maxlength="256" value="<%= settings.events?.prizeName || '' %>" placeholder="예: 10,000 캐시" required />
+          <input type="text" name="eventsPrizeName" maxlength="256" value="<%= settings.events?.prizeName || '' %>" placeholder="예: 10,000 캐시" />
         </label>
         <label class="field full">
           <span>상품 내용(DM 전송)</span>
-          <textarea name="eventsPrizeContent" rows="4" maxlength="4000" placeholder="당첨자에게만 DM으로 보낼 상품 내용입니다." required><%= settings.events?.prizeContent || '' %></textarea>
+          <textarea name="eventsPrizeContent" rows="4" maxlength="4000" placeholder="당첨자에게만 DM으로 보낼 상품 내용입니다."><%= settings.events?.prizeContent || '' %></textarea>
         </label>
         <label class="field">
           <span>추첨 인원</span>
-          <input type="number" name="eventsWinnerCount" min="1" max="100" value="<%= settings.events?.winnerCount || 1 %>" required />
+          <input type="number" name="eventsWinnerCount" min="1" max="100" value="<%= settings.events?.winnerCount || 1 %>" />
         </label>
         <label class="field">
           <span>이벤트 기한</span>
-          <input type="text" inputmode="decimal" name="eventsDurationHours" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.events?.durationHours || 24, 'hours') : (settings.events?.durationHours || 24) %>" data-duration-input data-duration-default-unit="hours" data-duration-minutes-min="60" data-duration-minutes-max="43200" required />
+          <input type="text" inputmode="decimal" name="eventsDurationHours" value="<%= typeof formatDurationInput === 'function' ? formatDurationInput(settings.events?.durationHours || 24, 'hours') : (settings.events?.durationHours || 24) %>" data-duration-input data-duration-default-unit="hours" data-duration-minutes-min="60" data-duration-minutes-max="43200" />
           <small class="muted">예: 1시간, 1일, 90분 · 숫자만 입력하면 시간으로 저장됩니다.</small>
         </label>
       </div>

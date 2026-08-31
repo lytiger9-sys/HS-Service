@@ -3,6 +3,7 @@ import { getAccessMessage, resolveRequestAccess, resolveRequestAdministrator } f
 import { parseTicketSettingsBody } from "../../src/shared/ticket.js";
 import { canUseFeature, featureDeniedMessage, planAllowsFeatureToggle, planHasFeature } from "../../src/shared/planAccess.js";
 import { durationToStoredUnit } from "../../src/shared/duration.js";
+import { createDefaultGuildSettings, createDefaultGuildState } from "../../src/config/defaults.js";
 
 function readBoolean(value) {
   if (Array.isArray(value)) return value.some((entry) => readBoolean(entry));
@@ -15,15 +16,26 @@ function readOptionalBoolean(value) {
   return value === undefined ? undefined : readBoolean(value);
 }
 
+function isBlank(value) {
+  if (Array.isArray(value)) return value.every((entry) => isBlank(entry));
+  return value === undefined || value === null || (typeof value === "string" && !value.trim());
+}
+
 function readNumber(value, fallback = 0, min = -Infinity, max = Infinity) {
+  if (isBlank(value)) return fallback;
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, parsed));
 }
 
 function readText(value, fallback = "", maxLength = 2000) {
-  const text = String(value ?? fallback).trim();
-  return text.slice(0, maxLength);
+  const text = String(value ?? "").trim();
+  const resolved = text || String(fallback ?? "").trim();
+  return resolved.slice(0, maxLength);
+}
+
+function readDuration(value, fallback, options) {
+  return durationToStoredUnit(isBlank(value) ? fallback : value, options);
 }
 
 function readDiscordId(value) {
@@ -67,28 +79,31 @@ async function requireFeature(context, guildId, feature) {
   return { ...access, allowed: access.featureAllowed, message: featureDeniedMessage(feature) };
 }
 
-function saveResponse(res, req, { section, message = "저장되었습니다." }) {
+function saveResponse(res, req, { section, message = "저장되었습니다.", refresh = false }) {
   const nextSection = section === "staff" ? "administrators" : section;
   if (wantsJson(req)) {
-    return res.json({ ok: true, section: nextSection, message });
+    return res.json({ ok: true, section: nextSection, message, refresh });
   }
 
   return res.redirect(nextSection === "administrators" ? "/?section=administrators" : `/?section=${nextSection}`);
 }
 
-function sectionPayload(section, body) {
+export function sectionPayload(section, body) {
+  const defaults = createDefaultGuildSettings();
+  const stateDefaults = createDefaultGuildState();
+
   if (section === "welcome") {
     return {
       welcome: {
         enabled: readOptionalBoolean(body.welcomeEnabled),
         channelId: readDiscordId(body.welcomeChannelId),
         errorChannelId: readDiscordId(body.welcomeErrorChannelId),
-        embedTitle: readText(body.welcomeEmbedTitle, "", 256),
-        embedDescription: readText(body.welcomeEmbedDescription, "", 4000),
-        embedColor: /^#[0-9a-f]{6}$/i.test(body.welcomeEmbedColor || "") ? body.welcomeEmbedColor : "#101010",
-        dmTitle: readText(body.welcomeDmTitle, "", 256),
-        dmMessage: readText(body.welcomeDmMessage, "", 4000),
-        dmColor: /^#[0-9a-f]{6}$/i.test(body.welcomeDmColor || "") ? body.welcomeDmColor : "#1f1f1f"
+        embedTitle: readText(body.welcomeEmbedTitle, defaults.welcome.embedTitle, 256),
+        embedDescription: readText(body.welcomeEmbedDescription, defaults.welcome.embedDescription, 4000),
+        embedColor: /^#[0-9a-f]{6}$/i.test(body.welcomeEmbedColor || "") ? body.welcomeEmbedColor : defaults.welcome.embedColor,
+        dmTitle: readText(body.welcomeDmTitle, defaults.welcome.dmTitle, 256),
+        dmMessage: readText(body.welcomeDmMessage, defaults.welcome.dmMessage, 4000),
+        dmColor: /^#[0-9a-f]{6}$/i.test(body.welcomeDmColor || "") ? body.welcomeDmColor : defaults.welcome.dmColor
       }
     };
   }
@@ -104,9 +119,9 @@ function sectionPayload(section, body) {
       staff: {
         enabled: readOptionalBoolean(body.staffEnabled),
         channelId: readDiscordId(body.staffChannelId),
-        embedTitle: readText(body.staffEmbedTitle, "", 256),
-        embedDescription: readText(body.staffEmbedDescription, "", 4000),
-        buttonLabel: readText(body.staffButtonLabel, "출퇴근", 80)
+        embedTitle: readText(body.staffEmbedTitle, defaults.staff.embedTitle, 256),
+        embedDescription: readText(body.staffEmbedDescription, defaults.staff.embedDescription, 4000),
+        buttonLabel: readText(body.staffButtonLabel, defaults.staff.buttonLabel, 80)
       }
     };
   }
@@ -119,11 +134,11 @@ function sectionPayload(section, body) {
         spamEnabled: body.spamEnabled === undefined ? true : readBoolean(body.spamEnabled),
         profanityEnabled: body.profanityEnabled === undefined ? true : readBoolean(body.profanityEnabled),
         inviteEnabled: body.inviteEnabled === undefined ? true : readBoolean(body.inviteEnabled),
-        massMentionTimeoutMinutes: durationToStoredUnit(body.massMentionTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "전체 멘션 타임아웃" }),
-        spamTimeoutMinutes: durationToStoredUnit(body.spamTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "도배 타임아웃" }),
-        profanityTimeoutMinutes: durationToStoredUnit(body.profanityTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "욕설 타임아웃" }),
-        inviteTimeoutMinutes: durationToStoredUnit(body.inviteTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "초대 링크 타임아웃" }),
-        spamRepeatThreshold: readNumber(body.spamRepeatThreshold, 3, 2, 100),
+        massMentionTimeoutMinutes: readDuration(body.massMentionTimeoutMinutes, defaults.security.massMentionTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "전체 멘션 타임아웃" }),
+        spamTimeoutMinutes: readDuration(body.spamTimeoutMinutes, defaults.security.spamTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "도배 타임아웃" }),
+        profanityTimeoutMinutes: readDuration(body.profanityTimeoutMinutes, defaults.security.profanityTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "욕설 타임아웃" }),
+        inviteTimeoutMinutes: readDuration(body.inviteTimeoutMinutes, defaults.security.inviteTimeoutMinutes, { defaultUnit: "minutes", storageUnit: "minutes", minMinutes: 0, maxMinutes: 10080, fieldLabel: "초대 링크 타임아웃" }),
+        spamRepeatThreshold: readNumber(body.spamRepeatThreshold, defaults.security.spamRepeatThreshold, 2, 100),
         profanityWords: splitLines(body.profanityWords, 200, 80),
         securityLogChannelId: readDiscordId(body.securityLogChannelId)
       }
@@ -145,8 +160,8 @@ function sectionPayload(section, body) {
       voice: {
         enabled: readOptionalBoolean(body.voiceEnabled),
         categoryId: readDiscordId(body.voiceCategoryId),
-        defaultName: readText(body.voiceDefaultName, "임시 채널", 100),
-        maxUsers: readNumber(body.voiceMaxUsers, 0, 0, 99)
+        defaultName: readText(body.voiceDefaultName, defaults.voice.defaultName, 100),
+        maxUsers: readNumber(body.voiceMaxUsers, defaults.voice.maxUsers, 0, 99)
       }
     };
   }
@@ -165,9 +180,9 @@ function sectionPayload(section, body) {
         channelId: readDiscordId(body.embedChannelId),
         destinationType: body.embedDestinationType === "webhook" ? "webhook" : "channel",
         webhookUrl: normalizeWebhookUrl(body.embedWebhookUrl),
-        title: readText(body.embedTitle, "서버 공지", 256),
-        description: readText(body.embedDescription ?? body.noticeContent, "", 4000),
-        color: /^#[0-9a-f]{6}$/i.test(body.embedColor || "") ? body.embedColor : "#1a1d23",
+        title: readText(body.embedTitle, defaults.embed.title, 256),
+        description: readText(body.embedDescription ?? body.noticeContent, defaults.embed.description, 4000),
+        color: /^#[0-9a-f]{6}$/i.test(body.embedColor || "") ? body.embedColor : defaults.embed.color,
         footer: readText(body.embedFooter, "", 2048),
         authorName: readText(body.embedAuthorName, "", 256),
         authorUrl: readText(body.embedAuthorUrl, "", 500),
@@ -179,7 +194,7 @@ function sectionPayload(section, body) {
         mentionHere: readBoolean(body.embedMentionHere),
         mentionRoleIds: splitLines(body.embedMentionRoleIds, 20, 22).filter((id) => /^\d{15,22}$/.test(id)),
         scheduleEnabled: readBoolean(body.embedScheduleEnabled),
-        scheduleIntervalMinutes: durationToStoredUnit(body.embedScheduleIntervalMinutes, { defaultUnit: "days", storageUnit: "minutes", minMinutes: 1, maxMinutes: 10080, fieldLabel: "자동 전송 주기" }),
+        scheduleIntervalMinutes: readDuration(body.embedScheduleIntervalMinutes, `${defaults.embed.scheduleIntervalMinutes}분`, { defaultUnit: "days", storageUnit: "minutes", minMinutes: 1, maxMinutes: 10080, fieldLabel: "자동 전송 주기" }),
         updatedAt: new Date().toISOString()
       }
     };
@@ -190,7 +205,7 @@ function sectionPayload(section, body) {
       polls: {
         enabled: readOptionalBoolean(body.pollsEnabled),
         resultVisibility: body.pollResultVisibility === "private" ? "private" : "public",
-        expirationDays: durationToStoredUnit(body.pollExpirationDays, { defaultUnit: "days", storageUnit: "days", minMinutes: 1440, maxMinutes: 365 * 1440, fieldLabel: "투표 만료 기간" }),
+        expirationDays: readDuration(body.pollExpirationDays, defaults.polls.expirationDays, { defaultUnit: "days", storageUnit: "days", minMinutes: 1440, maxMinutes: 365 * 1440, fieldLabel: "투표 만료 기간" }),
         voteLogChannelId: readDiscordId(body.pollVoteLogChannelId)
       }
     };
@@ -227,14 +242,14 @@ function sectionPayload(section, body) {
       enabled: readOptionalBoolean(body.shopEnabled),
       messageChannelId: readDiscordId(body.shopMessageChannelId),
       birthdayChannelId: readDiscordId(body.shopBirthdayChannelId),
-      birthdayReward: readNumber(body.shopBirthdayReward, 100, 0, 1000000),
-      dailyReward: readNumber(body.shopDailyReward, 100, 0, 1000000),
-      messageReward: readNumber(body.shopMessageReward, 10, 0, 1000000),
-      messageThreshold: readNumber(body.shopMessageThreshold, 20, 1, 100000),
-      gamblingEnabled: readBoolean(body.shopGamblingEnabled),
-      gamblingWinRate: readNumber(body.shopGamblingWinRate, 45, 1, 99),
-      gamblingMaxBet: readNumber(body.shopGamblingMaxBet, 100000, 1, 100000000),
-      embedBody: readText(body.shopEmbedBody, "상품을 확인하거나 내 캐시 잔액을 확인하세요.", 4000)
+      birthdayReward: readNumber(body.shopBirthdayReward, stateDefaults.shop.birthdayReward, 0, 1000000),
+      dailyReward: readNumber(body.shopDailyReward, stateDefaults.shop.dailyReward, 0, 1000000),
+      messageReward: readNumber(body.shopMessageReward, stateDefaults.shop.messageReward, 0, 1000000),
+      messageThreshold: readNumber(body.shopMessageThreshold, stateDefaults.shop.messageThreshold, 1, 100000),
+      gamblingEnabled: body.shopGamblingEnabled === undefined ? stateDefaults.shop.gamblingEnabled : readBoolean(body.shopGamblingEnabled),
+      gamblingWinRate: readNumber(body.shopGamblingWinRate, stateDefaults.shop.gamblingWinRate, 1, 99),
+      gamblingMaxBet: readNumber(body.shopGamblingMaxBet, stateDefaults.shop.gamblingMaxBet, 1, 100000000),
+      embedBody: readText(body.shopEmbedBody, stateDefaults.shop.embedBody, 4000)
     } };
   }
   if (section === "purchaseFeedback") {
@@ -243,8 +258,8 @@ function sectionPayload(section, body) {
         enabled: readOptionalBoolean(body.purchaseFeedbackEnabled),
         logChannelId: readDiscordId(body.purchaseFeedbackLogChannelId),
         reviewChannelId: readDiscordId(body.purchaseFeedbackReviewChannelId),
-        logTemplate: readText(body.purchaseFeedbackLogTemplate, "# 구매 로그\n--\n유저\n{user}\n제품명\n{product}", 4000),
-        reviewTemplate: readText(body.purchaseFeedbackReviewTemplate, "# 구매 후기\n--\n유저\n{user}\n제품명\n{product}\n후기\n{review}", 4000)
+        logTemplate: readText(body.purchaseFeedbackLogTemplate, defaults.purchaseFeedback.logTemplate, 4000),
+        reviewTemplate: readText(body.purchaseFeedbackReviewTemplate, defaults.purchaseFeedback.reviewTemplate, 4000)
       }
     };
   }
@@ -253,12 +268,12 @@ function sectionPayload(section, body) {
       events: {
         enabled: readOptionalBoolean(body.eventsEnabled),
         channelId: readDiscordId(body.eventsChannelId),
-        name: readText(body.eventsName, "서버 이벤트", 256),
-        description: readText(body.eventsDescription, "", 4000),
-        prizeName: readText(body.eventsPrizeName, "이벤트 상품", 256),
-        prizeContent: readText(body.eventsPrizeContent, "", 4000),
-        winnerCount: readNumber(body.eventsWinnerCount, 1, 1, 100),
-        durationHours: durationToStoredUnit(body.eventsDurationHours, { defaultUnit: "hours", storageUnit: "hours", minMinutes: 60, maxMinutes: 720 * 60, fieldLabel: "이벤트 기한" })
+        name: readText(body.eventsName, defaults.events.name, 256),
+        description: readText(body.eventsDescription, defaults.events.description, 4000),
+        prizeName: readText(body.eventsPrizeName, defaults.events.prizeName, 256),
+        prizeContent: readText(body.eventsPrizeContent, defaults.events.prizeContent, 4000),
+        winnerCount: readNumber(body.eventsWinnerCount, defaults.events.winnerCount, 1, 100),
+        durationHours: readDuration(body.eventsDurationHours, defaults.events.durationHours, { defaultUnit: "hours", storageUnit: "hours", minMinutes: 60, maxMinutes: 720 * 60, fieldLabel: "이벤트 기한" })
       }
     };
   }
@@ -269,22 +284,22 @@ function sectionPayload(section, body) {
         conditionsChannelId: readDiscordId(body.partnerConditionsChannelId),
         approvalChannelId: readDiscordId(body.partnerApprovalChannelId),
         partnerCategoryId: readDiscordId(body.partnerCategoryId),
-        namePrefix: readText(body.partnerNamePrefix, "", 30),
-        nameSuffix: readText(body.partnerNameSuffix, "", 30),
-        embedTitle: readText(body.partnerEmbedTitle, "파트너 모집", 256),
-        embedDescription: readText(body.partnerEmbedDescription, "", 4000),
-        embedColor: /^#[0-9a-f]{6}$/i.test(body.partnerEmbedColor || "") ? body.partnerEmbedColor : "#3a7da8",
-        buttonLabel: readText(body.partnerButtonLabel, "파트너 신청", 80),
+        namePrefix: readText(body.partnerNamePrefix, defaults.partner.namePrefix, 30),
+        nameSuffix: readText(body.partnerNameSuffix, defaults.partner.nameSuffix, 30),
+        embedTitle: readText(body.partnerEmbedTitle, defaults.partner.embedTitle, 256),
+        embedDescription: readText(body.partnerEmbedDescription, defaults.partner.embedDescription, 4000),
+        embedColor: /^#[0-9a-f]{6}$/i.test(body.partnerEmbedColor || "") ? body.partnerEmbedColor : defaults.partner.embedColor,
+        buttonLabel: readText(body.partnerButtonLabel, defaults.partner.buttonLabel, 80),
         banner: {
           enabled: readOptionalBoolean(body.bannerEnabled),
           channelId: readDiscordId(body.bannerChannelId),
           categoryId: readDiscordId(body.bannerCategoryId),
-          namePrefix: readText(body.bannerNamePrefix, "", 30),
-          nameSuffix: readText(body.bannerNameSuffix, "", 30),
-          embedTitle: readText(body.bannerEmbedTitle, "상단 배너", 256),
-          embedDescription: readText(body.bannerEmbedDescription, "", 4000),
-          embedColor: /^#[0-9a-f]{6}$/i.test(body.bannerEmbedColor || "") ? body.bannerEmbedColor : "#b89968",
-          buttonLabel: readText(body.bannerButtonLabel, "상단배너 신청", 80)
+          namePrefix: readText(body.bannerNamePrefix, defaults.partner.banner.namePrefix, 30),
+          nameSuffix: readText(body.bannerNameSuffix, defaults.partner.banner.nameSuffix, 30),
+          embedTitle: readText(body.bannerEmbedTitle, defaults.partner.banner.embedTitle, 256),
+          embedDescription: readText(body.bannerEmbedDescription, defaults.partner.banner.embedDescription, 4000),
+          embedColor: /^#[0-9a-f]{6}$/i.test(body.bannerEmbedColor || "") ? body.bannerEmbedColor : defaults.partner.banner.embedColor,
+          buttonLabel: readText(body.bannerButtonLabel, defaults.partner.banner.buttonLabel, 80)
         }
       }
     };
@@ -325,6 +340,7 @@ export function createApiRouter(context) {
       }
 
       await context.services.settings.updateSettings(guildId, payload);
+      const refresh = Object.values(req.body || {}).some((value) => isBlank(value));
 
       if (section === "staff") {
         await context.services.staff.syncStaffBoard(guildId).catch(() => null);
@@ -338,7 +354,8 @@ export function createApiRouter(context) {
         await context.services.partners.syncBannerMessage(guildId).catch(() => null);
       }
 
-      return saveResponse(res, req, { section });
+            return saveResponse(res, req, { section, refresh });
+
     } catch (error) {
       next(error);
     }

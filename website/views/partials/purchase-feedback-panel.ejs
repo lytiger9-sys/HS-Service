@@ -16,7 +16,7 @@
       <div class="form-grid">
         <label class="field">
           <span>구매로그 게시 채널</span>
-          <select name="purchaseFeedbackLogChannelId" required>
+          <select name="purchaseFeedbackLogChannelId">
             <option value="">채널을 선택하세요</option>
             <% channels.text.forEach((channel) => { %>
               <option value="<%= channel.id %>" <%= settings.purchaseFeedback.logChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
@@ -25,7 +25,7 @@
         </label>
         <label class="field">
           <span>구매후기 게시 채널</span>
-          <select name="purchaseFeedbackReviewChannelId" required>
+          <select name="purchaseFeedbackReviewChannelId">
             <option value="">채널을 선택하세요</option>
             <% channels.text.forEach((channel) => { %>
               <option value="<%= channel.id %>" <%= settings.purchaseFeedback.reviewChannelId === channel.id ? 'selected' : '' %>><%= channel.label %></option>
@@ -34,7 +34,7 @@
         </label>
         <label class="field full">
           <span>구매로그 기본 틀</span>
-          <textarea name="purchaseFeedbackLogTemplate" rows="5" maxlength="4000" required><%= settings.purchaseFeedback.logTemplate %></textarea>
+          <textarea name="purchaseFeedbackLogTemplate" rows="5" maxlength="4000"><%= settings.purchaseFeedback.logTemplate %></textarea>
           <div class="welcome-variable-buttons purchase-feedback-variable-buttons" data-purchase-feedback-variable-target="purchaseFeedbackLogTemplate">
             <button type="button" class="ghost variable-button" data-purchase-feedback-variable="--">-- <span>실선 추가</span></button>
             <button type="button" class="ghost variable-button" data-purchase-feedback-variable="{user}">{user} 유저</button>
@@ -44,7 +44,7 @@
         </label>
         <label class="field full">
           <span>구매후기 기본 틀</span>
-          <textarea name="purchaseFeedbackReviewTemplate" rows="6" maxlength="4000" required><%= settings.purchaseFeedback.reviewTemplate %></textarea>
+          <textarea name="purchaseFeedbackReviewTemplate" rows="6" maxlength="4000"><%= settings.purchaseFeedback.reviewTemplate %></textarea>
           <div class="welcome-variable-buttons purchase-feedback-variable-buttons" data-purchase-feedback-variable-target="purchaseFeedbackReviewTemplate">
             <button type="button" class="ghost variable-button" data-purchase-feedback-variable="--">-- <span>실선 추가</span></button>
             <button type="button" class="ghost variable-button" data-purchase-feedback-variable="{user}">{user} 유저</button>

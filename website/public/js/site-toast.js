@@ -127,8 +127,13 @@
       if (requestPath === "/license/issue" || /^\/license\/[^/]+\/revoke$/.test(requestPath)) {
         window.dispatchEvent(new CustomEvent("license:changed", { detail: payload }));
       }
-      showSiteToast(payload.message || "저장되었습니다.", "success");
-      if (payload.redirect) window.setTimeout(() => { window.location.assign(payload.redirect); }, 350);
+            showSiteToast(payload.message || "저장되었습니다.", "success");
+      if (payload.redirect) {
+        window.setTimeout(() => { window.location.assign(payload.redirect); }, 350);
+      } else if (payload.refresh) {
+        window.setTimeout(() => { window.location.reload(); }, 350);
+      }
+
     } catch (error) {
       showSiteToast(error?.message || "요청을 처리하지 못했습니다.", "error");
     } finally {

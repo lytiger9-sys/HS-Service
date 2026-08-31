@@ -47,12 +47,8 @@ function firstValue(value) {
 }
 
 function normalizeText(value, fallback = "") {
-  const resolved = firstValue(value);
-  if (resolved == null || resolved === "") {
-    return fallback;
-  }
-
-  return String(resolved).trim();
+  const text = String(firstValue(value) ?? "").trim();
+  return text || fallback;
 }
 
 function toEntries(value) {
