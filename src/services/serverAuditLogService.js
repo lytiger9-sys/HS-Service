@@ -1,7 +1,17 @@
 import { ContainerBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from "discord.js";
-import { AuditLogEvent } from "discord.js";
+import { AuditLogEvent, ChannelType } from "discord.js";
 import { palette } from "../shared/embeds.js";
 import { formatDurationMinutes } from "../shared/time.js";
+
+const OVERVIEW_CATEGORY_NAME = "개요";
+const OVERVIEW_STAT_PREFIXES = ["전체 인원 수", "봇 수", "인원 수", "인원수"];
+
+export function isOverviewStatsChannel(channel) {
+  if (!channel || channel.type !== ChannelType.GuildVoice) return false;
+  const parent = channel.parent || channel.guild?.channels?.cache?.get(channel.parentId);
+  return parent?.name === OVERVIEW_CATEGORY_NAME
+    && OVERVIEW_STAT_PREFIXES.some((prefix) => String(channel.name || "").startsWith(`${prefix}:`));
+}
 
 export function createServerAuditLogService(context) {
   function componentsLog(title, description, fields = []) {
@@ -90,20 +100,20 @@ export function createServerAuditLogService(context) {
   }
 
   async function handleChannelCreate(channel) {
-    if (!channel.guild) return false;
+    if (!channel.guild || isOverviewStatsChannel(channel)) return false;
     const eventKey = channel.type === 4 ? "categoryChange" : "channelChange";
     const label = channel.type === 4 ? channel.name : `<#${channel.id}>`;
     return send(channel.guild.id, eventKey, channel.type === 4 ? "카테고리 추가" : "채널 추가", `${label}이(가) 추가되었습니다.`);
   }
 
   async function handleChannelDelete(channel) {
-    if (!channel.guildId) return false;
+    if (!channel.guildId || isOverviewStatsChannel(channel)) return false;
     const eventKey = channel.type === 4 ? "categoryChange" : "channelChange";
     return send(channel.guildId, eventKey, channel.type === 4 ? "카테고리 삭제" : "채널 삭제", `${channel.name || channel.id}이(가) 삭제되었습니다.`);
   }
 
   async function handleChannelUpdate(oldChannel, newChannel) {
-    if (!newChannel.guild) return false;
+    if (!newChannel.guild || isOverviewStatsChannel(newChannel) || isOverviewStatsChannel(oldChannel)) return false;
 
     const nameChanged = oldChannel.name !== newChannel.name;
     const parentChanged = oldChannel.parentId !== newChannel.parentId;
