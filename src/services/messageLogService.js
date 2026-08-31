@@ -51,6 +51,18 @@ function summarizeAttachments(message) {
   return shorten(attachments.join(", "));
 }
 
+export function buildDeletedAttachmentFiles(message, maxFiles = 10) {
+  return [...(message?.attachments?.values?.() ?? [])]
+    .filter((attachment) => Boolean(attachment?.url))
+    .slice(0, maxFiles)
+    .map((attachment) => ({
+      attachment: attachment.url,
+      name: attachment.name || undefined,
+      description: attachment.description || undefined,
+      spoiler: Boolean(attachment.spoiler)
+    }));
+}
+
 function hasMeaningfulUpdate(before, after) {
   if (!before || !after) {
     return true;
@@ -133,11 +145,12 @@ export function createMessageLogService(context) {
       return false;
     }
 
+    const files = buildDeletedAttachmentFiles(snapshot);
     await sendServerLog(guildId, "messageChange", {
       embeds: [
         buildBaseEmbed({
           title: "메시지 삭제",
-            description: `${resolveAuthorLabel(snapshot)}의 메시지가 삭제되었습니다.`,
+          description: `${resolveAuthorLabel(snapshot)}의 메시지가 삭제되었습니다.`,
           color: palette.danger,
           fields: [
             { name: "채널", value: resolveChannelLabel(snapshot), inline: true },
@@ -147,7 +160,8 @@ export function createMessageLogService(context) {
           ],
           timestamp: Date.now()
         })
-      ]
+      ],
+      ...(files.length ? { files } : {})
     });
 
     return true;
