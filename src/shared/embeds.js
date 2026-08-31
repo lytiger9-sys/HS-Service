@@ -251,9 +251,9 @@ export function buildServerInfoComponents(guild, stats) {
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(new TextDisplayBuilder().setContent([
       "**서버 규모**",
-      `전체 인원 · ${stats.totalMembers}명`,
-      `사람 · ${stats.humans}명`,
-      `봇 · ${stats.bots}명`,
+      `전체 인원 수 ${stats.totalMembers} 명`,
+      `봇 수 ${stats.bots} 명`,
+      `인원 수 ${stats.humans} 명`,
       `채널 · ${stats.channels}개`,
       `역할 · ${stats.roles}개`,
       `관리자 · ${stats.adminCount}명`

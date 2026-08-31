@@ -2,17 +2,21 @@ import { ChannelType, PermissionFlagsBits } from "discord.js";
 
 const CATEGORY_NAME = "개요";
 const CHANNEL_DEFINITIONS = [
-  { key: "members", prefix: "인원수", unit: "명" },
+  { key: "total", prefix: "전체 인원 수", unit: "명" },
   { key: "bots", prefix: "봇 수", unit: "개" },
-  { key: "total", prefix: "전체 인원 수", unit: "명" }
+  { key: "members", prefix: "인원 수", legacyPrefixes: ["인원수"], unit: "명" }
 ];
 
 function channelName(prefix, value, unit = "명") {
   return `${prefix}: ${value}${unit}`;
 }
 
-function findManagedChannel(category, prefix) {
-  return category.children.cache.find((channel) => channel.type === ChannelType.GuildVoice && channel.name.startsWith(`${prefix}:`));
+function findManagedChannel(category, definition) {
+  const prefixes = [definition.prefix, ...(definition.legacyPrefixes || [])];
+  return category.children.cache.find((channel) => (
+    channel.type === ChannelType.GuildVoice
+    && prefixes.some((prefix) => channel.name.startsWith(`${prefix}:`))
+  ));
 }
 
 export function createOverviewChannelService(context) {
@@ -62,7 +66,7 @@ export function createOverviewChannelService(context) {
 
     const channels = {};
     for (const definition of CHANNEL_DEFINITIONS) {
-      let channel = findManagedChannel(category, definition.prefix);
+      let channel = findManagedChannel(category, definition);
       if (!channel) {
         channel = await guild.channels.create({
           name: channelName(definition.prefix, counts[definition.key], definition.unit),
