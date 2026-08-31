@@ -106,7 +106,7 @@ export function createIndexRouter(context) {
       ["nickname", "닉네임", "역할별 닉네임 접두사·접미사 규칙과 역할 획득 시 적용되는 닉네임 기능을 설정합니다."],
       ["shop", "상점", "캐시 보상, 상품 재고·구매, 도박, 상점 임베드와 생일 보상을 관리합니다."],
             ["events", "이벤트", "이벤트를 게시하고 참가자를 추첨해 당첨 결과와 상품을 안내합니다."],
-      ["purchaseFeedback", "구매로그 및 후기 자동화", "구매 정보를 기록하고 DM으로 후기를 받아 후기 채널에 Components V2 메시지로 자동 게시합니다."]
+      ["purchaseFeedback", "구매로그 및 후기 자동화", "구매 정보를 기록하고 DM으로 후기를 받아 후기 채널에 자동 게시합니다."]
 
     ].map(([id, label, description]) => ({
       id,

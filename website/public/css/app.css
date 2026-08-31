@@ -5495,15 +5495,37 @@ html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-co
   opacity: 1;
 }
 
-/* Match the light embed editor controls with an ivory role-mention combobox. */
+/* Match the light role selector with the adjacent ghost action buttons. */
 html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-input {
-  background-color: #f5f1e8 !important;
-  color: #0d0d0d !important;
-  -webkit-text-fill-color: #0d0d0d !important;
+  min-height: 42px;
+  padding: 9px 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--control-border);
+  border-radius: 9px;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  -webkit-text-fill-color: var(--ink) !important;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
 }
 html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-input::placeholder {
-  color: rgba(13, 13, 13, .68) !important;
+  color: var(--ink) !important;
   opacity: 1;
+}
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-input:focus,
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox.is-open .channel-combobox-input {
+  border-color: var(--warm);
+  background: #e6dccb !important;
+  box-shadow: none;
 }
 html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-list {
   background: #fbf8f1;
