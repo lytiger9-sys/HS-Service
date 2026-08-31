@@ -13,7 +13,7 @@ export function createDefaultGuildSettings() {
       channelId: "",
       errorChannelId: "",
       embedTitle: "",
-      embedDescription: "# {totalmember}번째 멤버가 입장했어요\n--\n유저\n{user} ({username})\n\n서버에 입장한 시간\n{joinedat} ({joinedrelative})\n\n계정 생성일\n{accountcreatedat} ({accountcreatedrelative})\n\n초대자\n{inviter} ({invitername})",
+      embedDescription: "# {totalmember}번째 멤버가 입장했어요\n--\n유저\n{user} {username}\n\n서버에 입장한 시간\n{joinedat} ({joinedrelative})\n\n계정 생성일\n{accountcreatedat} ({accountcreatedrelative})\n\n초대자\n{inviter} {invitername}",
       embedColor: "#101010",
       dmTitle: "환영합니다",
       dmMessage: "{user}님, {guild} 서버에 오신 것을 환영합니다.\n현재 인원: {totalmember}명",

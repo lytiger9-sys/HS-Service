@@ -31,7 +31,7 @@ export const PLAN_DEFINITIONS = [
   {
     id: "pro",
     label: "Pro",
-    description: "보안·이벤트·파트너·상점을 포함한 전체 서버 운영 기능",
+    description: "보안·이벤트·파트너·상점·구매로그/후기를 포함한 전체 서버 운영 기능",
     order: 3,
     allowFeatureToggle: true,
     tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "shop", "events", "purchaseFeedback"],

@@ -124,16 +124,6 @@
                       <button type="button" class="ghost" data-welcome-component-insert="[image] ">[image] <span>사진 링크 입력</span></button>
                       <button type="button" class="ghost" data-welcome-component-insert="[thumbnail] ">[thumbnail] <span>썸네일 링크 입력</span></button>
                     </div>
-                    <div class="component-tool-row component-tool-row-mentions">
-                      <button type="button" class="ghost" data-welcome-component-insert="@everyone">@everyone <span>전체 멘션</span></button>
-                      <button type="button" class="ghost" data-welcome-component-insert="@here">@here <span>온라인 멤버 멘션</span></button>
-                      <select data-welcome-component-role aria-label="멘션할 역할 선택" data-combo-placeholder="역할 이름 검색 또는 선택">
-                        <option value="">역할 멘션 추가</option>
-                        <% roles.filter((role) => role.id !== guild.id).forEach((role) => { %>
-                          <option value="<%= role.name %>">@<%= role.name %></option>
-                        <% }) %>
-                      </select>
-                    </div>
                     <div class="component-tool-row welcome-variable-buttons">
                       <button type="button" class="ghost variable-button" data-variable="{totalmember}">전체 인원</button>
                       <button type="button" class="ghost variable-button" data-variable="{user}">유저 멘션</button>
@@ -146,7 +136,6 @@
                       <button type="button" class="ghost variable-button" data-variable="{invitername}">초대자명</button>
                     </div>
                   </div>
-                  <small class="muted">사진·썸네일 링크는 HTTPS 주소를 사용하세요. 초대자는 봇이 초대 링크를 조회할 권한이 없거나 초대자를 특정할 수 없으면 안내 문구로 표시됩니다.</small>
                 </div>
               </label>
               <label class="field">

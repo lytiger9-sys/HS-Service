@@ -286,7 +286,28 @@ function setupWelcomeComponentTools() {
   });
 }
 
+function setupPurchaseFeedbackVariableButtons() {
+  document.querySelectorAll("[data-purchase-feedback-variable-target]").forEach((tools) => {
+    const targetName = tools.dataset.purchaseFeedbackVariableTarget;
+    const target = targetName ? document.querySelector(`[name="${targetName}"]`) : null;
+    if (!target) return;
+
+    tools.querySelectorAll("[data-purchase-feedback-variable]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const variable = button.dataset.purchaseFeedbackVariable || "";
+        const start = Number.isInteger(target.selectionStart) ? target.selectionStart : target.value.length;
+        const end = Number.isInteger(target.selectionEnd) ? target.selectionEnd : start;
+        target.value = `${target.value.slice(0, start)}${variable}${target.value.slice(end)}`;
+        target.focus();
+        target.setSelectionRange(start + variable.length, start + variable.length);
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+    });
+  });
+}
+
 function setupEmbedPanel() {
+
   const form = document.querySelector("[data-embed-form]");
   if (!form) return;
   const channelSelect = form.querySelector("[data-embed-channel]");
@@ -638,6 +659,7 @@ function setupSearch() {
 }
 
 setupWelcomeComponentTools();
+setupPurchaseFeedbackVariableButtons();
 setupChannelComboboxes();
 setupShopPanel();
 setupTabs();

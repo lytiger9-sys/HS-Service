@@ -35,12 +35,21 @@
         <label class="field full">
           <span>구매로그 기본 틀</span>
           <textarea name="purchaseFeedbackLogTemplate" rows="5" maxlength="4000" required><%= settings.purchaseFeedback.logTemplate %></textarea>
-          <small class="muted">사용 가능 변수: <code>{user}</code>, <code>{product}</code> · 전송 결과는 Components V2 메시지로 표시됩니다.</small>
+          <div class="welcome-variable-buttons purchase-feedback-variable-buttons" data-purchase-feedback-variable-target="purchaseFeedbackLogTemplate">
+            <button type="button" class="ghost variable-button" data-purchase-feedback-variable="{user}">{user} 유저</button>
+            <button type="button" class="ghost variable-button" data-purchase-feedback-variable="{product}">{product} 제품명</button>
+          </div>
+          <small class="muted">전송 결과는 Components V2 메시지로 표시됩니다.</small>
         </label>
         <label class="field full">
           <span>구매후기 기본 틀</span>
           <textarea name="purchaseFeedbackReviewTemplate" rows="6" maxlength="4000" required><%= settings.purchaseFeedback.reviewTemplate %></textarea>
-          <small class="muted">사용 가능 변수: <code>{user}</code>, <code>{product}</code>, <code>{review}</code> · <code>{review}</code>는 후기 내용으로 자동 치환됩니다.</small>
+          <div class="welcome-variable-buttons purchase-feedback-variable-buttons" data-purchase-feedback-variable-target="purchaseFeedbackReviewTemplate">
+            <button type="button" class="ghost variable-button" data-purchase-feedback-variable="{user}">{user} 유저</button>
+            <button type="button" class="ghost variable-button" data-purchase-feedback-variable="{product}">{product} 제품명</button>
+            <button type="button" class="ghost variable-button" data-purchase-feedback-variable="{review}">{review} 후기 내용</button>
+          </div>
+          <small class="muted"><code>{review}</code>는 후기 내용으로 자동 치환됩니다.</small>
         </label>
       </div>
       <div class="form-actions"><button class="primary" type="submit">설정 저장</button></div>

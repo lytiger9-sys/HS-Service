@@ -5482,15 +5482,36 @@ html[data-theme="dark"] .dashboard-page .ticket-publish-form select option {
 
 
 /* Keep role-mention combobox text legible on the dark embed editor. */
-.dashboard-page .component-tool-row-mentions .channel-combobox-input,
-.dashboard-page .component-tool-row-mentions .channel-combobox-option,
-.dashboard-page .component-tool-row-mentions .channel-combobox-option:hover,
-.dashboard-page .component-tool-row-mentions .channel-combobox-option:focus-visible,
-.dashboard-page .component-tool-row-mentions .channel-combobox-option[aria-selected="true"] {
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-input,
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option,
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option:hover,
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option:focus-visible,
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option[aria-selected="true"] {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
-.dashboard-page .component-tool-row-mentions .channel-combobox-input::placeholder {
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-input::placeholder {
   color: rgba(255, 255, 255, .78);
   opacity: 1;
+}
+
+/* Match the light embed editor controls with an ivory role-mention combobox. */
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-input {
+  background-color: #f5f1e8 !important;
+  color: #0d0d0d !important;
+  -webkit-text-fill-color: #0d0d0d !important;
+}
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-input::placeholder {
+  color: rgba(13, 13, 13, .68) !important;
+  opacity: 1;
+}
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-list {
+  background: #fbf8f1;
+}
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-option,
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-option:hover,
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-option:focus-visible,
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-option[aria-selected="true"] {
+  color: #0d0d0d !important;
+  -webkit-text-fill-color: #0d0d0d !important;
 }
