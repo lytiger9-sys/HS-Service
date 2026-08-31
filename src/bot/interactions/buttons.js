@@ -213,7 +213,7 @@ export async function handleButtonInteraction(interaction, context) {
 
   if (scope === "staff" && action === "toggle") {
     if (!isAdministrator(interaction.member)) {
-      return interaction.reply({ content: "관리자만 출퇴근 상태를 변경할 수 있습니다.", ephemeral: true });
+      return interaction.reply({ content: "관리자가 아닙니다.", ephemeral: true });
     }
 
     await interaction.deferReply({ ephemeral: true });
