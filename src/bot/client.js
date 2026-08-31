@@ -79,5 +79,6 @@ export async function createBot(context) {
   });
 
   await client.login(context.config.discordToken);
+
   return client;
 }

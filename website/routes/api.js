@@ -69,7 +69,7 @@ function wantsJson(req) {
 }
 
 function featureForSection(section) {
-  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", nickname: "nickname", shop: "shop", partner: "partner", purchaseFeedback: "purchaseFeedback" };
+  const map = { welcome: "welcome", ticket: "ticket", staff: "administrators", administrators: "administrators", security: "security", embed: "embed", notice: "embed", noticeDm: "noticeDm", polls: "polls", assignment: "assignment", voice: "voice", logs: "logs", nickname: "nickname", shop: "shop", partner: "partner", purchaseFeedback: "purchaseFeedback" };
   return map[section] || null;
 }
 
@@ -266,6 +266,26 @@ export function sectionPayload(section, body) {
         reviewChannelId: readDiscordId(body.purchaseFeedbackReviewChannelId),
         logTemplate: readText(body.purchaseFeedbackLogTemplate, defaults.purchaseFeedback.logTemplate, 4000),
         reviewTemplate: readText(body.purchaseFeedbackReviewTemplate, defaults.purchaseFeedback.reviewTemplate, 4000)
+      }
+    };
+  }
+  if (section === "noticeDm") {
+    return {
+      noticeDm: {
+        enabled: readOptionalBoolean(body.noticeDmEnabled),
+        mode: "components",
+        title: readText(body.noticeDmTitle, defaults.noticeDm.title, 256),
+        description: readText(body.noticeDmComponentsBody, defaults.noticeDm.description, 4000),
+        color: /^#[0-9a-f]{6}$/i.test(body.noticeDmColor || "") ? body.noticeDmColor : defaults.noticeDm.color,
+        footer: readText(body.noticeDmFooter, defaults.noticeDm.footer, 2048),
+        authorName: readText(body.noticeDmAuthorName, defaults.noticeDm.authorName, 256),
+        thumbnailUrl: readText(body.noticeDmThumbnailUrl, defaults.noticeDm.thumbnailUrl, 500),
+        imageUrl: readText(body.noticeDmImageUrl, defaults.noticeDm.imageUrl, 500),
+        componentsBody: readText(body.noticeDmComponentsBody, defaults.noticeDm.componentsBody, 8000),
+        mentionEveryone: readBoolean(body.noticeDmMentionEveryone),
+        mentionHere: readBoolean(body.noticeDmMentionHere),
+        mentionRoleIds: splitLines(body.noticeDmMentionRoleIds, 20, 22).filter((id) => /^\d{15,22}$/.test(id)),
+        updatedAt: new Date().toISOString()
       }
     };
   }

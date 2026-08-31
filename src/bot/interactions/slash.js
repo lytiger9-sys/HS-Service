@@ -9,6 +9,7 @@ export function commandFeature(commandName) {
   if (["닉네임적용", "닉네임랜덤", "닉네임초기화"].includes(name)) return "nickname";
   if (["도박", "캐시", "캐시지급", "생일"].includes(name)) return "shop";
   if (name === "구매로그") return "purchaseFeedback";
+  if (name === "공지dm") return "noticeDm";
   if (["부스트로그켜기", "부스트로그끄기"].includes(name)) return "logs";
   if (name === "파트너메시지") return "partner";
   if (["보안제외", "보안적용"].includes(name)) return "security";

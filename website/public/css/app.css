@@ -2590,6 +2590,45 @@ body.dashboard-page { background: var(--ink-deep); }
   -webkit-text-fill-color: #111315;
 }
 
+/* Notice DM light theme — role mention combobox must not inherit muted or dark-theme text rendering. */
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-input {
+  background: #fffefb !important;
+  color: #1b1813 !important;
+  -webkit-text-fill-color: #1b1813 !important;
+  caret-color: #1b1813;
+  font-family: var(--pretendard), "Noto Sans KR", sans-serif !important;
+  font-weight: 600;
+  letter-spacing: normal !important;
+  word-spacing: normal;
+  text-transform: none;
+}
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-input::placeholder {
+  color: #625a4f !important;
+  -webkit-text-fill-color: #625a4f !important;
+  opacity: 1;
+  letter-spacing: normal !important;
+}
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-list {
+  background: #fffefb !important;
+  border-color: #d6ccba;
+}
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-option,
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-empty {
+  color: #1b1813 !important;
+  -webkit-text-fill-color: #1b1813 !important;
+  font-family: var(--pretendard), "Noto Sans KR", sans-serif !important;
+  font-weight: 600;
+  letter-spacing: normal !important;
+  text-transform: none;
+}
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-option:hover,
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-option:focus-visible,
+html:not([data-theme="dark"]) .dashboard-page .component-tool-row-mentions .channel-combobox-option[aria-selected="true"] {
+  background: #f0e6d4;
+  color: #1b1813 !important;
+  -webkit-text-fill-color: #1b1813 !important;
+}
+
 /* Shop vending-machine management */
 .shop-setting-block { display: grid; gap: 16px; padding: 20px 0; border-top: 1px solid var(--hairline-soft); }
 .shop-setting-block:first-child { padding-top: 0; border-top: 0; }
@@ -5536,4 +5575,44 @@ html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-c
 html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-option[aria-selected="true"] {
   color: #0d0d0d !important;
   -webkit-text-fill-color: #0d0d0d !important;
+}
+
+/* Dark theme — the dropdown surface fills the gaps around role options, not white. */
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-list {
+  background: #2b3134 !important;
+  border-color: #343d41;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .34);
+}
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option,
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option.is-empty {
+  background: #3d474b;
+  border-color: transparent;
+}
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option:hover,
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option:focus-visible,
+html[data-theme="dark"] .dashboard-page .component-tool-row-mentions .channel-combobox-option[aria-selected="true"] {
+  background: #4a575c;
+}
+
+/* Light theme — inherit the same role-selector typography and placement used in dark mode. */
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-input {
+  min-height: 50px;
+  padding: 14px 42px 14px 16px;
+  font-family: inherit !important;
+  font-size: 0.94rem;
+  font-weight: inherit;
+  letter-spacing: 0.005em !important;
+  line-height: 1.45;
+  text-align: left;
+  text-transform: none;
+}
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-option,
+html[data-theme="light"] .dashboard-page .component-tool-row-mentions .channel-combobox-empty {
+  font-family: inherit !important;
+  font-size: 0.88rem;
+  font-weight: inherit;
+  letter-spacing: normal !important;
+  line-height: 1.35;
+  text-align: left;
+  text-transform: none;
 }

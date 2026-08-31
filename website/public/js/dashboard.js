@@ -479,6 +479,31 @@ function setupEmbedPanel(root = document) {
   });
 }
 
+function setupNoticeDmEmbedPanel(root = document) {
+  const form = root.querySelector("[data-notice-dm-form]");
+  if (!form || form.dataset.noticeDmReady === "true") return;
+  form.dataset.noticeDmReady = "true";
+
+  const componentInput = form.querySelector('[name="noticeDmComponentsBody"]');
+  const roleSelect = form.querySelector("[data-notice-dm-component-role]");
+  const insertComponentSyntax = (syntax) => {
+    if (!componentInput) return;
+    const current = componentInput.value.trimEnd();
+    componentInput.value = `${current ? `${current}\n` : ""}${syntax}`;
+    componentInput.focus();
+    componentInput.setSelectionRange(componentInput.value.length, componentInput.value.length);
+    componentInput.dispatchEvent(new Event("input", { bubbles: true }));
+  };
+
+  form.querySelectorAll("[data-notice-dm-component-insert]").forEach((button) => {
+    button.addEventListener("click", () => insertComponentSyntax(button.dataset.noticeDmComponentInsert || ""));
+  });
+  roleSelect?.addEventListener("change", () => {
+    if (roleSelect.value) insertComponentSyntax(`@${roleSelect.value}`);
+    roleSelect.value = "";
+  });
+}
+
 function setupChannelComboboxes(root = document) {
   const selectors = 'select';
   const selects = [...root.querySelectorAll(selectors)].filter((select) => !select.dataset.comboReady);
@@ -668,6 +693,7 @@ window.initializeDashboardPanel = (root) => {
   setupChannelComboboxes(root);
   setupShopPanel(root);
   setupEmbedPanel(root);
+  setupNoticeDmEmbedPanel(root);
 };
 window.initializeDashboardPanel(document);
 setupTabs();

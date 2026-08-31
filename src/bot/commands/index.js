@@ -28,6 +28,7 @@ import roleAllNow from "./roleAllNow.js";
 import webhookCreate from "./webhookCreate.js";
 import stickerAdd from "./sticker.js";
 import purchaseLog from "./purchaseLog.js";
+import notifydm from "./notifydm.js";
 
 export const commandList = [
   serverinfo,
@@ -59,6 +60,7 @@ export const commandList = [
   roleAllNow,
   webhookCreate,
   purchaseLog,
+  notifydm,
   soundboardSteal,
   soundboardList,
   soundboardDelete,

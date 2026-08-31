@@ -34,7 +34,7 @@ export const PLAN_DEFINITIONS = [
     description: "보안·이벤트·파트너·상점·구매로그/후기를 포함한 전체 서버 운영 기능",
     order: 3,
     allowFeatureToggle: true,
-    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "shop", "events", "purchaseFeedback"],
+    tabs: ["overview", "administrators", "welcome", "ticket", "security", "assignment", "voice", "honeypot", "embed", "polls", "logs", "partner", "nickname", "shop", "events", "purchaseFeedback", "noticeDm"],
     includesFutureFeatures: true
   }
 ];
@@ -57,7 +57,8 @@ export const PLAN_TAB_LABELS = {
   embed: "임베드",
   events: "이벤트",
   shop: "상점",
-  purchaseFeedback: "구매로그/후기"
+  purchaseFeedback: "구매로그/후기",
+  noticeDm: "공지 DM"
 };
 
 export function normalizeFeatureId(feature) {

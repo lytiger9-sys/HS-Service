@@ -72,7 +72,8 @@ function buildSections() {
     { id: "events", label: "이벤트", description: "이벤트 추첨 및 상품" },
     { id: "nickname", label: "닉네임", description: "역할별 이름 규칙" },
     { id: "shop", label: "상점", description: "캐시 및 상품" },
-    { id: "purchaseFeedback", label: "구매로그/후기", description: "구매 안내 및 후기" }
+    { id: "purchaseFeedback", label: "구매로그/후기", description: "구매 안내 및 후기" },
+    { id: "noticeDm", label: "공지 DM", description: "발송 임베드 설정" }
   ];
 }
 
@@ -160,6 +161,23 @@ export async function buildDashboardViewModel(context, guild, planId = "pro", li
       logTemplate: "# 구매 로그\n--\n유저\n{user}\n제품명\n{product}",
       reviewTemplate: "# 구매 후기\n--\n유저\n{user}\n제품명\n{product}\n후기\n{review}",
       ...(settings.purchaseFeedback || {})
+    },
+    noticeDm: {
+      enabled: true,
+      mode: "components",
+      title: "공지 사항",
+      description: "공지 내용을 입력해 주세요.",
+      color: "#1a1d23",
+      footer: "",
+      authorName: "",
+      thumbnailUrl: "",
+      imageUrl: "",
+      componentsBody: "",
+      mentionEveryone: false,
+      mentionHere: false,
+      mentionRoleIds: [],
+      updatedAt: null,
+      ...(settings.noticeDm || {})
     },
     embed: {
       enabled: true,

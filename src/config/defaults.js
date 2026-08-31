@@ -55,6 +55,22 @@ export function createDefaultGuildSettings() {
       content: "공지사항이 아직 설정되지 않았습니다.",
       updatedAt: null
     },
+    noticeDm: {
+      enabled: true,
+      mode: "components",
+      title: "공지 사항",
+      description: "공지 내용을 입력해 주세요.",
+      color: "#1a1d23",
+      footer: "",
+      authorName: "",
+      thumbnailUrl: "",
+      imageUrl: "",
+      componentsBody: "",
+      mentionEveryone: false,
+      mentionHere: false,
+      mentionRoleIds: [],
+      updatedAt: null
+    },
     honeypot: {
       enabled: true,
       channelId: "",

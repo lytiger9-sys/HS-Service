@@ -88,7 +88,7 @@ export function createIndexRouter(context) {
       booston: "manageGuild", boostoff: "manageGuild", 복제: "manageChannels", 카테고리삭제: "manageChannels",
       이모지스틸: "manageExpressions", 이모지삭제: "manageExpressions", 사운드스틸: "manageExpressions",
       사운드삭제: "manageExpressions", 캐시지급: "administrator", partnermsg: "administrator", 계좌설정: "administrator",
-      securout: "administrator", securin: "administrator"
+      securout: "administrator", securin: "administrator", 공지dm: "administrator"
     };
     const dashboardFeatureDetails = [
       ["overview", "개요", "서버 현황과 전체 인원·봇·관리자·활성 투표·임시 음성채널 상태를 한눈에 확인합니다."],
@@ -105,8 +105,9 @@ export function createIndexRouter(context) {
 
       ["nickname", "닉네임", "역할별 닉네임 접두사·접미사 규칙과 역할 획득 시 적용되는 닉네임 기능을 설정합니다."],
       ["shop", "상점", "캐시 보상, 상품 재고·구매, 도박, 상점 임베드와 생일 보상을 관리합니다."],
-            ["events", "이벤트", "이벤트를 게시하고 참가자를 추첨해 당첨 결과와 상품을 안내합니다."],
-      ["purchaseFeedback", "구매로그 및 후기 자동화", "구매 정보를 기록하고 DM으로 후기를 받아 후기 채널에 자동 게시합니다."]
+      ["events", "이벤트", "이벤트를 게시하고 참가자를 추첨해 당첨 결과와 상품을 안내합니다."],
+      ["purchaseFeedback", "구매로그 및 후기 자동화", "구매 정보를 기록하고 DM으로 후기를 받아 후기 채널에 자동 게시합니다."],
+      ["noticeDm", "공지 DM", "공지 DM 명령어에서 토큰을 입력하고 공지 내용을 작성하면, 해당 봇이 참여한 서버의 구성원에게 공지 DM을 순차 전송하고 완료 결과를 요청자에게 안내합니다."]
 
     ].map(([id, label, description]) => ({
       id,
@@ -114,15 +115,19 @@ export function createIndexRouter(context) {
       description,
       plans: PLAN_DEFINITIONS.filter((plan) => plan.tabs.includes(id)).map((plan) => plan.label)
     }));
+    const includesGuideFeature = (plan, featureId) => plan.tabs.includes(featureId) || (plan.id === "pro" && featureId === "noticeDm");
     const commands = [...commandMap.entries()].map(([name, command]) => {
-      const feature = commandFeature(name);
+      const feature = name === "공지dm" ? "noticeDm" : commandFeature(name);
+      const planIds = PLAN_DEFINITIONS
+        .filter((plan) => !feature || includesGuideFeature(plan, feature))
+        .map((plan) => plan.id);
       return {
         name,
         description: command.data.toJSON().description || "서버 기능을 실행합니다.",
-        feature: feature ? (PLAN_TAB_LABELS[feature] || feature) : "공통",
+        feature: feature ? (feature === "noticeDm" ? "공지 DM" : (PLAN_TAB_LABELS[feature] || feature)) : "공통",
         permission: permissionLabels[permissions[name] || "public"],
-        planIds: PLAN_DEFINITIONS.filter((plan) => !feature || plan.tabs.includes(feature)).map((plan) => plan.id),
-        plans: PLAN_DEFINITIONS.filter((plan) => !feature || plan.tabs.includes(feature)).map((plan) => plan.label)
+        planIds,
+        plans: PLAN_DEFINITIONS.filter((plan) => planIds.includes(plan.id)).map((plan) => plan.label)
       };
     });
     const planMeta = {
@@ -168,7 +173,7 @@ export function createIndexRouter(context) {
     };
     const planCards = PLAN_DEFINITIONS.map((plan, index) => {
       const previousTabs = new Set(PLAN_DEFINITIONS[index - 1]?.tabs || []);
-      const addedFeatures = dashboardFeatureDetails.filter((feature) => plan.tabs.includes(feature.id) && !previousTabs.has(feature.id));
+      const addedFeatures = dashboardFeatureDetails.filter((feature) => includesGuideFeature(plan, feature.id) && !previousTabs.has(feature.id));
       const addedFeatureLabels = new Set(addedFeatures.map((feature) => feature.label));
       const addedCommands = commands.filter((command) => addedFeatureLabels.has(command.feature)).map((command) => `/${command.name}`);
       return {
@@ -180,7 +185,7 @@ export function createIndexRouter(context) {
         guideDescription: planMeta[plan.id]?.guideDescription || plan.description,
         tabLabels: plan.tabs.map((tab) => PLAN_TAB_LABELS[tab] || tab),
         cardFeatures: cardFeatureLabels[plan.id] || [],
-        availableFeatures: dashboardFeatureDetails.filter((feature) => plan.tabs.includes(feature.id)),
+        availableFeatures: dashboardFeatureDetails.filter((feature) => includesGuideFeature(plan, feature.id)),
         addedFeatures,
         addedCommands,
         searchText: [plan.label, plan.description, ...plan.tabs, ...addedFeatures.map((feature) => `${feature.label} ${feature.description}`), ...addedCommands].join(" ").toLowerCase()

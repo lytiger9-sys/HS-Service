@@ -17,7 +17,8 @@ export const FEATURE_LABELS = {
   assignment: "역할",
   voice: "음성",
   honeypot: "허니팟",
-  logs: "로그"
+  logs: "로그",
+  noticeDm: "공지 DM"
 };
 
 export function planHasFeature(planId, feature) {

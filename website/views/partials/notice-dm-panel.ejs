@@ -1,0 +1,64 @@
+<%# Design: Editorial Ledger — 기존 Components V2 임베드 작성기와 같은 카드 구조·도구·입력 계층을 사용하는 Pro 전용 공지 DM 패널입니다. %>
+<section class="panel-stack <%= panelClass('noticeDm') %>" data-panel="noticeDm">
+  <article class="card section-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Notice DM</p>
+        <h3>공지 DM 임베드</h3>
+      </div>
+      <label class="field toggle section-toggle">
+        <input type="checkbox" form="notice-dm-settings-form" name="noticeDmEnabled" <%= settings.noticeDm.enabled !== false ? 'checked' : '' %> />
+        <span>공지 DM 기능 활성화</span>
+      </label>
+    </div>
+
+    <form class="settings-form" id="notice-dm-settings-form" method="post" action="/guild/<%= guild.id %>/settings/noticeDm" data-notice-dm-form>
+      <div class="form-grid">
+        <div class="field full">
+          <span>전송 형식</span>
+          <strong>Components V2</strong>
+        </div>
+        <label class="field">
+          <span>제목</span>
+          <input type="text" name="noticeDmTitle" value="<%= settings.noticeDm.title %>" maxlength="256" placeholder="공지 사항" />
+        </label>
+        <label class="field">
+          <span>색상</span>
+          <input type="color" name="noticeDmColor" value="<%= settings.noticeDm.color %>" />
+        </label>
+        <div class="field full">
+          <span>메시지 내용</span>
+          <textarea name="noticeDmComponentsBody" rows="9" maxlength="8000"><%= settings.noticeDm.componentsBody || settings.noticeDm.description %></textarea>
+          <div class="component-tools" data-notice-dm-component-tools>
+            <p class="component-tools-title">사용 가능한 기능</p>
+            <div class="component-tool-list">
+              <div class="component-tool-row component-tool-row-main">
+                <button type="button" class="ghost" data-notice-dm-component-insert="--">-- <span>실선 추가</span></button>
+                <button type="button" class="ghost" data-notice-dm-component-insert="[image] ">[image] <span>사진 링크 입력</span></button>
+                <button type="button" class="ghost" data-notice-dm-component-insert="[thumbnail] ">[thumbnail] <span>썸네일 링크 입력</span></button>
+              </div>
+              <div class="component-tool-row component-tool-row-mentions">
+                <button type="button" class="ghost" data-notice-dm-component-insert="@everyone">@everyone <span>전체 멘션</span></button>
+                <button type="button" class="ghost" data-notice-dm-component-insert="@here">@here <span>온라인 멤버 멘션</span></button>
+                <select data-notice-dm-component-role aria-label="멘션할 역할 선택" data-combo-placeholder="역할 이름 검색 또는 선택">
+                  <option value="">역할 멘션 추가</option>
+                  <% roles.filter((role) => role.id !== guild.id).forEach((role) => { %>
+                    <option value="<%= role.name %>">@<%= role.name %></option>
+                  <% }) %>
+                </select>
+              </div>
+            </div>
+          </div>
+          <small class="muted">입력한 순서대로 표시됩니다. 빈 줄은 줄바꿈, `--`는 실선, `[image] https://이미지주소`는 큰 이미지, `[thumbnail] https://이미지주소`는 썸네일입니다.</small>
+        </div>
+        <label class="field full">
+          <span>푸터</span>
+          <input type="text" name="noticeDmFooter" value="<%= settings.noticeDm.footer %>" maxlength="2048" placeholder="메시지 하단에 표시할 푸터" />
+        </label>
+      </div>
+      <div class="form-actions">
+        <button class="primary" type="submit">공지 DM 임베드 저장</button>
+      </div>
+    </form>
+  </article>
+</section>

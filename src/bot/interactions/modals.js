@@ -3,6 +3,7 @@ import { buildEmojiListPayload } from "../commands/emoji.js";
 import { PermissionFlagsBits } from "discord.js";
 
 export async function handleModalInteraction(interaction, context) {
+
   if (interaction.customId.startsWith("page:emoji-modal:")) {
     const [, , ownerId, totalPages] = interaction.customId.split(":");
     if (String(ownerId) !== String(interaction.user.id)) {

@@ -299,6 +299,9 @@
 
 
             <%- include('partials/embed-panel', { guild, channels, roles, settings, panelClass }) %>
+      <% if (sections.some((section) => section.id === 'noticeDm')) { %>
+        <%- include('partials/notice-dm-panel', { guild, roles, settings, panelClass }) %>
+      <% } %>
 
       <section class="panel-stack <%= panelClass('polls') %>" data-panel="polls">
         <article class="card section-panel">
