@@ -79,10 +79,16 @@ async function requireFeature(context, guildId, feature) {
   return { ...access, allowed: access.featureAllowed, message: featureDeniedMessage(feature) };
 }
 
-function saveResponse(res, req, { section, message = "저장되었습니다.", refresh = false }) {
+function saveResponse(res, req, { section, message = "저장되었습니다." }) {
   const nextSection = section === "staff" ? "administrators" : section;
   if (wantsJson(req)) {
-    return res.json({ ok: true, section: nextSection, message, refresh });
+    return res.json({
+      ok: true,
+      section: nextSection,
+      message,
+      partialUrl: `/?section=${encodeURIComponent(nextSection)}`,
+      partialTargets: [nextSection]
+    });
   }
 
   return res.redirect(nextSection === "administrators" ? "/?section=administrators" : `/?section=${nextSection}`);
@@ -340,7 +346,6 @@ export function createApiRouter(context) {
       }
 
       await context.services.settings.updateSettings(guildId, payload);
-      const refresh = Object.values(req.body || {}).some((value) => isBlank(value));
 
       if (section === "staff") {
         await context.services.staff.syncStaffBoard(guildId).catch(() => null);
@@ -354,7 +359,7 @@ export function createApiRouter(context) {
         await context.services.partners.syncBannerMessage(guildId).catch(() => null);
       }
 
-            return saveResponse(res, req, { section, refresh });
+      return saveResponse(res, req, { section });
 
     } catch (error) {
       next(error);

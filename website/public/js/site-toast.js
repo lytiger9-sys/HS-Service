@@ -28,7 +28,7 @@
     if (method !== "post") return false;
     if (form.dataset.toastForm === "true") return true;
     if (!/^https?:\/\//i.test(action) && !action.startsWith("/")) return false;
-    if (!action.includes("/guild/") && !action.includes("/license/")) return false;
+    if (!action.includes("/guild/") && !action.includes("/license/") && !(action.includes("/api/") && action.includes("/settings/"))) return false;
     return !/\/license\/(login|logout|switch)(?:[/?#]|$)/.test(action);
   }
 
@@ -39,12 +39,14 @@
     const parsed = new DOMParser().parseFromString(html, "text/html");
     const names = Array.isArray(targets) && targets.length ? targets : ["partner"];
     names.forEach((name) => {
-      const selector = name === "partner" ? '[data-panel="partner"]' : `[data-partial-target="${name}"]`;
+      const selector = `[data-panel="${name}"], [data-partial-target="${name}"]`;
       const incoming = parsed.querySelector(selector);
       const current = document.querySelector(selector);
       if (!incoming || !current) throw new Error("목록 화면을 갱신하지 못했습니다.");
-      incoming.className = current.className;
+            incoming.className = current.className;
       current.replaceWith(incoming);
+      window.initializeDashboardPanel?.(incoming);
+
     });
   }
 
@@ -130,8 +132,6 @@
             showSiteToast(payload.message || "저장되었습니다.", "success");
       if (payload.redirect) {
         window.setTimeout(() => { window.location.assign(payload.redirect); }, 350);
-      } else if (payload.refresh) {
-        window.setTimeout(() => { window.location.reload(); }, 350);
       }
 
     } catch (error) {

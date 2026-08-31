@@ -131,10 +131,14 @@ window.normalizeDurationInputs = (form) => {
   form?.querySelectorAll?.("[data-duration-input]").forEach((input) => normalizeDurationField(input));
 };
 
-document.querySelectorAll("[data-duration-input]").forEach((input) => {
-  input.addEventListener("change", () => normalizeDurationField(input));
-  input.addEventListener("blur", () => normalizeDurationField(input));
-});
+function setupDurationInputs(root = document) {
+  root.querySelectorAll("[data-duration-input]").forEach((input) => {
+    if (input.dataset.durationReady === "true") return;
+    input.dataset.durationReady = "true";
+    input.addEventListener("change", () => normalizeDurationField(input));
+    input.addEventListener("blur", () => normalizeDurationField(input));
+  });
+}
 
 function showToast(message) {
   if (!toast) {
@@ -260,10 +264,10 @@ function setupForms() {
   });
 }
 
-function setupWelcomeComponentTools() {
-  document.querySelectorAll("[data-welcome-component-tools]").forEach((tools) => {
+function setupWelcomeComponentTools(root = document) {
+  root.querySelectorAll("[data-welcome-component-tools]").forEach((tools) => {
     const targetName = tools.dataset.welcomeComponentTarget;
-    const target = targetName ? document.querySelector(`[name="${targetName}"]`) : null;
+    const target = targetName ? root.querySelector(`[name="${targetName}"]`) : null;
     if (!target) return;
     const insert = (syntax) => {
       const current = target.value.trimEnd();
@@ -286,10 +290,10 @@ function setupWelcomeComponentTools() {
   });
 }
 
-function setupPurchaseFeedbackVariableButtons() {
-  document.querySelectorAll("[data-purchase-feedback-variable-target]").forEach((tools) => {
+function setupPurchaseFeedbackVariableButtons(root = document) {
+  root.querySelectorAll("[data-purchase-feedback-variable-target]").forEach((tools) => {
     const targetName = tools.dataset.purchaseFeedbackVariableTarget;
-    const target = targetName ? document.querySelector(`[name="${targetName}"]`) : null;
+    const target = targetName ? root.querySelector(`[name="${targetName}"]`) : null;
     if (!target) return;
 
     tools.querySelectorAll("[data-purchase-feedback-variable]").forEach((button) => {
@@ -306,9 +310,8 @@ function setupPurchaseFeedbackVariableButtons() {
   });
 }
 
-function setupEmbedPanel() {
-
-  const form = document.querySelector("[data-embed-form]");
+function setupEmbedPanel(root = document) {
+  const form = root.querySelector("[data-embed-form]");
   if (!form) return;
   const channelSelect = form.querySelector("[data-embed-channel]");
   const channelSearch = form.querySelector('[data-channel-search="embed-channel-select"]');
@@ -476,9 +479,9 @@ function setupEmbedPanel() {
   });
 }
 
-function setupChannelComboboxes() {
+function setupChannelComboboxes(root = document) {
   const selectors = 'select';
-  const selects = [...document.querySelectorAll(selectors)].filter((select) => !select.dataset.comboReady);
+  const selects = [...root.querySelectorAll(selectors)].filter((select) => !select.dataset.comboReady);
   const closeAll = (except) => {
     document.querySelectorAll(".channel-combobox.is-open").forEach((combo) => {
       if (combo !== except) combo.classList.remove("is-open");
@@ -583,10 +586,10 @@ function setupChannelComboboxes() {
   }
 }
 window.setupChannelComboboxes = setupChannelComboboxes;
-function setupShopPanel() {
-  const list = document.querySelector("[data-shop-product-list]");
-  const add = document.querySelector("[data-shop-add-product]");
-  const settingsForm = document.querySelector("#shop-settings-form");
+function setupShopPanel(root = document) {
+  const list = root.querySelector("[data-shop-product-list]");
+  const add = root.querySelector("[data-shop-add-product]");
+  const settingsForm = root.querySelector("#shop-settings-form");
   const channelSelect = settingsForm?.querySelector('[name="shopMessageChannelId"]');
   const publishButton = settingsForm?.querySelector('button[formaction*="/shop/publish"]');
   const shopBodyInput = settingsForm?.querySelector('[name="shopEmbedBody"]');
@@ -658,12 +661,16 @@ function setupSearch() {
   });
 }
 
-setupWelcomeComponentTools();
-setupPurchaseFeedbackVariableButtons();
-setupChannelComboboxes();
-setupShopPanel();
+window.initializeDashboardPanel = (root) => {
+  setupDurationInputs(root);
+  setupWelcomeComponentTools(root);
+  setupPurchaseFeedbackVariableButtons(root);
+  setupChannelComboboxes(root);
+  setupShopPanel(root);
+  setupEmbedPanel(root);
+};
+window.initializeDashboardPanel(document);
 setupTabs();
 setupSearch();
-setupEmbedPanel();
 injectFeatureToggles();
 setupForms();
