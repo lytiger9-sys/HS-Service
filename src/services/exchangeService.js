@@ -12,6 +12,18 @@ const CRYPTO_IDS = {
   LINK: "chainlink"
 };
 
+export function normalizeUsdRates(fiatRates = {}) {
+  const normalized = { USD: 1, USDT: 1 };
+  for (const [currency, unitsPerUsd] of Object.entries(fiatRates)) {
+    const value = Number(unitsPerUsd);
+    if (Number.isFinite(value) && value > 0) {
+      // ER-API는 '1 USD = N 통화' 형식이므로, 변환식에는 역수인 '통화 1 = N USD'를 쓴다.
+      normalized[currency] = 1 / value;
+    }
+  }
+  return normalized;
+}
+
 export function createExchangeService() {
   async function getRates() {
     const [fiatResponse, cryptoResponse] = await Promise.all([
@@ -22,7 +34,7 @@ export function createExchangeService() {
     const fiatData = await fiatResponse.json();
     if (fiatData.result !== "success" || !fiatData.rates) throw new Error("법정통화 환율 응답이 올바르지 않습니다.");
 
-    const rates = { USD: 1, USDT: 1, ...fiatData.rates };
+    const rates = normalizeUsdRates(fiatData.rates);
     if (cryptoResponse.ok) {
       const cryptoData = await cryptoResponse.json();
       for (const [symbol, id] of Object.entries(CRYPTO_IDS)) {
