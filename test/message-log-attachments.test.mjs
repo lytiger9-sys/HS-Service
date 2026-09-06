@@ -33,3 +33,46 @@ test("첨부파일이 없거나 Discord 한도를 넘는 경우 안전하게 처
   );
   assert.equal(buildDeletedAttachmentFiles({ attachments }).length, 10);
 });
+
+import { createMessageLogService } from "../src/services/messageLogService.js";
+import { convertLegacyPayload } from "../src/shared/embeds.js";
+
+test("삭제 로그는 사진과 일반 파일을 안내 임베드가 있는 같은 메시지에 함께 전송한다", async () => {
+  let captured = null;
+  const service = createMessageLogService({
+    services: {
+      logs: {
+        async sendLogByKey(guildId, eventKey, payload) {
+          captured = { guildId, eventKey, payload };
+          return payload;
+        }
+      }
+    }
+  });
+  const message = {
+    guildId: "guild-1",
+    channel: { id: "channel-1" },
+    author: {
+      id: "user-1",
+      tag: "user#0001",
+      bot: false,
+      toString: () => "<@user-1>"
+    },
+    content: "삭제할 첨부파일 메시지",
+    attachments: new Map([
+      ["image", { url: "https://cdn.discordapp.com/attachments/1/photo.png", name: "photo.png" }],
+      ["document", { url: "https://cdn.discordapp.com/attachments/2/manual.pdf", name: "manual.pdf" }]
+    ])
+  };
+
+  await service.handleMessageDelete(message);
+
+  assert.equal(captured.guildId, "guild-1");
+  assert.equal(captured.eventKey, "messageChange");
+  assert.equal(captured.payload.embeds.length, 1);
+  assert.deepEqual(captured.payload.files.map((file) => file.name), ["photo.png", "manual.pdf"]);
+
+  const componentsPayload = convertLegacyPayload(captured.payload);
+  assert.equal(componentsPayload.files.length, 2);
+  assert.deepEqual(componentsPayload.files.map((file) => file.name), ["photo.png", "manual.pdf"]);
+});
