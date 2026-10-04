@@ -20,6 +20,9 @@ function findManagedChannel(category, definition) {
 }
 
 export function createOverviewChannelService(context) {
+  const syncStates = new Map();
+  const SYNC_DEBOUNCE_MS = 300;
+
   async function getOrCreateCategory(guild) {
     let category = guild.channels.cache.find(
       (channel) => channel.type === ChannelType.GuildCategory && channel.name === CATEGORY_NAME
@@ -52,7 +55,7 @@ export function createOverviewChannelService(context) {
     };
   }
 
-  async function syncGuild(guild) {
+  async function syncGuildNow(guild) {
     if (!guild) return null;
     const category = await getOrCreateCategory(guild);
     const counts = await getCounts(guild);
@@ -89,6 +92,33 @@ export function createOverviewChannelService(context) {
     }
 
     return { categoryId: category.id, channels, counts };
+  }
+
+  function syncGuild(guild) {
+    if (!guild) return Promise.resolve(null);
+    let state = syncStates.get(guild.id);
+    if (!state) {
+      state = { timer: null, waiters: [], running: false };
+      syncStates.set(guild.id, state);
+    }
+    return new Promise((resolve, reject) => {
+      state.waiters.push({ resolve, reject });
+      if (state.timer) clearTimeout(state.timer);
+      state.timer = setTimeout(async () => {
+        state.timer = null;
+        state.running = true;
+        const waiters = state.waiters.splice(0);
+        try {
+          const result = await syncGuildNow(guild);
+          waiters.forEach(({ resolve: finish }) => finish(result));
+        } catch (error) {
+          waiters.forEach(({ reject: fail }) => fail(error));
+        } finally {
+          state.running = false;
+          if (!state.timer && !state.waiters.length) syncStates.delete(guild.id);
+        }
+      }, SYNC_DEBOUNCE_MS);
+    });
   }
 
   async function syncGuildById(guildId) {
